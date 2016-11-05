@@ -1,0 +1,14 @@
+{
+  "name": "skin-analytics",
+  "version": "1.0.0",
+  "description": "Advanced analytics module to track activities of chatbots",
+  "main": "index.js",
+  "botskin": {
+    "menuText": "skin-analytics"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dany Fortin-Simard and Sylvain Perron",
+  "license": "AGPL-3.0"
+}
