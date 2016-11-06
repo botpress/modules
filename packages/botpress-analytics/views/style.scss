@@ -1,3 +1,17 @@
-.hello {
-  color: red;
+.container {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 10px;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+}
+
+.graphContainer {
+  height: 350px;
+}
+
+.graphContainerTwoColumn {
+  height: 250px;
 }

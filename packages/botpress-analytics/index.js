@@ -2,7 +2,6 @@ const Analytics = require('./analytics')
 const fs = require('fs')
 const path = require('path')
 
-
 const loadDataFromFile = (file) => {
   if(!fs.existsSync(file)){
     console.log("Analytics file (" + file + ") doesn\'t exist.")
@@ -18,12 +17,15 @@ module.exports = {
   ingoing: function(event, next) {
 
   },
+
   outgoing: function(event, next) {
 
   },
+
   init: function(skin) {
 
   },
+
   ready: function(skin) {
     const rawDatafile = path.join(skin.projectLocation, skin.botfile.dataDir, 'skin-analytics.raw.json')
     const chartsDatafile = path.join(skin.projectLocation, skin.botfile.dataDir, 'skin-analytics.charts.json')
@@ -35,7 +37,7 @@ module.exports = {
 
     skin.getRouter("skin-analytics")
     .get("/graphs", (req, res, next) => {
-      res.send(analytics.getGraphsData())
+      res.send(analytics.getChartsGraphData())
     })
 
   }
