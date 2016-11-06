@@ -30,11 +30,9 @@ export default class AnalyticsModule extends React.Component {
   }
 
   renderSimpleLineChart(){
-    console.log(Recharts)
+    const data = this.state.simpleLineChart
 
     const {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend} = Recharts
-
-    const data = this.state.simpleLineChart
 
     const SimpleLineChart = React.createClass({
     	render () {
