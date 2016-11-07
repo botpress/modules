@@ -5,7 +5,6 @@ import {
   Grid,
   Panel,
   Row,
-  ControlLabel,
   Table
  } from 'react-bootstrap'
 import axios from 'axios'
@@ -28,9 +27,38 @@ import {
 import style from './style.scss'
 import _ from 'lodash'
 
+
 const toPercent = (decimal, fixed = 0) => {
 	return `${(decimal * 100).toFixed(fixed)}%`;
 };
+
+const color = {
+  facebook: '#8884d8',
+  slack: '#de5454',
+  kik: '#ffc658',
+  male: '#8884d8',
+  female: '#de5454',
+  conversation: '#de5454',
+  retention: '0, 177, 92', //rgb, convert in rgba in code
+  busyHours: '255, 162, 22' //rgb, convert in rgba in code
+}
+
+const renderLine = (data) => {
+  return _.mapValues(data, (value, key) => {
+    if(key !== 'name'){
+      return <Line key={key} type="monotone" dataKey={key} stroke={color[key]} activeDot={{r: 8}}/>
+    }
+  })
+}
+
+const renderArea = (data) => {
+  return _.mapValues(data, (value, key) => {
+    if(key !== 'name'){
+      return <Area key={key} type='monotone' dataKey={key} stackId="1" stroke={color[key]} fill={color[key]} />
+    }
+  })
+}
+
 
 export default class AnalyticsModule extends React.Component {
 
@@ -69,19 +97,14 @@ export default class AnalyticsModule extends React.Component {
              <CartesianGrid strokeDasharray="3 3"/>
              <Tooltip/>
              <Legend />
-             <Line type="monotone" dataKey="facebook" stroke="#8884d8" activeDot={{r: 8}}/>
-             <Line type="monotone" dataKey="slack" stroke="#de5454" />
-             <Line type="monotone" dataKey="kik" stroke="#ffc658" />
-
+             {_.values(renderLine(data[0]))}
             </LineChart>
           </ResponsiveContainer>
         );
       }
     })
-
     return <SimpleLineChart />
   }
-
 
   renderStackedLineChartForTotalUsers() {
     const data = this.state.totalUsersChartData;
@@ -97,9 +120,7 @@ export default class AnalyticsModule extends React.Component {
               <CartesianGrid strokeDasharray="3 3"/>
               <Tooltip/>
               <Legend />
-              <Area type='monotone' dataKey='facebook' stackId="1" stroke='#8884d8' fill='#8884d8' />
-              <Area type='monotone' dataKey='slack' stackId="1" stroke='#de5454' fill='#de5454' />
-              <Area type='monotone' dataKey='kik' stackId="1" stroke='#ffc658' fill='#ffc658' />
+              {_.values(renderArea(data[0]))}
             </AreaChart>
           </ResponsiveContainer>
         );
@@ -107,8 +128,6 @@ export default class AnalyticsModule extends React.Component {
     })
     return <StackedAreaChart />
   }
-
-
 
   renderGenderPercentAreaChart() {
     const data = this.state.genderUsageChartData
@@ -124,14 +143,12 @@ export default class AnalyticsModule extends React.Component {
               <CartesianGrid strokeDasharray="3 3"/>
               <Tooltip />
               <Legend />
-              <Area type='monotone' dataKey='male' stackId="1" stroke='#8884d8' fill='#8884d8' />
-              <Area type='monotone' dataKey='female' stackId="1" stroke='#de5454' fill='#de5454' />
+              {_.values(renderArea(data[0]))}
             </AreaChart>
           </ResponsiveContainer>
         );
       }
     })
-
     return <StackedAreaChart />
   }
 
@@ -148,13 +165,12 @@ export default class AnalyticsModule extends React.Component {
               <YAxis tickFormatter={toPercent}/>
               <CartesianGrid strokeDasharray="3 3"/>
               <Tooltip />
-              <Bar dataKey="percentage" fill="#8884d8" />
+              <Bar dataKey="count" fill={color['conversation']} />
             </BarChart>
           </ResponsiveContainer>
         )
       }
     })
-
     return <SimpleBarChart />
   }
 
@@ -173,28 +189,37 @@ export default class AnalyticsModule extends React.Component {
     )
   }
 
+  renderDays(){
+    const days = [1,2,3,4,5,6,7]
+    return days.map((i) => {
+      return <td key={i}>Day {i}</td>
+    })
+  }
 
   renderRetentionHeatMapHeader(){
     return (
       <thead>
         <tr>
           <th>Date</th>
-          <td>Day 1</td>
-          <td>Day 2</td>
-          <td>Day 3</td>
-          <td>Day 4</td>
-          <td>Day 5</td>
-          <td>Day 6</td>
-          <td>Day 7</td>
+          <td>Users</td>
+          {this.renderDays()}
         </tr>
       </thead>
     )
   }
 
   renderRetentionData(value, i){
+    if(value === null) {
+      return <td key={i}>&nbsp;</td>
+    }
+
+    if(i === 0){
+      return <td key={i}>{value}</td>
+    }
+
     const opacity = value
     const bgStyle = {
-      'backgroundColor': 'rgba(0, 177, 92,' + opacity + ')'
+      'backgroundColor': 'rgba(' + color['retention'] + ',' + opacity + ')'
      }
     return <td style={bgStyle} key={i}>{toPercent(value)}</td>
   }
@@ -228,21 +253,23 @@ export default class AnalyticsModule extends React.Component {
     )
   }
 
-  renderBusyHoursHeatMapHeader() {
+  renderHours(){
     const hours = []
+    for (var i = 0; i < 24; i++) {
+      hours.push(i)
+    }
+
+    return hours.map((i) => {
+      return <td key={i}>{i}</td>
+    })
+  }
+
+  renderBusyHoursHeatMapHeader() {
     return (
       <thead>
         <tr>
-          <th>Date / Hours</th>
-          <td>0</td><td>&nbsp;</td><td>&nbsp;</td>
-          <td>3</td><td>&nbsp;</td><td>&nbsp;</td>
-          <td>6</td><td>&nbsp;</td><td>&nbsp;</td>
-          <td>9</td><td>&nbsp;</td><td>&nbsp;</td>
-          <td>12</td><td>&nbsp;</td><td>&nbsp;</td>
-          <td>15</td><td>&nbsp;</td><td>&nbsp;</td>
-          <td>18</td><td>&nbsp;</td><td>&nbsp;</td>
-          <td>21</td><td>&nbsp;</td><td>&nbsp;</td>
-          <td>24</td>
+          <th>Hours</th>
+          {this.renderHours()}
         </tr>
       </thead>
     )
@@ -251,7 +278,7 @@ export default class AnalyticsModule extends React.Component {
   renderBusyHoursData(value, i) {
     const opacity = value
     const bgStyle = {
-      'backgroundColor': 'rgba(255, 145, 0,' + opacity + ')'
+      'backgroundColor': 'rgba(' + color['busyHours'] + ',' + opacity + ')'
      }
     return <td style={bgStyle} key={i}>&nbsp;</td>
   }
@@ -278,10 +305,12 @@ export default class AnalyticsModule extends React.Component {
 
   renderBusyHoursHeatMapChart() {
     return (
-      <Table className={style.busyHoursHeatMap}>
-        {this.renderBusyHoursHeatMapHeader()}
-        {this.renderBusyHoursHeatMapBody()}
-      </Table>
+      <div className={style.busyHoursHeatMap}>
+        <Table>
+          {this.renderBusyHoursHeatMapHeader()}
+          {this.renderBusyHoursHeatMapBody()}
+        </Table>
+      </div>
     )
   }
 
