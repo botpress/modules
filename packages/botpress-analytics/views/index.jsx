@@ -184,10 +184,10 @@ export default class AnalyticsModule extends React.Component {
     const data = this.state.specificMetricsForLastDays
     return (
       <div className={style.specificMetrics}>
-        <h4>Average interaction</h4>
+        <h4>Average number of interactions</h4>
         <h1>{data.numberOfInteractionInAverage.toFixed(2)}</h1>
 
-        <h4>Number of users</h4>
+        <h4>Number of active users</h4>
         <h3><small>Today :</small> {data.numberOfUsersToday}</h3>
         <h5><small>Yesterday :</small> {data.numberOfUsersYesterday}</h5>
         <h5><small>Week :</small> {data.numberOfUsersThisWeek}</h5>
@@ -333,7 +333,7 @@ export default class AnalyticsModule extends React.Component {
 
   renderActiveUsersPanel() {
     return(
-      <Panel header='Active users for last 30 days'>
+      <Panel header='Active users in last 2 weeks'>
         <div className={style.graphContainerTwoColumn}>
           {this.renderActiveUsersSimpleLineChart()}
         </div>
@@ -343,7 +343,7 @@ export default class AnalyticsModule extends React.Component {
 
   renderGenderUsagePanel() {
     return(
-      <Panel header='Gender usage for last 7 days'>
+      <Panel header='Gender usage in last week'>
         <div className={style.graphContainerTwoColumn}>
           {this.renderGenderPercentAreaChart()}
         </div>
@@ -353,7 +353,7 @@ export default class AnalyticsModule extends React.Component {
 
   renderSpecificMetricForLastDaysPanel() {
       return(
-        <Panel header='Specific metrics for last days'>
+        <Panel header='Insights'>
           <div className={style.graphContainerTwoColumn}>
             {this.renderSpecificMetricForLastDaysValues()}
           </div>
@@ -363,7 +363,7 @@ export default class AnalyticsModule extends React.Component {
 
   renderTypicalConversationInADayPanel() {
     return(
-      <Panel header='Typical conversation in a day'>
+      <Panel header='Average incoming interactions (last 2 weeks)'>
         <div className={style.graphContainerTwoColumn}>
           {this.renderTypicalConversationLengthInADayChart()}
         </div>
@@ -438,14 +438,10 @@ export default class AnalyticsModule extends React.Component {
   }
 
   renderAllMetrics(){
-    return(
+    return (
       <div>
-        <Panel header='Basic metrics'>
-          {this.renderBasicMetrics()}
-        </Panel>
-        <Panel header='Advanced metrics'>
-          {this.renderAdvancedMetrics()}
-        </Panel>
+        {this.renderBasicMetrics()}
+        {this.renderAdvancedMetrics()}
       </div>
     )
   }
