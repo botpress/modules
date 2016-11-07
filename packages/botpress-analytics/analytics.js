@@ -81,17 +81,41 @@ class Analytics extends EventEmitter {
 
     this.fictiveSpecificMetrics = {
       numberOfInteractionInAverage: 12.4,
+      numberOfUsersToday: 234,
       numberOfUsersYesterday: 5234,
-      numberOfNewUsersInLast7days: 981
-
+      numberOfUsersThisWeek: 20232
     }
 
+    this.fictiveRetentionHeatMap = {
+      'Oct 31': [1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1],
+      'Oct 30': [1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1],
+      'Oct 29': [1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1],
+      'Oct 28': [1.0, 0.9, 0.8, 0.7, 0.4, 0.9, 0.1],
+      'Oct 27': [1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1],
+      'Oct 26': [1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1],
+      'Oct 25': [1.0, 0.9, 0.8, 0.7, 0.4, 0.9, 1.0],
+      'Oct 24': [1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1]
+    }
+
+    this.fictiveBusyHour = {
+      'Oct 31': [1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 0.4, 0.3, 0.1],
+      'Oct 30': [1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 0.4, 0.3, 0.1],
+      'Oct 29': [1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 0.4, 0.3, 0.1],
+      'Oct 28': [1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 0.4, 0.3, 0.1],
+      'Oct 27': [1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 0.4, 0.3, 0.1],
+      'Oct 26': [1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 0.4, 0.3, 0.1],
+      'Oct 25': [1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 0.4, 0.3, 0.1],
+      'Oct 24': [1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 1.0, 0.9, 0.8, 0.7, 0.4, 0.3, 0.1, 0.4, 0.3, 0.1],
+    }
+    
     this.chartsGraphData = {
       totalUsersChartData: this.fictiveDataForTotalUsers,
       activeUsersChartData: this.fictiveActiveUsersData,
       genderUsageChartData: this.fictiveGenderUsageData,
       typicalConversationLengthInADay: this.fictiveConversationData,
-      specificMetricsForLastDays: this.fictiveSpecificMetrics
+      specificMetricsForLastDays: this.fictiveSpecificMetrics,
+      retentionHeatMap: this.fictiveRetentionHeatMap,
+      busyHoursHeatMap: this.fictiveBusyHour
     }
   }
 
