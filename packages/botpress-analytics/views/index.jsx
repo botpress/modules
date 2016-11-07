@@ -84,7 +84,9 @@ export default class AnalyticsModule extends React.Component {
   }
 
   renderActiveUsersSimpleLineChart() {
-    const data = this.state.activeUsersChartData
+    const data = this.state.activeUsersChartData.map(o => _.omit(o, 'total'))
+    const sortedByKeys = _.sortBy(data, o => _.keys(o).length)
+    const legend = sortedByKeys[sortedByKeys.length - 1]
 
     const SimpleLineChart = React.createClass({
     	render () {
@@ -97,7 +99,7 @@ export default class AnalyticsModule extends React.Component {
              <CartesianGrid strokeDasharray="3 3"/>
              <Tooltip/>
              <Legend />
-             {_.values(renderLine(data[0]))}
+             {_.values(renderLine(legend))}
             </LineChart>
           </ResponsiveContainer>
         );
@@ -107,7 +109,9 @@ export default class AnalyticsModule extends React.Component {
   }
 
   renderStackedLineChartForTotalUsers() {
-    const data = this.state.totalUsersChartData;
+    const data = this.state.totalUsersChartData.map(o => _.omit(o, 'total'))
+    const sortedByKeys = _.sortBy(data, o => _.keys(o).length)
+    const legend = sortedByKeys[sortedByKeys.length - 1]
 
     const StackedAreaChart = React.createClass( {
       render () {
@@ -130,7 +134,9 @@ export default class AnalyticsModule extends React.Component {
   }
 
   renderGenderPercentAreaChart() {
-    const data = this.state.genderUsageChartData
+    const data = this.state.genderUsageChartData.map(o => _.omit(o, 'total'))
+    const sortedByKeys = _.sortBy(data, o => _.keys(o).length)
+    const legend = sortedByKeys[sortedByKeys.length - 1]
 
     const StackedAreaChart = React.createClass({
     	render () {
@@ -143,7 +149,7 @@ export default class AnalyticsModule extends React.Component {
               <CartesianGrid strokeDasharray="3 3"/>
               <Tooltip />
               <Legend />
-              {_.values(renderArea(data[0]))}
+              {_.values(renderArea(legend))}
             </AreaChart>
           </ResponsiveContainer>
         );
@@ -162,7 +168,7 @@ export default class AnalyticsModule extends React.Component {
             <BarChart data={data}
               margin={{top: 5, right: 30, left: 20, bottom: 5}}>
               <XAxis dataKey="name"/>
-              <YAxis tickFormatter={toPercent}/>
+              <YAxis/>
               <CartesianGrid strokeDasharray="3 3"/>
               <Tooltip />
               <Bar dataKey="count" fill={color['conversation']} />
@@ -179,7 +185,7 @@ export default class AnalyticsModule extends React.Component {
     return (
       <div className={style.specificMetrics}>
         <h4>Average interaction</h4>
-        <h1>{data.numberOfInteractionInAverage}</h1>
+        <h1>{data.numberOfInteractionInAverage.toFixed(2)}</h1>
 
         <h4>Number of users</h4>
         <h3><small>Today :</small> {data.numberOfUsersToday}</h3>
@@ -203,6 +209,7 @@ export default class AnalyticsModule extends React.Component {
           <th>Date</th>
           <td>Users</td>
           {this.renderDays()}
+          <td>Overall</td>
         </tr>
       </thead>
     )
