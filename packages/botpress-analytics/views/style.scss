@@ -33,11 +33,41 @@
   }
 }
 
-.rententionHeatMap{
+.rententionHeatMap {
   text-align: center;
   height: 100%;
 
   th {
     text-align: center;
+  }
+}
+
+.busyHoursHeatMap {
+
+  overflow-x: scroll;
+  table {
+    min-width: 800px;
+  }
+
+  thead {
+    th {
+      text-align: right;
+    }
+    td, th{
+      border-style: none;
+      border-width: 0px;
+      font-size: 12px;
+    }
+  }
+  tbody {
+    tr {
+      td, th{
+        border-style: solid;
+        border-color: #ffffff;
+        border-width: 3px;
+        font-size: 12px;
+        text-align: right;
+      }
+    }
   }
 }
