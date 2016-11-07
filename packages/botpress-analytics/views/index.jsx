@@ -5,7 +5,8 @@ import {
   Grid,
   Panel,
   Row,
-  ControlLabel
+  ControlLabel,
+  Table
  } from 'react-bootstrap'
 import axios from 'axios'
 
@@ -25,6 +26,7 @@ import {
 } from 'recharts'
 
 import style from './style.scss'
+import _ from 'lodash'
 
 const toPercent = (decimal, fixed = 0) => {
 	return `${(decimal * 100).toFixed(fixed)}%`;
@@ -32,15 +34,14 @@ const toPercent = (decimal, fixed = 0) => {
 
 export default class AnalyticsModule extends React.Component {
 
-  constructor(props){
+  constructor(props) {
     super(props)
     this.state = {loading:true}
   }
 
-  componentDidMount(){
+  componentDidMount() {
     axios.get("/api/skin-analytics/graphs")
     .then((res) => {
-      console.log(res.data)
       this.setState({
         loading:false,
         ...res.data
@@ -54,7 +55,7 @@ export default class AnalyticsModule extends React.Component {
     </p>
   }
 
-  renderActiveUsersSimpleLineChart(){
+  renderActiveUsersSimpleLineChart() {
     const data = this.state.activeUsersChartData
 
     const SimpleLineChart = React.createClass({
@@ -82,10 +83,10 @@ export default class AnalyticsModule extends React.Component {
   }
 
 
-  renderStackedLineChartForTotalUsers(){
+  renderStackedLineChartForTotalUsers() {
     const data = this.state.totalUsersChartData;
 
-    const StackedAreaChart = React.createClass({
+    const StackedAreaChart = React.createClass( {
       render () {
         return (
           <ResponsiveContainer >
@@ -109,7 +110,7 @@ export default class AnalyticsModule extends React.Component {
 
 
 
-  renderGenderPercentAreaChart(){
+  renderGenderPercentAreaChart() {
     const data = this.state.genderUsageChartData
 
     const StackedAreaChart = React.createClass({
@@ -134,7 +135,7 @@ export default class AnalyticsModule extends React.Component {
     return <StackedAreaChart />
   }
 
-  renderTypicalConversationLengthInADayChart(){
+  renderTypicalConversationLengthInADayChart() {
     const data = this.state.typicalConversationLengthInADay
 
     const SimpleBarChart = React.createClass({
@@ -157,12 +158,134 @@ export default class AnalyticsModule extends React.Component {
     return <SimpleBarChart />
   }
 
-  renderSpecificMetricForLastDaysValues(){
-    const data = this.state.lastDaysMetrics
+  renderSpecificMetricForLastDaysValues() {
+    const data = this.state.specificMetricsForLastDays
+    return (
+      <div className={style.specificMetrics}>
+        <h4>Average interaction</h4>
+        <h1>{data.numberOfInteractionInAverage}</h1>
+
+        <h4>Number of users</h4>
+        <h3><small>Today :</small> {data.numberOfUsersToday}</h3>
+        <h5><small>Yesterday :</small> {data.numberOfUsersYesterday}</h5>
+        <h5><small>Week :</small> {data.numberOfUsersThisWeek}</h5>
+      </div>
+    )
   }
 
 
-  renderTotalNumberOfUsersPanel(){
+  renderRetentionHeatMapHeader(){
+    return (
+      <thead>
+        <tr>
+          <th>Date</th>
+          <td>Day 1</td>
+          <td>Day 2</td>
+          <td>Day 3</td>
+          <td>Day 4</td>
+          <td>Day 5</td>
+          <td>Day 6</td>
+          <td>Day 7</td>
+        </tr>
+      </thead>
+    )
+  }
+
+  renderRetentionData(value, i){
+    const opacity = value
+    const bgStyle = {
+      'backgroundColor': 'rgba(0, 177, 92,' + opacity + ')'
+     }
+    return <td style={bgStyle} key={i}>{toPercent(value)}</td>
+  }
+
+  renderRetentionRow(rowValues, key){
+    const date = key
+    const rowData = rowValues.map(this.renderRetentionData.bind(this))
+    return (
+      <tr key={date}>
+        <th>{date}</th>
+        {rowData}
+      </tr>
+    )
+  }
+
+  renderRetentionHeatMapBody() {
+    const dataPerDate = _.mapValues(this.state.retentionHeatMap, this.renderRetentionRow.bind(this))
+    return (
+      <tbody key='retention'>
+        {_.values(dataPerDate)}
+      </tbody>
+    )
+  }
+
+  renderRetentionHeatMapChart() {
+    return (
+      <Table striped bordered hover className={style.rententionHeatMap}>
+        {this.renderRetentionHeatMapHeader()}
+        {this.renderRetentionHeatMapBody()}
+      </Table>
+    )
+  }
+
+  renderBusyHoursHeatMapHeader() {
+    const hours = []
+    return (
+      <thead>
+        <tr>
+          <th>Date / Hours</th>
+          <td>0</td><td>&nbsp;</td><td>&nbsp;</td>
+          <td>3</td><td>&nbsp;</td><td>&nbsp;</td>
+          <td>6</td><td>&nbsp;</td><td>&nbsp;</td>
+          <td>9</td><td>&nbsp;</td><td>&nbsp;</td>
+          <td>12</td><td>&nbsp;</td><td>&nbsp;</td>
+          <td>15</td><td>&nbsp;</td><td>&nbsp;</td>
+          <td>18</td><td>&nbsp;</td><td>&nbsp;</td>
+          <td>21</td><td>&nbsp;</td><td>&nbsp;</td>
+          <td>24</td>
+        </tr>
+      </thead>
+    )
+  }
+
+  renderBusyHoursData(value, i) {
+    const opacity = value
+    const bgStyle = {
+      'backgroundColor': 'rgba(255, 145, 0,' + opacity + ')'
+     }
+    return <td style={bgStyle} key={i}>&nbsp;</td>
+  }
+
+  renderBusyHoursRow(rowValues, key) {
+    const date = key
+    const rowData = rowValues.map(this.renderBusyHoursData.bind(this))
+    return (
+      <tr key={date}>
+        <th>{date}</th>
+          {rowData}
+      </tr>
+    )
+  }
+
+  renderBusyHoursHeatMapBody() {
+    const dataPerDate = _.mapValues(this.state.busyHoursHeatMap, this.renderBusyHoursRow.bind(this))
+    return (
+      <tbody key='busyhours'>
+        {_.values(dataPerDate)}
+      </tbody>
+    )
+  }
+
+  renderBusyHoursHeatMapChart() {
+    return (
+      <Table className={style.busyHoursHeatMap}>
+        {this.renderBusyHoursHeatMapHeader()}
+        {this.renderBusyHoursHeatMapBody()}
+      </Table>
+    )
+  }
+
+  renderTotalNumberOfUsersPanel() {
     return(
       <Panel header='Total number of users'>
         <div className={style.graphContainer}>
@@ -172,7 +295,7 @@ export default class AnalyticsModule extends React.Component {
     )
   }
 
-  renderActiveUsersPanel(){
+  renderActiveUsersPanel() {
     return(
       <Panel header='Active users for last 30 days'>
         <div className={style.graphContainerTwoColumn}>
@@ -182,7 +305,7 @@ export default class AnalyticsModule extends React.Component {
     )
   }
 
-  renderGenderUsagePanel(){
+  renderGenderUsagePanel() {
     return(
       <Panel header='Gender usage for last 7 days'>
         <div className={style.graphContainerTwoColumn}>
@@ -192,7 +315,7 @@ export default class AnalyticsModule extends React.Component {
     )
   }
 
-  renderSpecificMetricForLastDaysPanel(){
+  renderSpecificMetricForLastDaysPanel() {
       return(
         <Panel header='Specific metrics for last days'>
           <div className={style.graphContainerTwoColumn}>
@@ -202,7 +325,7 @@ export default class AnalyticsModule extends React.Component {
       )
   }
 
-  renderTypicalConversationInADayPanel(){
+  renderTypicalConversationInADayPanel() {
     return(
       <Panel header='Typical conversation in a day'>
         <div className={style.graphContainerTwoColumn}>
@@ -212,9 +335,30 @@ export default class AnalyticsModule extends React.Component {
     )
   }
 
-  renderBasicMetrics(){
+  renderRetentionHeatMapPanel() {
     return (
-      <Grid fluid='true'>
+      <Panel header='Rentention for last 7 days'>
+        <div className={style.graphContainer}>
+          {this.renderRetentionHeatMapChart()}
+        </div>
+      </Panel>
+    )
+  }
+
+  renderBusyHoursHeatMapPanel() {
+    return (
+      <Panel header='Busy hours for last 7 days'>
+        <div className={style.graphContainer}>
+          {this.renderBusyHoursHeatMapChart()}
+        </div>
+      </Panel>
+    )
+  }
+
+
+  renderBasicMetrics() {
+    return (
+      <Grid fluid >
         <Row>
           <Col md={12}>
             {this.renderTotalNumberOfUsersPanel()}
@@ -242,18 +386,15 @@ export default class AnalyticsModule extends React.Component {
 
   renderAdvancedMetrics(){
     return (
-      <Grid fluid='true'>
+      <Grid fluid >
         <Row>
           <Col md={12}>
-            {this.renderTotalNumberOfUsersPanel()}
+            {this.renderRetentionHeatMapPanel()}
           </Col>
         </Row>
         <Row>
-          <Col md={6}>
-            {this.renderTotalNumberOfUsersPanel()}
-          </Col>
-          <Col md={6}>
-            {this.renderTotalNumberOfUsersPanel()}
+          <Col md={12}>
+            {this.renderBusyHoursHeatMapPanel()}
           </Col>
         </Row>
       </Grid>
