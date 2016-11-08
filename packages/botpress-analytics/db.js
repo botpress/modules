@@ -1,4 +1,5 @@
 const Promise = require('bluebird')
+const moment = require('moment')
 
 var knex = null
 
@@ -54,11 +55,11 @@ function saveFacebookIn(event) {
     gender: event.user.gender || 'unknown',
     timezone: event.user.timezone || null,
     locale: event.user.locale || null,
-    created_on: new Date()
+    created_on: moment(new Date()).format('x')
   }
 
   const interactionRow = {
-    ts: new Date(),
+    ts: moment(new Date()).format('x'),
     type: event.type,
     text: event.text,
     user: userId,
@@ -80,7 +81,7 @@ function saveFacebookIn(event) {
 function saveFacebookOut(event) {
   const userId = 'facebook:' + event.raw.to
   const interactionRow = {
-    ts: new Date(),
+    ts: moment(new Date()).format('x'),
     type: event.type,
     text: event.text,
     user: userId,

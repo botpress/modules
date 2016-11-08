@@ -85,7 +85,7 @@ function getLastDaysRange(nb) {
 }
 
 function getDailyActiveUsers(dbFile) {
-  const ranges = getLastDaysRange()
+  const ranges = _.reverse(getLastDaysRange())
   return db.getOrCreate(dbFile)
   .then((knex) => {
     return Promise.mapSeries(ranges, (range) => {
@@ -110,7 +110,7 @@ function getDailyActiveUsers(dbFile) {
 }
 
 function getDailyGender(dbFile) {
-  const ranges = getLastDaysRange()
+  const ranges = _.reverse(getLastDaysRange())
   return db.getOrCreate(dbFile)
   .then((knex) => {
     return Promise.mapSeries(ranges, (range) => {

@@ -22,7 +22,12 @@ class Analytics extends EventEmitter {
     this.chartsDatafile = path.join(skin.projectLocation, skin.botfile.dataDir, 'skin-analytics.charts.json')    
     this.dbFile = path.join(skin.projectLocation, skin.botfile.dataDir, 'skin-analytics.sqlite')
 
+    let running = false
+
     setInterval(() => {
+      if(running) return
+      running = true
+
       stats.getTotalUsers(this.dbFile)
       .then(data => this.savePartialData('totalUsers', data))
       .then(() => stats.getDailyActiveUsers(this.dbFile))
@@ -47,6 +52,7 @@ class Analytics extends EventEmitter {
       .then(data => this.savePartialData('retentionHeatMap', data))
       .then(() => stats.getBusyHours(this.dbFile))
       .then(data => this.savePartialData('busyHoursHeatMap', data))
+      .then(() => running = false)
     }, 5000)
     // }, 30 * 1000 * 60) // every 30min
   }
