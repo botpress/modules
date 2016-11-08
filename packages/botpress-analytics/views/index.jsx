@@ -144,7 +144,7 @@ export default class AnalyticsModule extends React.Component {
           <ResponsiveContainer>
           	<AreaChart data={data} stackOffset="expand"
                   margin={{top: 10, right: 30, left: 0, bottom: 0}} >
-              <XAxis dataKey="month"/>
+              <XAxis dataKey="name"/>
               <YAxis tickFormatter={toPercent}/>
               <CartesianGrid strokeDasharray="3 3"/>
               <Tooltip />
@@ -182,10 +182,11 @@ export default class AnalyticsModule extends React.Component {
 
   renderSpecificMetricForLastDaysValues() {
     const data = this.state.specificMetricsForLastDays
+    const nbOfInteractions = (data.numberOfInteractionInAverage || 0).toFixed(2)
     return (
       <div className={style.specificMetrics}>
         <h4>Average number of interactions</h4>
-        <h1>{data.numberOfInteractionInAverage.toFixed(2)}</h1>
+        <h1>{nbOfInteractions}</h1>
 
         <h4>Number of active users</h4>
         <h3><small>Today :</small> {data.numberOfUsersToday}</h3>
@@ -224,7 +225,7 @@ export default class AnalyticsModule extends React.Component {
       return <td key={i}>{value}</td>
     }
 
-    const opacity = value
+    const opacity = value * value
     const bgStyle = {
       'backgroundColor': 'rgba(' + color['retention'] + ',' + opacity + ')'
      }

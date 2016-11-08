@@ -1,4 +1,5 @@
 const Analytics = require('./analytics')
+const db = require('./db')
 let analytics = null
 
 module.exports = {

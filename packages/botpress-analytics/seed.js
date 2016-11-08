@@ -5,41 +5,45 @@ const Promise = require('bluebird')
 const fs = require('fs')
 
 const dbFile = process.env.DB_PATH || './seed.sqlite'
-const daysBack = 7
-const initialNumberOfUsers = 10000
-const interactionsPerDay = 20000
-const retentionRate = 0.88
-const growthRate = 0.12
-const platforms = ['facebook', 'slack', 'kik']
+const daysBack = 98
+const initialNumberOfUsers = 1000
+const interactionsPerDay = 1.5
+const retentionRate = 0.94
+const growthRate = 0.01
+const fixedDailyGrowth = 250
+const platforms = ['facebook', 'slack']
 const distribution = {
+  0: 5,
   1: 5,
   2: 5,
-  3: 5,
-  4: 7,
+  3: 7,
+  4: 10,
   5: 10,
-  6: 10,
-  7: 20,
-  8: 30,
-  9: 55,
+  6: 20,
+  7: 30,
+  8: 70,
+  9: 65,
   10: 20,
-  11: 20,
-  12: 30,
-  13: 35,
-  14: 23,
-  15: 20,
-  16: 50,
-  17: 55,
-  18: 60,
-  19: 40,
-  20: 30,
-  21: 25,
-  22: 20,
-  23: 9,
-  24: 8
+  11: 30,
+  12: 35,
+  13: 23,
+  14: 20,
+  15: 35,
+  16: 65,
+  17: 70,
+  18: 75,
+  19: 30,
+  20: 25,
+  21: 20,
+  22: 9,
+  23: 8
 }
 
 const users = []
 
+const vary = (nb, variance = 0.1) => {
+  return nb + _.random(-variance * nb, variance * nb, false)
+}
 
 const dropUsers = (count) => {
   count = parseInt(count)
@@ -53,7 +57,7 @@ const addUsers = (count, knex, date) => {
   const rows = []
   for(var i = 0; i < count; i++) {
     const platform = _.sample(platforms)
-    const gender = Math.random() < 0.65 ? 'male' : 'female'
+    const gender = Math.random() < vary(0.65, 0.35) ? 'male' : 'female'
     const id = _.uniqueId()
     const locale = _.sample(['en_US', 'fr_CA', 'en_CA'])
 
@@ -80,17 +84,18 @@ const run = (knex) => {
   const startDate = moment(new Date()).subtract(daysBack, 'days').format('x')
   return addUsers(initialNumberOfUsers, knex, startDate)
   .then(() => {
-    return Promise.mapSeries(_.times(daysBack, Number), (day) => {
+    return Promise.mapSeries(_.times(daysBack, n => n + 1), (day) => {
       const i = daysBack - day
+      console.log('day', i)
       let count = 0
-      const target = interactionsPerDay + _.random(-0.1 * interactionsPerDay, 0.1 * interactionsPerDay, false)
+      const target = vary(interactionsPerDay * users.length)
       while(count < target) {
-        const hour = _.random(0, 23, false)
+        const hour = _.random(1, 24, false)
         if(Math.random() > distribution[hour] / 100) {
           continue
         }
-        const time = moment(new Date()).subtract(i, 'days').startOf('day').add(hour, 'hours')
-        const direction = Math.random() > 0.70 ? 'in' : 'out'
+        const time = moment(new Date()).startOf('day').subtract(i, 'days').add(hour - 1, 'hours')
+        const direction = Math.random() > 0.30 ? 'in' : 'out'
         const user = _.sample(users)
         interactions.push({
           ts: time.format('x'),
@@ -101,12 +106,14 @@ const run = (knex) => {
         })
         count++
       }
-      dropUsers((1 - retentionRate) * users.length)
+      dropUsers(vary((1 - retentionRate) * users.length), 0.13)
       const addDate = moment(new Date()).subtract(i, 'days').format('x')
-      return addUsers(users.length * growthRate, knex, addDate)
+      const nbNewUsers = vary(users.length * growthRate, 0.25) + vary(fixedDailyGrowth, 0.25)
+      return addUsers(nbNewUsers, knex, addDate)
     })
   })
   .then(() => {
+    console.log('Preparing to insert', interactions.length)
     return knex.batchInsert('interactions', interactions, 20)
     .then(() => console.log('Added', interactions.length, 'interactions'))
   })
