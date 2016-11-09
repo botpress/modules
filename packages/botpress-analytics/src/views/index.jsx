@@ -7,6 +7,7 @@ import {
   Row,
   Table
  } from 'react-bootstrap'
+import axios from 'axios'
 
 import {
   Area,
@@ -25,6 +26,8 @@ import {
 
 import style from './style.scss'
 import _ from 'lodash'
+import EventEmitter from 'eventemitter2'
+
 
 
 const toPercent = (decimal, fixed = 0) => {
@@ -58,23 +61,22 @@ const renderArea = (data) => {
   })
 }
 
-
 export default class AnalyticsModule extends React.Component {
 
   constructor(props) {
     super(props)
     this.state = {loading: true}
+
+    this.props.skin.events.on('data.send', (data) => {
+      this.setState({
+          ...data
+        }
+      )
+    })
   }
 
-  componentDidMount() {
-    const { axios } = this.props.skin
-    axios.get("/api/skin-analytics/graphs")
-    .then((res) => {
-      this.setState({
-        loading:false,
-        ...res.data
-      })
-    });
+  componentDidMount(){
+    this.props.skin.events.emit('data.update')
   }
 
   renderErrorMessage() {
@@ -449,7 +451,7 @@ export default class AnalyticsModule extends React.Component {
 
   render() {
     return <div>
-      {this.state.loading ? null : this.renderAllMetrics()}
+      {this.state.loading ? <h3>Wait, we are loading graphs...</h3> : this.renderAllMetrics()}
     </div>
   }
 }
