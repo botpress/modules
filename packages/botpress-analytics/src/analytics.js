@@ -53,7 +53,7 @@ class Analytics extends EventEmitter {
       .then(() => stats.getBusyHours(this.dbFile))
       .then(data => this.savePartialData('busyHoursHeatMap', data))
       .then(() => running = false)
-    }, 5000)
+    }, 30 * 1000 * 60)
     // }, 30 * 1000 * 60) // every 30min
   }
 
