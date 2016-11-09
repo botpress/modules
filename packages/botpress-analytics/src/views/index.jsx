@@ -7,7 +7,6 @@ import {
   Row,
   Table
  } from 'react-bootstrap'
-import axios from 'axios'
 
 import {
   Area,
@@ -68,6 +67,7 @@ export default class AnalyticsModule extends React.Component {
   }
 
   componentDidMount() {
+    const { axios } = this.props.skin
     axios.get("/api/skin-analytics/graphs")
     .then((res) => {
       this.setState({
