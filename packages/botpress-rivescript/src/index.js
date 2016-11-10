@@ -70,6 +70,8 @@ module.exports = {
 
       fs.unlinkSync(filePath)
 
+      reloadRiveScript()
+      
       res.sendStatus(200)
     })
 

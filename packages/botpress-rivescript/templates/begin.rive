@@ -22,6 +22,7 @@
 - Hello, human!
 
 + my name is *
+* <get name> == undefined => You haven't told me your name yet
 - <set name=<formal>>Nice to meet you, <get name>.
 - <set name=<formal>><get name>, nice to meet you.
 
