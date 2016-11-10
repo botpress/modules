@@ -1,0 +1,31 @@
+! version = 2.0
+
+// Substitutions
+! sub i'm     = i am
+! sub i'd     = i would
+! sub i've    = i have
+! sub i'll    = i will
+! sub don't   = do not
+! sub isn't   = is not
+! sub you'd   = you would
+! sub you're  = you are
+! sub you've  = you have
+! sub you'll  = you will
+! sub what's  = what is
+! sub whats   = what is
+! sub what're = what are
+! sub what've = what have
+! sub what'll = what will
+! sub who's   = who is
+
++ hello
+- Hello, human!
+
++ my name is *
+- <set name=<formal>>Nice to meet you, <get name>.
+- <set name=<formal>><get name>, nice to meet you.
+
++ (what is my name|who am i|do you know my name|do you know who i am){weight=10}
+- Your name is <get name>.
+- You told me your name is <get name>.
+- Aren't you <get name>?
