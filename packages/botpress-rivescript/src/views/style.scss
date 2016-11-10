@@ -1,1 +1,28 @@
+:global(.ReactCodeMirror) {
+  border: 1px solid #ccc;
+}
 
+:global(.CodeMirror) {
+  height: 600px !important;
+}
+
+.tabs {
+  ul {
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+  }
+
+  li {
+    float: inherit;
+    display: inline-block;
+  }
+}
+
+textarea.discussion {
+  height: 620px;
+}
+
+.dirty {
+  color: red;
+}
