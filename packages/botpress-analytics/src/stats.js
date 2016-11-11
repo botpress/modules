@@ -21,10 +21,13 @@ function rangeDates(dbFile) {
       for(var i = 1; i <= 10; i++) {
         ranges.push(parseInt(result.min + (range/10*i)))
       }
-      const ret = { min: result.min, max: result.max, format: null, ranges: ranges }
-      if(range / oneDayMs < 1) {
-        ret.format = (date) => moment(date).format('ha')
-      } else if(range / oneDayMs < 360) {
+      const ret = { 
+        min: result.min, 
+        max: result.max, 
+        format: null, 
+        ranges: ranges
+      }
+      if(range / oneDayMs < 360) {
         ret.format = (date) => moment(date).format('MMM Do')
       } else { // > 1year period
         ret.format = (date) => moment(date).format('MMM YY')
@@ -40,31 +43,46 @@ function getTotalUsers(dbFile) {
   .then(dates => {
     return db.getOrCreate(dbFile)
     .then(knex => {
-      return knex('users')
-      .select(knex.raw('count(*) as count, created_on as date, platform'))
-      .groupBy(knex.raw("date(created_on/1000, 'unixepoch'), platform"))
-      .orderBy('created_on')
-      .then(rows => {
-        let total = 0
-        let totalPlatform = {}
-        const result = {}
-        rows.map((row) => {
-          const date = dates.format(row.date)
-          if(!result[date]) {
-            result[date] = { total: 0 }
-          }
-          if(!totalPlatform[row.platform]) {
-            totalPlatform[row.platform] = 0
-          }
-          totalPlatform[row.platform] += row.count
-          result[date].total = total += row.count
-          result[date][row.platform] = totalPlatform[row.platform]
+      return knex('users').select(knex.raw('distinct platform'))
+      .then(platforms => {
+        const statsBase = platforms.reduce((acc, curr) => {
+          acc[curr.platform] = 0
+          return acc
+        }, { total: 0 })
+        return knex('users')
+        .select(knex.raw('count(*) as count, created_on as date, platform'))
+        .groupBy(knex.raw("strftime('%Y-%m-%d', created_on/1000, 'unixepoch'), platform"))
+        .orderBy('created_on')
+        .then(rows => {
+          let total = 0
+          let totalPlatform = {}
+          const result = {}
+          const min = dates.format(moment(new Date(dates.min)).subtract(1, 'day'))
+          result[min] = Object.assign({}, statsBase)
+          rows.map((row) => {
+            const date = dates.format(row.date)
+            if(!result[date]) {
+              result[date] = Object.assign({}, statsBase)
+            }
+            if(!totalPlatform[row.platform]) {
+              totalPlatform[row.platform] = 0
+            }
+            totalPlatform[row.platform] += row.count
+            result[date].total = total += row.count
+            result[date][row.platform] = totalPlatform[row.platform]
+          })
+          const max = dates.format(moment(new Date(dates.max)).add(1, 'hour'))
+          result[max] = Object.assign({}, statsBase, { total: total }, totalPlatform)
+          return _.toPairs(result).map(([k, v]) => {
+            v.name = k
+            return v
+          })
         })
-        return _.toPairs(result).map(([k, v]) => {
-          v.name = k
-          return v
-        })
-      })  
+      })
+    })
+    .then(result => {
+      console.log('>>>', result)
+      return result
     })
   })
 }
