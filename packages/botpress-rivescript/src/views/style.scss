@@ -6,23 +6,81 @@
   height: 600px !important;
 }
 
-.tabs {
-  ul {
-    white-space: nowrap;
-    overflow-x: scroll;
-    overflow-y: hidden;
+.navbar {
+  margin-bottom: 0px;
+  border-radius: 0px;
+  button {
+    width: 50px;
+    font-size: 16px;
+    margin: 5px;
   }
+}
 
-  li {
-    float: inherit;
-    display: inline-block;
+.headerRow {
+  margin-bottom: 0px;
+}
+
+.headerForm {
+  padding-right: 0px;
+  margin: 0px;
+}
+
+.fileSelection {
+  height: 602px;
+  li > a {
+    padding: 8px;
+    color: #a6a6a6;
   }
+}
+
+:global(.active) {
+  background-color: #dedede;
+}
+
+.fileInFolder > a {
+  padding-left: 20px !important;
+}
+
+.folderText {
+  padding-left: 10px;
+}
+
+.simulationColumn {
+  padding: 0px;
+}
+
+.contentColumn {
+  padding: 0px;
+  border-style: solid;
+  border-color: #e2e2e2;
+  border-width: 1px;
 }
 
 textarea.discussion {
-  height: 620px;
+  background-color: #ffffff !important;
+  font-family: 'Oswald', sans-serif;
+  border-radius: 0px;
+  height: 569px;
+}
+
+textarea.simulationRunning {
+  background-color: #fefd92 !important;
+}
+
+.sendButton {
+  width: 50px;
+  height: 35px;
+  font-size: 16px;
+  border-radius: 0px;
+}
+
+.sendText {
+  height: 35px;
+  width: 100%;
+  border-radius: 0px;
 }
 
 .dirty {
-  color: red;
+  background-color: #ff5252;
+  color: white;
 }

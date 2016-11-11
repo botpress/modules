@@ -1,7 +1,24 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import { Tabs, Tab, Col, Row, Grid, Form, FormGroup, Button, FormControl } from 'react-bootstrap'
+import {
+  Tabs,
+  Tab,
+  Col,
+  Row,
+  Grid,
+  Form,
+  FormGroup,
+  Button,
+  FormControl,
+  ControlLabel,
+  Panel,
+  Navbar,
+  Nav,
+  NavItem,
+  Glyphicon,
+  InputGroup
+ } from 'react-bootstrap'
 
 import _ from 'lodash'
 
@@ -56,7 +73,7 @@ export default class RiveScriptModule extends React.Component {
   }
 
   resetDirtyForOne(name) {
-    this.setState({ 
+    this.setState({
       dirty: { ...this.state.dirty, [name]: md5(this.state.files[name]) }
     })
   }
@@ -75,6 +92,9 @@ export default class RiveScriptModule extends React.Component {
       this.setState({ discussion: '' })
       axios.post('/api/skin-rivescript/reset')
     }
+    if(!this.state.simulationOn) {
+      setTimeout(() => ReactDOM.findDOMNode(this.sendMessage).focus(), 300)
+    }
 
     this.setState({ simulationOn: !this.state.simulationOn })
   }
@@ -91,7 +111,7 @@ export default class RiveScriptModule extends React.Component {
   deleteScript() {
     const { axios } = this.props.skin
 
-    const response = confirm("Are you sure you want to delete this script (" + 
+    const response = confirm("Are you sure you want to delete this script (" +
       this.state.selected + ")? This can't be undone.")
 
     if(response === true) {
@@ -107,8 +127,8 @@ export default class RiveScriptModule extends React.Component {
   saveCurrentFile() {
     const { axios } = this.props.skin
 
-    const data = { 
-      name: this.state.selected, 
+    const data = {
+      name: this.state.selected,
       content: this.state.files[this.state.selected],
       overwrite: true
     }
@@ -124,12 +144,12 @@ export default class RiveScriptModule extends React.Component {
     const { axios } = this.props.skin
     const text = this.state.textInput
 
-    const youSent = 'You> ' + text
+    const youSent = 'You > ' + text
     this.setState({ discussion: this.state.discussion + '\n' + youSent })
 
     axios.post('/api/skin-rivescript/simulate', { text })
     .then(({ data }) => {
-      const botSent = 'Bot> ' + data
+      const botSent = 'Bot > ' + data
       this.setState({ discussion: this.state.discussion + '\n' + botSent })
     })
 
@@ -151,51 +171,89 @@ export default class RiveScriptModule extends React.Component {
     const onChange = (code) => this.setState({ files: { ...this.state.files, [selected]: code } })
 
     const editor = <Codemirror
-      value={this.state.files[selected]} 
-      onChange={onChange} 
-      options={{ lineNumbers: true }} />
+      value={this.state.files[selected]}
+      onChange={onChange}
+      options={{ lineNumbers: true, readOnly: this.state.simulationOn }} />
 
     const onSelect = (key) => this.setState({ selected: key })
 
     const editors = _.values(_.mapValues(this.state.files, function (value, key) {
-      return <Tab key={key} eventKey={key} title={key}></Tab>
+      if(selected === key){
+        return <NavItem className={style.fileInFolder} key={key} eventKey={key} active>{key}</NavItem>
+      }
+      return <NavItem className={style.fileInFolder} key={key} eventKey={key}>{key}</NavItem>
     }))
 
     const tabsInstance = (
-      <Tabs id="fileSelection" className={style.tabs} onSelect={onSelect}>
-        {editors}
-      </Tabs>
+      <Tab.Container id='listOfFiles' className={style.fileSelection}>
+        <Nav onSelect={onSelect.bind(this)} stacked>
+          <NavItem key='folder' disabled>
+            <Glyphicon glyph='folder-open'></Glyphicon>
+            <span className={style.folderText}>rivescript</span>
+          </NavItem>
+          {editors}
+        </Nav>
+      </Tab.Container>
     )
 
     const saveClass = classnames({
       [style.dirty]: this.isDirty(this.state.selected)
     })
 
+    const simulationClass = classnames({
+      [style.discussion]: true,
+      [style.simulationRunning]: this.state.simulationOn
+    })
+
     const simOn = this.state.simulationOn
 
     return <Grid fluid>
-      <Row>
-        <Button onClick={this.toggleSimulation.bind(this)}>{this.state.simulationOn ? 'Stop' : 'Play'}</Button>
-        <Button onClick={this.saveCurrentFile.bind(this)} className={saveClass}>Save</Button>
-        <Button onClick={this.createNewFile.bind(this)}>New...</Button>
-        <Button onClick={this.deleteScript.bind(this)}>Delete...</Button>
+      <Row className={style.headerRow}>
+        <Col>
+          <Navbar fluid className={style.navbar}>
+            <Navbar.Collapse className={style.headerForm}>
+              <Navbar.Form pullRight className={style.headerForm}>
+                <Button onClick={this.toggleSimulation.bind(this)}>
+                  {this.state.simulationOn ? <Glyphicon glyph='stop'></Glyphicon> : <Glyphicon glyph='play'></Glyphicon> }
+                </Button>
+                <Button onClick={this.saveCurrentFile.bind(this)} className={saveClass}>
+                  <Glyphicon glyph='floppy-disk'></Glyphicon>
+                </Button>
+                <Button onClick={this.createNewFile.bind(this)}>
+                  <Glyphicon glyph='file'></Glyphicon>
+                </Button>
+                <Button onClick={this.deleteScript.bind(this)}>
+                  <Glyphicon glyph='trash'></Glyphicon>
+                </Button>
+              </Navbar.Form>
+            </Navbar.Collapse>
+          </Navbar>
+        </Col>
       </Row>
-      <Row>
-        <Col md={12} lg={8}>
+      <Row >
+        <Col sm={3} md={3} lg={2} className={style.contentColumn}>
           {tabsInstance}
+        </Col>
+        <Col sm={9} md={9} lg={7} className={style.contentColumn}>
           {editor}
         </Col>
-        <Col md={12} lg={4}>
-          <FormControl readOnly componentClass="textarea" value={this.state.discussion} className={style.discussion} />
-            <Form inline action='' onSubmit={this.sendText.bind(this)}>
-              <FormGroup>
-                <FormControl disabled={!simOn} placeholder="Speak here" value={this.state.textInput} onChange={this.onInputChanged.bind(this)} />
-              </FormGroup>
-              <Button disabled={!simOn} onClick={this.sendText.bind(this)}>Send</Button>
-            </Form>
+        <Col sm={12} md={12} lg={3} className={style.simulationColumn}>
+          <FormControl readOnly componentClass="textarea" value={this.state.discussion} className={simulationClass} />
+          <Form action='' onSubmit={this.sendText.bind(this)}>
+            <FormGroup>
+              <InputGroup>
+                <FormControl ref={i => this.sendMessage = i} className={style.sendText} disabled={!simOn}
+                  placeholder="Speak here" value={this.state.textInput} onChange={this.onInputChanged.bind(this)} />
+                <InputGroup.Button>
+                  <Button className={style.sendButton} disabled={!simOn} onClick={this.sendText.bind(this)}>
+                    <Glyphicon glyph='send'></Glyphicon>
+                  </Button>
+                </InputGroup.Button>
+              </InputGroup>
+            </FormGroup>
+          </Form>
         </Col>
       </Row>
-      
     </Grid>
   }
 }
