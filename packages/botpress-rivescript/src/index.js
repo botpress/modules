@@ -3,6 +3,9 @@ import fs from 'fs-extra'
 
 import RiveScript from 'rivescript'
 
+import calls from './calls'
+import deliveries from './deliveries'
+
 var rs = null
 
 const validateRiveName = (name) => /[A-Z0-9_-]+/i.test(name)
@@ -10,8 +13,17 @@ const validateRiveName = (name) => /[A-Z0-9_-]+/i.test(name)
 module.exports = {
   incoming: function(event, next) {
     if (event.platform === 'facebook') {
-      const reply = rs.reply(event.user.id, event.text)
-      event.skin.messenger.pipeText(event.user.id, reply)
+      rs.replyAsync(event.user.id, event.text)
+      .then(reply => {
+        deliveries.forEach(delivery => {
+          if(delivery && delivery.test.test(reply)) {
+            delivery.handler(delivery.test.exec(reply), rs, event.skin, event)
+            next()
+            return
+          }
+        })
+        event.skin.messenger.pipeText(event.user.id, reply)
+      })
     } else {
       throw new Error('Unsupported platform: ', event.platform)
     }
@@ -38,6 +50,8 @@ module.exports = {
       }, (err) => {
         console.log('Error', err) // TODO clean that
       })
+
+      calls(rs)
     }
 
     reloadRiveScript()
@@ -103,7 +117,16 @@ module.exports = {
 
     router.post('/simulate', (req, res, next) => {
       const { text } = req.body
-      res.send(rs.reply('local-user', text))
+      rs.replyAsync('local-user', text)
+      .then((reply) => {
+        deliveries.forEach(delivery => {
+          if(delivery && delivery.test.test(reply)) {
+            res.send('[Would be delivered by "' + delivery.name + '"]: ' + reply)
+            return
+          }
+        })
+        res.send(reply)  
+      })
     })
 
   }
