@@ -60,6 +60,48 @@ const renderArea = (data) => {
   })
 }
 
+class StatsHeader extends React.Component {
+
+  constructor(props) {
+    super(props)
+
+    this.state = {}
+  }
+
+  componentDidMount() {
+    this.metadataTimer = setInterval(this.fetchMetadata.bind(this), 10000)
+    this.fetchMetadata()
+  }
+
+  componentWillUnmount() {
+    this.unmounting = true
+    clearInterval(this.metadataTimer)
+  }
+
+  fetchMetadata() {
+    this.props.axios.get('/api/skin-analytics/metadata')
+    .then(({ data }) => {
+      this.setState({ ...data })
+    })
+  }
+
+  render() {
+    if (!this.state.size) return null
+    const size = this.state.size.toFixed(2)
+    const className = classnames('pull-right', style.metadata)
+
+    return <Row>
+      <Col sm={12}>
+        <div className={className}>
+          {'Last updated: ' + this.state.lastUpdated}
+          {' | ' + 'DB Size: ' + size + 'mb'}
+        </div>
+      </Col>
+    </Row>
+  }
+
+}
+
 export default class AnalyticsModule extends React.Component {
 
   constructor(props) {
@@ -69,13 +111,12 @@ export default class AnalyticsModule extends React.Component {
 
   componentDidMount() {
     this.unmounting = false
-    this.metadataTimer = setInterval(this.fetchMetadata.bind(this), 10000)
+    
     this.props.skin.axios.get('/api/skin-analytics/graphs')
     .then(({ data }) => {
       if (this.unmounting) return
       this.setState({ ...data })
     })
-    .then(this.fetchMetadata())
 
     this.props.skin.events.on('data.send', (data) => {
       if (this.unmounting) return
@@ -83,19 +124,6 @@ export default class AnalyticsModule extends React.Component {
           ...data
         }
       )
-    })
-  }
-
-  componentWillUnmount() {
-    this.unmounting = true
-    clearInterval(this.metadataTimer)
-  }
-
-  fetchMetadata() {
-    this.props.skin.axios.get('/api/skin-analytics/metadata')
-    .then(({ data }) => {
-      if (this.unmounting) return
-      this.setState({ metadata: data })
     })
   }
 
@@ -460,25 +488,10 @@ export default class AnalyticsModule extends React.Component {
     )
   }
 
-  renderMetadata() {
-    if (this.state.metadata) {
-      const size = this.state.metadata.size.toFixed(2)
-      const className = classnames('pull-right', style.metadata)
-      return <Row>
-        <Col sm={12}>
-          <div className={className}>
-            {'Last updated: ' + this.state.metadata.lastUpdated}
-            {' | ' + 'DB Size: ' + size + 'mb'}
-          </div>
-        </Col>
-      </Row>
-    }
-  }
-
   renderAllMetrics(){
     return (
       <div>
-        {this.renderMetadata()}
+        <StatsHeader axios={this.props.skin.axios}/>
         {this.renderBasicMetrics()}
         {this.renderAdvancedMetrics()}
       </div>
