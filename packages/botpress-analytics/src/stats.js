@@ -339,6 +339,20 @@ function getBusyHours(dbFile) {
   .then(() => result)
 }
 
+function getLastRun(dbFile) {
+  return db.getOrCreate(dbFile)
+  .then((knex) => {
+    return knex('runs').orderBy('ts', 'desc').limit(1)
+    .then().get(0).then(entry => {
+      return entry && Number(entry.ts)
+    })
+  })
+}
+
+function setLastRun(dbFile) {
+  return db.getOrCreate(dbFile)
+  .then((knex) => knex('runs').insert({ ts: moment(new Date()).format('x') }))
+}
 
 module.exports = {
   getTotalUsers: getTotalUsers,
@@ -348,5 +362,7 @@ module.exports = {
   getAverageInteractions: getAverageInteractions,
   getNumberOfUsers: getNumberOfUsers,
   usersRetention: usersRetention,
-  getBusyHours: getBusyHours
+  getBusyHours: getBusyHours,
+  getLastRun: getLastRun,
+  setLastRun: setLastRun
 }

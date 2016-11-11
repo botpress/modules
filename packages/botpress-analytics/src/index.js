@@ -25,5 +25,11 @@ module.exports = {
       res.send(analytics.getChartsGraphData())
     })
 
+    skin.getRouter('skin-analytics')
+    .get('/metadata', (req, res, next) => {
+      analytics.getAnalyticsMetadata()
+      .then(metadata => res.send(metadata))
+    })
+
   }
 }
