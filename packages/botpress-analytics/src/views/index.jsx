@@ -26,8 +26,7 @@ import {
 
 import style from './style.scss'
 import _ from 'lodash'
-import EventEmitter from 'eventemitter2'
-
+import classnames from 'classnames'
 
 
 const toPercent = (decimal, fixed = 0) => {
@@ -66,8 +65,20 @@ export default class AnalyticsModule extends React.Component {
   constructor(props) {
     super(props)
     this.state = {loading: true}
+  }
+
+  componentDidMount() {
+    this.unmounting = false
+    this.metadataTimer = setInterval(this.fetchMetadata.bind(this), 10000)
+    this.props.skin.axios.get('/api/skin-analytics/graphs')
+    .then(({ data }) => {
+      if (this.unmounting) return
+      this.setState({ ...data })
+    })
+    .then(this.fetchMetadata())
 
     this.props.skin.events.on('data.send', (data) => {
+      if (this.unmounting) return
       this.setState({
           ...data
         }
@@ -75,8 +86,17 @@ export default class AnalyticsModule extends React.Component {
     })
   }
 
-  componentDidMount(){
-    this.props.skin.events.emit('data.update')
+  componentWillUnmount() {
+    this.unmounting = true
+    clearInterval(this.metadataTimer)
+  }
+
+  fetchMetadata() {
+    this.props.skin.axios.get('/api/skin-analytics/metadata')
+    .then(({ data }) => {
+      if (this.unmounting) return
+      this.setState({ metadata: data })
+    })
   }
 
   renderErrorMessage() {
@@ -423,7 +443,7 @@ export default class AnalyticsModule extends React.Component {
     )
   }
 
-  renderAdvancedMetrics(){
+  renderAdvancedMetrics() {
     return (
       <Grid fluid >
         <Row>
@@ -440,9 +460,25 @@ export default class AnalyticsModule extends React.Component {
     )
   }
 
+  renderMetadata() {
+    if (this.state.metadata) {
+      const size = this.state.metadata.size.toFixed(2)
+      const className = classnames('pull-right', style.metadata)
+      return <Row>
+        <Col sm={12}>
+          <div className={className}>
+            {'Last updated: ' + this.state.metadata.lastUpdated}
+            {' | ' + 'DB Size: ' + size + 'mb'}
+          </div>
+        </Col>
+      </Row>
+    }
+  }
+
   renderAllMetrics(){
     return (
       <div>
+        {this.renderMetadata()}
         {this.renderBasicMetrics()}
         {this.renderAdvancedMetrics()}
       </div>

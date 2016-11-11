@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const EventEmitter = require('eventemitter2');
 const _ = require('lodash')
+const moment = require('moment')
 
 const stats = require('./stats')
 
@@ -32,18 +33,40 @@ class Analytics {
 
     let running = false
     setInterval(() => {
-      this.updateData()
-    }, 30 * 1000 * 60)
-    // }, 30 * 1000 * 60) // every 30min
-
-    this.skin.events.on('data.update', () => { this.updateData() })
+      stats.getLastRun(this.dbFile)
+      .then(ts => {
+        const run = moment(new Date(ts))
+        const then = moment(new Date()).subtract(30, 'min')
+        const elasped = moment.duration(then.diff(run)).asMinutes()
+        if(!ts || elasped >= this.getUpdateFrequency()) {
+          this.updateData()
+        }
+      })
+    }, 5000)
   }
 
-  updateData(){
-    console.log('Called')
-    if(this.running) return
+  getDBSize() {
+    return fs.statSync(this.dbFile)['size'] / 1000000.0 // in megabytes
+  }
 
+  getAnalyticsMetadata() {
+    return stats.getLastRun(this.dbFile)
+    .then(ts => {
+      const run = moment(new Date(ts))
+      const then = moment(new Date()).subtract(30, 'min')
+      const elasped = moment.duration(then.diff(run)).humanize()
+      return { lastUpdated: elasped, size: this.getDBSize() }
+    })
+  }
+
+  getUpdateFrequency() {
+    return this.getDBSize() < 5 ? 5 : 60
+  }
+
+  updateData() {
+    if(this.running) return
     this.running = true
+    this.skin.logger.debug('skin-analytics: recompiling analytics')
     stats.getTotalUsers(this.dbFile)
     .then(data => this.savePartialData('totalUsers', data))
     .then(() => stats.getDailyActiveUsers(this.dbFile))
@@ -68,12 +91,12 @@ class Analytics {
     .then(data => this.savePartialData('retentionHeatMap', data))
     .then(() => stats.getBusyHours(this.dbFile))
     .then(data => this.savePartialData('busyHoursHeatMap', data))
-    .then(() => this.running = false)
     .then(() => {
       const data = this.getChartsGraphData()
-      console.log("sending sent")
       this.skin.events.emit('data.send', data)
+      stats.setLastRun(this.dbFile)
     })
+    .then(() => this.running = false)
   }
 
   savePartialData(property, data) {

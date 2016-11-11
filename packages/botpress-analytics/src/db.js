@@ -43,6 +43,12 @@ function initializeDb() {
       table.enu('direction', ['in', 'out'])
     })
   })
+  .then(function() {
+    return knex.schema.createTableIfNotExists('runs', function(table) {
+      table.increments('id').primary()
+      table.timestamp('ts')
+    })
+  })
   .then(() => knex)
 }
 
