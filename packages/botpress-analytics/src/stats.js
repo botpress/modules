@@ -80,10 +80,6 @@ function getTotalUsers(dbFile) {
         })
       })
     })
-    .then(result => {
-      console.log('>>>', result)
-      return result
-    })
   })
 }
 
@@ -176,12 +172,12 @@ function getInteractionRanges(dbFile) {
         sum(r7) as s7,
         sum(r8) as s8
       from (select 
-        (select count(*) where c between 0 and 2) as r1,
-        (select count(*) where c between 2 and 4) as r2,
-        (select count(*) where c between 4 and 6) as r3,
-        (select count(*) where c between 6 and 10) as r4,
-        (select count(*) where c between 10 and 15) as r5,
-        (select count(*) where c between 15 and 30) as r6,
+        (select count(*) where c between 0 and 1) as r1,
+        (select count(*) where c between 2 and 3) as r2,
+        (select count(*) where c between 4 and 5) as r3,
+        (select count(*) where c between 6 and 9) as r4,
+        (select count(*) where c between 10 and 14) as r5,
+        (select count(*) where c between 15 and 29) as r6,
         (select count(*) where c between 30 and 50) as r7,
         (select count(*) where c > 50) as r8
           from (` + inner + `))`)
