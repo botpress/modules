@@ -13,6 +13,8 @@ const validateRiveName = (name) => /[A-Z0-9_-]+/i.test(name)
 module.exports = {
   incoming: function(event, next) {
     if (event.platform === 'facebook') {
+      rs.setUservar(event.user.id, 'platform', event.platform)
+      rs.setUservars(event.user.id, event.user)
       rs.replyAsync(event.user.id, event.text)
       .then(reply => {
         deliveries.forEach(delivery => {
