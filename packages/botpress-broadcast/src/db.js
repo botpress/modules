@@ -47,7 +47,43 @@ function addSchedule({ dateTime, userTimezone, content, type }) {
   .then().get(0)
 }
 
+function updateSchedule({ id, dateTime, userTimezone, content, type }) {
+
+  const row = {
+    date_time: moment(new Date(dateTime)).format('YYYY-MM-DD HH:mm'),
+    ts: userTimezone ? null : moment(new Date(dateTime)).format('x'),
+    text: content,
+    type: type
+  }
+
+  return knex('broadcast_schedules')
+  .where({ id: id, outboxed: 0 })
+  .update(row)
+  .then(result => {
+    console.log('UPDATE RESULT', result)
+  })
+}
+
+function deleteSchedule(id) {
+  return knex('broadcast_schedules')
+  .where(id: id)
+  .delete()
+  .then(() => {
+    return knex('broadcast_outbox')
+    .where(scheduleId: id)
+    .del()
+    .then(() => true)
+  })
+}
+
+function listSchedules() {
+  return knex('broadcast_schedules')
+  .then(rows => {
+
+  })
+}
+
 module.exports = (k) => {
   knex = k
-  return { initialize, addSchedule }
+  return { initialize, addSchedule, deleteSchedule, updateSchedule, listSchedules }
 }

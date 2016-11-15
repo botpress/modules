@@ -76,6 +76,7 @@ const convertTimeToHoursMinuteSeconds = (time) => {
 }
 
 const convertTimeStampToDate = (timestamp) => {
+  console.log(timestamp)
   return dateformat(timestamp, "yyyy-mm-d")
 }
 
