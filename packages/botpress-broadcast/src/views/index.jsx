@@ -39,7 +39,20 @@ const broadcastTypes = {
   facebook: 'Facebook specific content'
 }
 
-const getTimeFromTimeStamp = (timestamp) => {
+const getEmptyBroadcast = () => {
+  var timestamp = new Date().toISOString()
+
+  return {
+    type: 'text',
+    content: broadcastTypes['text'],
+    date: convertTimeStampToDate(timestamp),
+    time: convertTimeStampToTime(timestamp),
+    process: 0,
+    userTimeZone: true
+  }
+}
+
+const convertTimeStampToTime = (timestamp) => {
   const hours = dateformat(timestamp, 'h')
   const minutes = dateformat(timestamp, 'MM')
   const count = hours * 3600 + minutes * 60
@@ -50,8 +63,22 @@ const getTimeFromTimeStamp = (timestamp) => {
   return roundedByStep
 }
 
-const getDateFromTimeStamp = (timestamp) => {
+const convertTimeToHoursMinuteSeconds = (time) => {
+  const hours = Math.floor(time / 3600)
+  let minutes = Math.floor((time % 3600) / 60)
+  minutes = ( minutes < 10) ? ("0" + minutes) : minutes;
+  return hours + ':' + minutes
+}
+
+const convertTimeStampToDate = (timestamp) => {
   return dateformat(timestamp, "yyyy-mm-d")
+}
+
+
+const convertTimeDateToTimeStamp = (time, date) => {
+  const hoursMinutesSeconds = convertTimeToHoursMinuteSeconds(time)
+  const timezone = moment(new Date()).format('Z')
+  return date + ' ' + hoursMinutesSeconds + timezone
 }
 
 export default class BroadcastModule extends React.Component {
@@ -59,27 +86,19 @@ export default class BroadcastModule extends React.Component {
 constructor(props){
     super(props)
 
-    var date = new Date().toISOString()
     this.state = {
       loading: true,
       showModalForm: false,
       broadcast: {},
       broadcasts: {
-        1 : {
-          type: 'text',
-          timestamp: date,
-          userTimeZone: true
-        },
-        2 : {
-          type: 'javascript',
-          timestamp:  date,
-          userTimeZone: false
-        }
+        1 : getEmptyBroadcast(),
+        2 : getEmptyBroadcast()
       }
     }
 
     this.updateBroadcasts = this.updateBroadcasts.bind(this)
     this.handleAddBroadcast = this.handleAddBroadcast.bind(this)
+    this.handleModifyBroadcast = this.handleModifyBroadcast.bind(this)
     this.handleRemoveBroadcast = this.handleRemoveBroadcast.bind(this)
     this.handleOpenModalForm = this.handleOpenModalForm.bind(this)
     this.handleCloseModalForm = this.handleCloseModalForm.bind(this)
@@ -108,15 +127,17 @@ constructor(props){
   }
 
   handleAddBroadcast() {
-    console.log(this.state.broadcast)
+    const newBroadcast = this.state.broadcast
+    newBroadcast.timestamp = convertTimeDateToTimeStamp(newBroadcast.time , newBroadcast.date)
 
     var newBroadcasts = this.state.broadcasts
-    newBroadcasts[333] = broadcast
+    newBroadcasts[12] = newBroadcast
 
     this.setState({
       broadcasts: newBroadcasts,
       loading: false,
-      error: null
+      error: null,
+      showModalForm: false
     })
 
     // this.getAxios().post("/api/skin-broadcast/broadcasts", broadcast)
@@ -139,40 +160,53 @@ constructor(props){
   }
 
   handleModifyBroadcast() {
-    this.getAxios().update("/api/skin-broadcast/broadcasts/" + id, broadcast)
-    .then(res => {
-      var newBroadcasts = this.state.broadcast
-      newBroadcasts[id] = broadcast
+    const broadcast = this.state.broadcast
+    const time = this.state.broadcast.time
+    const date = this.state.broadcast.date
 
-      this.setState({
-        broadcasts: newBroadcasts,
-        loading: false,
-        error: null
-      })
+    console.log(time,date,broadcast)
+
+    broadcast.timestamp = convertTimeDateToTimeStamp(time, date)
+    var newBroadcasts = this.state.broadcasts
+
+    newBroadcasts[this.state.id] = broadcast
+
+    this.setState({
+      broadcasts: newBroadcasts,
+      loading: false,
+      error: null,
+      showModalForm: false
     })
-    .catch((err) => {
-      this.setState({
-        loading: false,
-        error: err.response.data.message
-      })
-    })
+
+    // this.getAxios().update("/api/skin-broadcast/broadcasts/" + id, broadcast)
+    // .then(res => {
+    //
+    // })
+    // .catch((err) => {
+    //   this.setState({
+    //     loading: false,
+    //     error: err.response.data.message
+    //   })
+    // })
   }
 
   handleRemoveBroadcast(id) {
-    this.getAxios().delete("/api/skin-broadcast/broadcasts/" + id)
-    .then(res => {
-      this.setState({
-        broadcasts: _.omit(this.state.broadcasts, [id]),
-        loading: false,
-        error: null
-      })
+    this.setState({
+      broadcasts: _.omit(this.state.broadcasts, [id]),
+      loading: false,
+      error: null
     })
-    .catch((err) => {
-      this.setState({
-        loading: false,
-        error: err.response.data.message
-      })
-    })
+
+    // this.getAxios().delete("/api/skin-broadcast/broadcasts/" + id)
+    // .then(res => {
+    //
+    // })
+    // .catch((err) => {
+    //   this.setState({
+    //     loading: false,
+    //     error: err.response.data.message
+    //   })
+    // })
   }
 
   handleCloseModalForm() {
@@ -185,16 +219,8 @@ constructor(props){
     }
 
     if(!broadcast) {
-      broadcast = {
-        type: 'text',
-        content: broadcastTypes['text'],
-        timestamp:  new Date().toISOString(),
-        userTimeZone: true
-      }
+      broadcast = getEmptyBroadcast()
     }
-
-    var convertedTime = getTimeFromTimeStamp(broadcast.timestamp)
-    var convertedDate = getDateFromTimeStamp(broadcast.timestamp)
 
     this.setState({
       modifyBroadcast: !id ? false : true,
@@ -204,10 +230,11 @@ constructor(props){
       broadcast: {
         type: broadcast.type,
         content: broadcast.content,
-        timestamp: broadcast.timestamp,
         userTimeZone: broadcast.userTimeZone,
-        date: convertedDate,
-        time: convertedTime
+        date: broadcast.date,
+        time: broadcast.time,
+        timestamp: broadcast.timestamp,
+        process: broadcast.process
       }
     })
   }
@@ -230,8 +257,7 @@ constructor(props){
 
   handleDateChange(value) {
     var newBroadcast = this.state.broadcast
-    newBroadcast.date = getDateFromTimeStamp(value)
-
+    newBroadcast.date = convertTimeStampToDate(value)
     this.setState({
       broadcast: newBroadcast
     })
@@ -262,7 +288,7 @@ constructor(props){
           <th>Date</th>
           <th>Type</th>
           <th>Content</th>
-          <th>Send</th>
+          <th>Process</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -277,7 +303,7 @@ constructor(props){
           <td>{moment().calendar(value.timestamp)}</td>
           <td>{value.type}</td>
           <td>{value.content}</td>
-          <td>{value.send}</td>
+          <td>{value.process}</td>
           <td>
             <Button onClick={() => this.handleOpenModalForm(value, key)}>
               <Glyphicon glyph='file' />
