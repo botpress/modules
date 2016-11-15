@@ -4,7 +4,7 @@ const EventEmitter = require('eventemitter2');
 const _ = require('lodash')
 const moment = require('moment')
 
-const stats = require('./stats')
+const Stats = require('./stats')
 
 const createEmptyFileIfDoesntExist = (file) => {
   if(!fs.existsSync(file)) {
@@ -20,20 +20,21 @@ const loadDataFromFile = (file) => {
 }
 
 class Analytics {
-  constructor(skin) {
+  constructor(skin, knex) {
     if (!skin){
       throw new Error('You need to specify skin');
     }
 
     this.skin = skin
+    this.knex = knex
+    this.stats = Stats(knex)
     this.chartsDatafile = path.join(skin.projectLocation, skin.botfile.dataDir, 'skin-analytics.charts.json')
-    this.dbFile = path.join(skin.projectLocation, skin.botfile.dataDir, 'skin-analytics.sqlite')
 
     createEmptyFileIfDoesntExist(this.chartsDatafile)
 
     let running = false
     setInterval(() => {
-      stats.getLastRun(this.dbFile)
+      this.stats.getLastRun()
       .then(ts => {
         const run = moment(new Date(ts))
         const then = moment(new Date()).subtract(30, 'min')
@@ -46,11 +47,11 @@ class Analytics {
   }
 
   getDBSize() {
-    return fs.statSync(this.dbFile)['size'] / 1000000.0 // in megabytes
+    return fs.statSync(this.skin.db.location)['size'] / 1000000.0 // in megabytes
   }
 
   getAnalyticsMetadata() {
-    return stats.getLastRun(this.dbFile)
+    return this.stats.getLastRun()
     .then(ts => {
       const run = moment(new Date(ts))
       const then = moment(new Date()).subtract(30, 'min')
@@ -67,17 +68,17 @@ class Analytics {
     if(this.running) return
     this.running = true
     this.skin.logger.debug('skin-analytics: recompiling analytics')
-    stats.getTotalUsers(this.dbFile)
+    this.stats.getTotalUsers()
     .then(data => this.savePartialData('totalUsers', data))
-    .then(() => stats.getDailyActiveUsers(this.dbFile))
+    .then(() => this.stats.getDailyActiveUsers())
     .then(data => this.savePartialData('activeUsers', data))
-    .then(() => stats.getDailyGender(this.dbFile))
+    .then(() => this.stats.getDailyGender())
     .then(data => this.savePartialData('genderUsage', data))
-    .then(() => stats.getInteractionRanges(this.dbFile))
+    .then(() => this.stats.getInteractionRanges())
     .then(data => this.savePartialData('interactionsRange', data))
-    .then(() => stats.getAverageInteractions(this.dbFile))
+    .then(() => this.stats.getAverageInteractions())
     .then(averageInteractions => {
-      stats.getNumberOfUsers(this.dbFile)
+      this.stats.getNumberOfUsers()
       .then(nbUsers => {
         this.savePartialData('fictiveSpecificMetrics', {
           numberOfInteractionInAverage: averageInteractions,
@@ -87,14 +88,14 @@ class Analytics {
         })
       })
     })
-    .then(() => stats.usersRetention(this.dbFile))
+    .then(() => this.stats.usersRetention())
     .then(data => this.savePartialData('retentionHeatMap', data))
-    .then(() => stats.getBusyHours(this.dbFile))
+    .then(() => this.stats.getBusyHours())
     .then(data => this.savePartialData('busyHoursHeatMap', data))
     .then(() => {
       const data = this.getChartsGraphData()
       this.skin.events.emit('data.send', data)
-      stats.setLastRun(this.dbFile)
+      this.stats.setLastRun()
     })
     .then(() => this.running = false)
   }
@@ -103,10 +104,6 @@ class Analytics {
     const chartsData = loadDataFromFile(this.chartsDatafile)
     chartsData[property] = data
     fs.writeFileSync(this.chartsDatafile, JSON.stringify(chartsData))
-  }
-
-  beta() {
-    stats.getBusyHours(this.dbFile)
   }
 
   getChartsGraphData() {
