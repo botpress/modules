@@ -41,6 +41,10 @@ var webConfig = {
     libraryTarget: 'assign',
     library: ['botskin', pkg.name]
   },
+  externals: {
+    'react': 'React',
+    'react-dom': 'ReactDOM'
+  },
   resolve: {
     extensions: ['', '.js', '.jsx']
   },
