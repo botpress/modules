@@ -27,7 +27,7 @@ module.exports = {
 
     router.post('/broadcasts', (req, res, next) => {
       const { date, userTimeZone, content, type } = req.body
-      console.log(req.body)
+      
       db.addSchedule({ 
         dateTime: date,
         userTimezone: userTimeZone,
