@@ -1,4 +1,7 @@
 import deamon from './deamon'
+import DB from './db'
+
+let db = null
 
 module.exports = {
   ingoing: function(event, next) {
@@ -9,6 +12,10 @@ module.exports = {
   },
   init: function(skin) {
     deamon(skin)
+    skin.db.get()
+    .then(knex => {
+      db = DB(knex)
+    })
   },
   ready: function(skin) {
 
@@ -19,9 +26,17 @@ module.exports = {
     })
 
     router.post('/broadcasts', (req, res, next) => {
-      const { date, time, userTimezone, text, textType } = req.body
-
-      // TODO Create broadcast
+      const { date, userTimeZone, content, type } = req.body
+      console.log(req.body)
+      db.addSchedule({ 
+        dateTime: date,
+        userTimezone: userTimeZone,
+        content: content,
+        type: type
+      })
+      .then(id => {
+        res.send({ id: id })
+      })
     })
 
   }

@@ -22,7 +22,7 @@ function scheduleToOutbox() {
     })
     .orWhere(function() {
       this.whereNull('ts')
-      .andWhere(knex.raw("julianday('now', '+14 hours', '+5 minutes') >= julianday(date || 'T' || time)"))
+      .andWhere(knex.raw("julianday('now', '+14 hours', '+5 minutes') >= julianday(date_time)"))
     })
   })
   .then(schedules => {

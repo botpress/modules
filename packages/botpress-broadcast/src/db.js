@@ -9,9 +9,8 @@ function initialize() {
   }
 
   return knex.schema.createTableIfNotExists('broadcast_schedules', function (table) {
-    table.string('id').primary()
-    table.string('date')
-    table.string('time')
+    table.increments('id').primary()
+    table.string('date_time')
     table.timestamp('ts')
     table.string('text')
     table.string('type')
@@ -30,7 +29,25 @@ function initialize() {
   })
 }
 
+function addSchedule({ dateTime, userTimezone, content, type }) {
+
+  const row = {
+    date_time: moment(new Date(dateTime)).format('YYYY-MM-DD HH:mm'),
+    ts: userTimezone ? null : moment(new Date(dateTime)).format('x'),
+    text: content,
+    type: type,
+    outboxed: false,
+    total_count: 0,
+    sent_count: 0,
+    created_on: moment(new Date()).format('x')
+  }
+
+  return knex('broadcast_schedules')
+  .insert(row, 'id')
+  .then().get(0)
+}
+
 module.exports = (k) => {
   knex = k
-  return { initialize }
+  return { initialize, addSchedule }
 }
