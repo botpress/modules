@@ -6,6 +6,7 @@
   "homepage": "https://github.com/DanyFS/skin-broadcast",
   "botskin": {
     "menuText": "Broadcast",
+    "menuIcon": "settings_input_antenna",
     "webBundle": "bin/web.bundle.js"
   },
   "scripts": {
@@ -43,6 +44,8 @@
     "dateformat": "^1.0.12",
     "moment": "^2.16.0",
     "react-bootstrap-date-picker": "^3.7.0",
-    "react-bootstrap-time-picker": "^1.0.1"
+    "react-bootstrap-time-picker": "^1.0.1",
+    "bluebird": "^3.4.6",
+    "moment": "^2.16.0"
   }
 }
