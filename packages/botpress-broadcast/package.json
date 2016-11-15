@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "bin/node.bundle.js",
+  "homepage": "https://github.com/DanyFS/skin-broadcast",
   "botskin": {
     "menuText": "Broadcast",
     "webBundle": "bin/web.bundle.js"
@@ -37,5 +38,11 @@
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
     "webpack": "^1.13.3"
+  },
+  "dependencies": {
+    "dateformat": "^1.0.12",
+    "moment": "^2.16.0",
+    "react-bootstrap-date-picker": "^3.7.0",
+    "react-bootstrap-time-picker": "^1.0.1"
   }
 }
