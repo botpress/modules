@@ -6,6 +6,7 @@
   "homepage": "https://github.com/DanyFS/skin-analytics",
   "botskin": {
     "menuText": "Analytics",
+    "menuIcon": "timeline",
     "webBundle": "bin/web.bundle.js"
   },
   "scripts": {
