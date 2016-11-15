@@ -1,3 +1,5 @@
+import deamon from './deamon'
+
 module.exports = {
   ingoing: function(event, next) {
 
@@ -6,7 +8,7 @@ module.exports = {
 
   },
   init: function(skin) {
-
+    deamon(skin)
   },
   ready: function(skin) {
 
@@ -18,7 +20,7 @@ module.exports = {
 
     router.post('/broadcasts', (req, res, next) => {
       const { date, time, userTimezone, text, textType } = req.body
-      
+
       // TODO Create broadcast
     })
 

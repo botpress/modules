@@ -3,15 +3,16 @@ const moment = require('moment')
 
 var knex = null
 
-function initializeDb() {
+function initialize() {
   if (!knex) {
     throw new Error('you must initialize the database before')
   }
 
   return knex.schema.createTableIfNotExists('broadcast_schedules', function (table) {
     table.string('id').primary()
-    table.date('ts')
-    table.boolean('user_timezone')
+    table.string('date')
+    table.string('time')
+    table.timestamp('ts')
     table.string('text')
     table.string('type')
     table.boolean('outboxed')
@@ -29,6 +30,7 @@ function initializeDb() {
   })
 }
 
-module.exports = {
-  initializeDb
+module.exports = (k) => {
+  knex = k
+  return { initialize }
 }
