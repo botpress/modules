@@ -3,7 +3,6 @@ import Promise from 'bluebird'
 
 import DB from './db'
 
-
 let knex = null
 
 function scheduleToOutbox() {
