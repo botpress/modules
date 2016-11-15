@@ -124,7 +124,7 @@ if(fs.existsSync(dbFile)) {
   fs.unlinkSync(dbFile)  
 }
 
-db.getOrCreate(dbFile)
+db.getOrCreate(dbFile) // TODO Fix that
 .then((knex) => {
   return run(knex)
 })

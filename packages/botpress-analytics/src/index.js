@@ -1,21 +1,31 @@
 const Analytics = require('./analytics')
-const db = require('./db')
+const DB = require('./db')
+
 let analytics = null
+let db = null
 
 module.exports = {
   incoming: function(event, next) {
-    db.saveIncoming(event)
-    next()
+    if (event.user) {
+      db && db.saveIncoming(event)
+      .then(() => next())
+    } else {
+      next()
+    }
   },
 
   outgoing: function(event, next) {
-    db.saveOutgoing(event)
+    db && db.saveOutgoing(event)
     next()
   },
 
   init: function(skin) {
-    analytics = new Analytics(skin)
-    analytics.beta()
+    skin.db.get()
+    .then(knex => {
+      db = DB(knex, skin)
+      return db.initializeDb()
+      .then(() => analytics = new Analytics(skin, knex))
+    })
   },
 
   ready: function(skin) {

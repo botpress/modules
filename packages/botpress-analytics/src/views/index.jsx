@@ -7,7 +7,6 @@ import {
   Row,
   Table
  } from 'react-bootstrap'
-import axios from 'axios'
 
 import {
   Area,
