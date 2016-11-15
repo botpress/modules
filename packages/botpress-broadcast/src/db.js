@@ -66,11 +66,11 @@ function updateSchedule({ id, dateTime, userTimezone, content, type }) {
 
 function deleteSchedule(id) {
   return knex('broadcast_schedules')
-  .where(id: id)
+  .where({ id: id })
   .delete()
   .then(() => {
     return knex('broadcast_outbox')
-    .where(scheduleId: id)
+    .where({ scheduleId: id })
     .del()
     .then(() => true)
   })
