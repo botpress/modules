@@ -76,14 +76,13 @@ const convertTimeToHoursMinuteSeconds = (time) => {
 }
 
 const convertTimeStampToDate = (timestamp) => {
-  console.log(timestamp)
-  return dateformat(timestamp, "yyyy-mm-d")
+  return moment(timestamp).format('YYYY-MM-DD')
 }
 
 const convertTimeDateToTimeStamp = (time, date) => {
   const hoursMinutesSeconds = convertTimeToHoursMinuteSeconds(time)
   const timezone = moment(new Date()).format('Z')
-  return date + ' ' + hoursMinutesSeconds + timezone
+  return moment(date).format('YYYY-MM-DD') + ' ' + hoursMinutesSeconds + timezone
 }
 
 export default class BroadcastModule extends React.Component {
@@ -132,7 +131,7 @@ constructor(props){
   }
 
   handleAddBroadcast() {
-    const newBroadcast = this.state.broadcast
+    const newBroadcast = Object.assign({}, this.state.broadcast)
     newBroadcast.timestamp = convertTimeDateToTimeStamp(newBroadcast.time , newBroadcast.date)
 
     var newBroadcasts = this.state.broadcasts
@@ -260,8 +259,7 @@ constructor(props){
 
   handleDateChange(value) {
     var newBroadcast = this.state.broadcast
-    newBroadcast.date = convertTimeStampToDate(value)
-
+    newBroadcast.date = value
     this.setState({
       broadcast: newBroadcast
     })
