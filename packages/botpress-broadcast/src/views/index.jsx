@@ -40,13 +40,18 @@ const broadcastTypes = {
 }
 
 const getEmptyBroadcast = () => {
-  var timestamp = new Date().toISOString()
+
+  var isotimestamp = new Date().toISOString()
+  var date = convertTimeStampToDate(timestamp)
+  var time = convertTimeStampToTime(timestamp)
+  var timestamp = convertTimeDateToTimeStamp(time, date)
 
   return {
     type: 'text',
     content: broadcastTypes['text'],
-    date: convertTimeStampToDate(timestamp),
-    time: convertTimeStampToTime(timestamp),
+    date: date,
+    time: time,
+    timestamp: timestamp,
     process: 0,
     userTimeZone: true
   }
@@ -73,7 +78,6 @@ const convertTimeToHoursMinuteSeconds = (time) => {
 const convertTimeStampToDate = (timestamp) => {
   return dateformat(timestamp, "yyyy-mm-d")
 }
-
 
 const convertTimeDateToTimeStamp = (time, date) => {
   const hoursMinutesSeconds = convertTimeToHoursMinuteSeconds(time)
@@ -163,8 +167,6 @@ constructor(props){
     const broadcast = this.state.broadcast
     const time = this.state.broadcast.time
     const date = this.state.broadcast.date
-
-    console.log(time,date,broadcast)
 
     broadcast.timestamp = convertTimeDateToTimeStamp(time, date)
     var newBroadcasts = this.state.broadcasts
@@ -258,6 +260,7 @@ constructor(props){
   handleDateChange(value) {
     var newBroadcast = this.state.broadcast
     newBroadcast.date = convertTimeStampToDate(value)
+
     this.setState({
       broadcast: newBroadcast
     })
@@ -300,7 +303,7 @@ constructor(props){
       return (
         <tr key={key}>
           <td>{key}</td>
-          <td>{moment().calendar(value.timestamp)}</td>
+          <td>{moment(new Date(value.timestamp).toISOString()).calendar()}</td>
           <td>{value.type}</td>
           <td>{value.content}</td>
           <td>{value.process}</td>
@@ -375,13 +378,22 @@ constructor(props){
   }
 
   renderFormDate() {
+    const getISODate = (date) => {
+      if(date) {
+        return new Date(date).toISOString()
+      }
+      return new Date().toISOString()
+    }
+
     return (
       <FormGroup controlId="formDate">
         <Col componentClass={ControlLabel} sm={2}>
           Date
         </Col>
         <Col sm={10}>
-        <DatePicker value={this.state.broadcast.date} onChange={this.handleDateChange}/>
+        <DatePicker
+          value={getISODate(this.state.broadcast.date)}
+          onChange={this.handleDateChange}/>
         </Col>
       </FormGroup>
     )
