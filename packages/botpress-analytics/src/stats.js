@@ -96,8 +96,8 @@ function getDailyActiveUsers() {
   const ranges = _.reverse(getLastDaysRange())
   return Promise.mapSeries(ranges, (range) => {
     return knex.select(knex.raw('count(*) as count, platform')).from(function() {
-      return this.from('interactions')
-      .join('users', 'users.id', 'interactions.user')
+      return this.from('analytics_interactions')
+      .join('users', 'users.id', 'analytics_interactions.user')
       .where('ts', '<', range.end)
       .andWhere('ts', '>', range.start)
       .andWhere('direction', '=', 'in')
@@ -118,8 +118,8 @@ function getDailyGender() {
   const ranges = _.reverse(getLastDaysRange())
   return Promise.mapSeries(ranges, (range) => {
     return knex.select(knex.raw('count(*) as count, gender')).from(function() {
-      return this.from('interactions')
-      .join('users', 'users.id', 'interactions.user')
+      return this.from('analytics_interactions')
+      .join('users', 'users.id', 'analytics_interactions.user')
       .where('ts', '<', range.end)
       .andWhere('ts', '>', range.start)
       .andWhere('direction', '=', 'in')
@@ -141,7 +141,7 @@ function getInteractionRanges() {
   const ranges = getLastDaysRange()
   return Promise.mapSeries(ranges, (range) => {
 
-    const inner = knex.from('interactions')
+    const inner = knex.from('analytics_interactions')
       .where('ts', '<', range.end)
       .andWhere('ts', '>', range.start)
       .andWhere('direction', '=', 'in')
@@ -195,7 +195,7 @@ function getAverageInteractions() {
   const daysAgo = moment(new Date()).subtract(7, 'days').format('x')
 
   return knex.select(knex.raw('avg(c) as count')).from(function() {
-    return this.from('interactions')
+    return this.from('analytics_interactions')
     .where('ts', '<', now)
     .andWhere('ts', '>', daysAgo)
     .andWhere('direction', '=', 'in')
@@ -224,7 +224,7 @@ function getNumberOfUsers() {
 
   return Promise.mapSeries(ranges, (range) => {
     return knex.select(knex.raw('count(*) as count')).from(function() {
-      return this.from('interactions')
+      return this.from('analytics_interactions')
       .where('ts', '<', range.end)
       .andWhere('ts', '>', range.start)
       .andWhere('direction', '=', 'in')
@@ -261,9 +261,9 @@ function usersRetention() {
   return Promise.mapSeries(cohorts, (coo) => {
     return knex.raw(`
       select count(*) total, ts date from
-      (select user, ts from interactions
-      join users on interactions.user = users.id
-      where interactions.direction = 'in'
+      (select user, ts from analytics_interactions
+      join users on analytics_interactions.user = users.id
+      where analytics_interactions.direction = 'in'
       and users.created_on > ?
       and users.created_on < ?
       group by user, date(ts/1000, 'unixepoch'))
@@ -305,7 +305,7 @@ function getBusyHours() {
 
     // select count(*) as count, ts from interactions
     // group by strftime('%H', ts/1000, 'unixepoch')
-    return knex('interactions')
+    return knex('analytics_interactions')
     .whereBetween('ts', [ range.start, range.end ])
     .select(knex.raw('count(*) as count, ts'))
     .groupBy(knex.raw("strftime('%H', ts/1000, 'unixepoch')"))
@@ -326,14 +326,14 @@ function getBusyHours() {
 }
 
 function getLastRun() {
-  return knex('runs').orderBy('ts', 'desc').limit(1)
+  return knex('analytics_runs').orderBy('ts', 'desc').limit(1)
   .then().get(0).then(entry => {
     return entry && Number(entry.ts)
   })
 }
 
 function setLastRun() {
-  return knex('runs')
+  return knex('analytics_runs')
   .insert({ ts: moment(new Date()).format('x') })
   .then(() => true)
 }

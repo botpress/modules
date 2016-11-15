@@ -9,7 +9,7 @@ function initializeDb() {
     throw new Error('you must initialize the database before')
   }
 
-  return knex.schema.createTableIfNotExists('interactions', function (table) {
+  return knex.schema.createTableIfNotExists('analytics_interactions', function (table) {
     table.increments('id').primary()
     table.timestamp('ts')
     table.string('type')
@@ -18,7 +18,7 @@ function initializeDb() {
     table.enu('direction', ['in', 'out'])
   })
   .then(function() {
-    return knex.schema.createTableIfNotExists('runs', function(table) {
+    return knex.schema.createTableIfNotExists('analytics_runs', function(table) {
       table.increments('id').primary()
       table.timestamp('ts')
     })
@@ -36,7 +36,7 @@ function saveFacebookOut(event) {
     direction: 'out'
   }
 
-  return knex('interactions').insert(interactionRow)
+  return knex('analytics_interactions').insert(interactionRow)
   .then(function(result) { return true })
 }
 
@@ -57,7 +57,7 @@ function saveInteractionIn(event) {
       direction: 'in'
     }
 
-    return knex('interactions').insert(interactionRow)
+    return knex('analytics_interactions').insert(interactionRow)
   })
 }
 

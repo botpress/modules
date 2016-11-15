@@ -114,7 +114,7 @@ const run = (knex) => {
   })
   .then(() => {
     console.log('Preparing to insert', interactions.length)
-    return knex.batchInsert('interactions', interactions, 20)
+    return knex.batchInsert('analytics_interactions', interactions, 20)
     .then(() => console.log('Added', interactions.length, 'interactions'))
   })
   .then(() => console.log('ALL DONE'))
