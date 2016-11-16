@@ -79,7 +79,7 @@ function deleteSchedule(id) {
 function listSchedules() {
   return knex('broadcast_schedules')
   .then(rows => {
-
+    return rows
   })
 }
 
