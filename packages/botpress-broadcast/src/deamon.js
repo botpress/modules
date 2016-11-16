@@ -6,11 +6,19 @@ import DB from './db'
 let knex = null
 let skin = null
 
+let schedulingLock = false
+let sendingLock = false
+
+const intervalBase = process.env.NODE_ENV === 'production'
+  ? 60 * 1000
+  : 1000
+
 function scheduleToOutbox() {
-  if (!knex) {
+  if (!knex || schedulingLock) {
     return
   }
 
+  schedulingLock = true
   knex('broadcast_schedules')
   .where({ outboxed: 0 })
   .andWhere(function() {
@@ -27,34 +35,87 @@ function scheduleToOutbox() {
     return Promise.map(schedules, (schedule) => {
       const time = schedule.ts
         ? schedule.ts
-        : moment('2016-11-15 07:15', 'YYYY-MM-DD HH:mm').format('x') + ' + (timezone * 3600)'
+        : moment(schedule.date_time + 'Z', 'YYYY-MM-DD HH:mm').format('x') + ' + (timezone * 3600)'
 
       return knex.raw(`insert into broadcast_outbox (userId, scheduleId, ts)
         select userId, ?, ?
         from (select timezone, id as userId from users)`, [schedule.id, knex.raw(time)])
       .then(() => {
-        return knex('broadcast_schedules')
-        .where({ id: schedule.id })
-        .update({ outboxed: 1 }, '')
-        .then(() => {
-          return knex('broadcast_outbox')
-          .where({ scheduleId: schedule.id })
-          .select(knex.raw('count(*) as count'))
-        })
+        return knex('broadcast_outbox')
+        .where({ scheduleId: schedule.id })
+        .select(knex.raw('count(*) as count'))
         .then().get(0).then(({ count }) => {
-          skin.logger.info('[broadcast] Scheduled broadcast #' 
-          + schedule.id, '. [' + count + ' messages]')
+          return knex('broadcast_schedules')
+          .where({ id: schedule.id })
+          .update({ outboxed: 1, total_count: count }) 
+          .then(() => {
+            skin.logger.info('[broadcast] Scheduled broadcast #' 
+            + schedule.id, '. [' + count + ' messages]')
+          })
         })
       })
     })
   })
+  .finally(() => {
+    schedulingLock = false
+  })
+}
+
+function sendBroadcasts() {
+  if (!knex || sendingLock) {
+    return
+  }
+
+  sendingLock = true
+
+  knex('broadcast_outbox')
+  .where(knex.raw("julianday(broadcast_outbox.ts/1000, 'unixepoch') <= julianday('now')"))
+  .join('users', 'users.id', 'broadcast_outbox.userId')
+  .join('broadcast_schedules', 'scheduleId', 'broadcast_schedules.id')
+  .limit(1000)
+  .select([
+    'users.userId as userId',
+    'users.platform as platform',
+    'broadcast_schedules.text as text',
+    'broadcast_schedules.type as type',
+    'broadcast_schedules.id as scheduleId',
+    'broadcast_outbox.ts as sendTime',
+    'broadcast_outbox.userId as scheduleUser'
+  ])
+  .then(rows => {
+    return Promise.mapSeries(rows, row => {
+      if (row.type === 'text') {
+        skin.outgoing({
+          platform: row.platform,
+          type: 'text',
+          text: row.text,
+          raw: {
+            to: row.userId,
+            message: row.text
+          }
+        })
+      } else {
+        const fn = new Function('skin', 'userId', 'platform', row.text)
+        fn(skin, row.userId, row.platform)
+      }
+
+      return knex('broadcast_outbox')
+      .where({ userId: row.scheduleUser, scheduleId: row.scheduleId })
+      .delete()
+      .then(() => {
+        knex('broadcast_schedules')
+        .where({ id: row.scheduleId })
+        .update({ sent_count: knex.raw('sent_count + 1') })
+        .then()
+      })
+    })
+  })
+  .finally(() => {
+    sendingLock = false
+  })
 }
 
 module.exports = (s) => {
-
-  // Exclusive locks
-  let schedulingLock = false
-  let sendingLock = false
   skin = s
 
   skin.db.get()
@@ -64,12 +125,8 @@ module.exports = (s) => {
     initialize()
   })
 
-  setInterval(scheduleToOutbox, 5 * 1000)
-
-  setInterval(() => {
-
-  }, 120 * 1000)
-
+  setInterval(scheduleToOutbox, 2 * intervalBase)
+  setInterval(sendBroadcasts, 10 * intervalBase)
 }
 
 // SCHEDULING (Every 1m) --> Exclusive lock
