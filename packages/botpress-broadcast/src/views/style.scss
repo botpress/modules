@@ -9,3 +9,14 @@
 .mainPanel {
   border-radius: 0px;
 }
+
+.scheduledTable {
+  text-align: center;
+  tbody > tr > td {
+    vertical-align: middle;
+  }
+
+  thead > tr > th {
+    text-align: center;
+  }
+}

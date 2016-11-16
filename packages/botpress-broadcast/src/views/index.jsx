@@ -148,7 +148,7 @@ constructor(props){
     if(!broadcast) {
       broadcast = {
         type: 'text',
-        content: broadcastTypes['text'],
+        content: '',
         date: new Date().toISOString(),
         time: 0,
         progress: 0,
@@ -268,7 +268,7 @@ constructor(props){
 
   renderPlannedBroadcastTable() {
     return (
-      <Table striped bordered condensed hover>
+      <Table striped bordered condensed hover className={style.scheduledTable}>
         {this.renderTableHeader()}
         {this.renderTableBody()}
       </Table>
@@ -402,7 +402,7 @@ constructor(props){
       <Navbar fluid collapseOnSelect className={style.navbar}>
         <Navbar.Header>
           <Navbar.Brand>
-            Planned broadcast
+            Scheduled broadcasts
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>
