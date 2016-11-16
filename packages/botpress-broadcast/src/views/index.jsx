@@ -32,7 +32,7 @@ import _ from 'lodash'
 import style from './style.scss'
 
 const broadcastTypes = {
-  text: 'Text content here',
+  text: '',
   javascript: 'JS function',
   facebook: 'Facebook specific content'
 }
@@ -78,7 +78,7 @@ constructor(props){
     .then((res) => {
       this.setState({
         loading: false,
-        broadcasts: res.data
+        broadcasts: _.orderBy(res.data, ['date', 'time'])
       })
     })
   }
@@ -234,18 +234,34 @@ constructor(props){
       return calendar + (userTimezone ? ' (users time)' : ' (your time)')
     }
 
+    const formatProgress = (progress, outboxed) => {
+      if(progress === 0) {
+        return outboxed ? 'Processing' : 'Not started'
+      }
+      if(progress === 1) {
+        return 'Done'
+      }
+      return (progress * 100).toFixed(2) + '%'
+    }
+
+    const renderModificationButton = (value) => {
+      return (
+        <Button onClick={() => this.handleOpenModalForm(value, value.id)}>
+          <Glyphicon glyph='file' />
+        </Button>
+      )
+    }
+
     return _.mapValues(this.state.broadcasts, (value) => {
       return (
         <tr key={value.id}>
-          <td>{value.id}</td>
-          <td>{getDateFormatted(value.time, value.date, value.userTimezone)}</td>
-          <td>{value.type}</td>
-          <td>{value.content}</td>
-          <td>{value.progress}</td>
-          <td>
-            <Button onClick={() => this.handleOpenModalForm(value, value.id)}>
-              <Glyphicon glyph='file' />
-            </Button>
+          <td style={{width:'5%'}}>{value.id}</td>
+          <td style={{width:'22%'}} className={style.scheduledDate}>{getDateFormatted(value.time, value.date, value.userTimezone)}</td>
+          <td style={{width:'8%'}}>{value.type}</td>
+          <td style={{maxWidth:'40%'}}>{value.content}</td>
+          <td style={{width:'10%'}}>{formatProgress(value.progress, value.outboxed) }</td>
+          <td style={{width:'15%'}}>
+            {!value.outboxed ? renderModificationButton(value) : null}
             <Button onClick={() => this.handleOpenModalForm(value)}>
               <Glyphicon glyph='copy' />
             </Button>
