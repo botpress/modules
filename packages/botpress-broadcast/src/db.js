@@ -29,11 +29,16 @@ function initialize() {
   })
 }
 
-function addSchedule({ dateTime, userTimezone, content, type }) {
+function addSchedule({ date, time, timezone, content, type }) {
+  let dateTime = date + ' ' + time
+  let ts = null
+  if (timezone) {
+    ts = moment(new Date(dateTime + ' ' + timezone)).format('x')
+  }
 
   const row = {
-    date_time: moment(new Date(dateTime)).format('YYYY-MM-DD HH:mm'),
-    ts: userTimezone ? null : moment(new Date(dateTime)).format('x'),
+    date_time: dateTime,
+    ts: ts,
     text: content,
     type: type,
     outboxed: false,
@@ -47,11 +52,16 @@ function addSchedule({ dateTime, userTimezone, content, type }) {
   .then().get(0)
 }
 
-function updateSchedule({ id, dateTime, userTimezone, content, type }) {
+function updateSchedule({ id, date, time, timezone, content, type }) {
+  let dateTime = date + ' ' + time
+  let ts = null
+  if (timezone) {
+    ts = moment(new Date(dateTime + ' ' + timezone)).format('x')
+  }
 
   const row = {
-    date_time: moment(new Date(dateTime)).format('YYYY-MM-DD HH:mm'),
-    ts: userTimezone ? null : moment(new Date(dateTime)).format('x'),
+    date_time: dateTime,
+    ts: ts,
     text: content,
     type: type
   }
@@ -60,7 +70,7 @@ function updateSchedule({ id, dateTime, userTimezone, content, type }) {
   .where({ id: id, outboxed: 0 })
   .update(row)
   .then(result => {
-    console.log('UPDATE RESULT', result)
+    console.log('Updated: ', result)
   })
 }
 
@@ -77,10 +87,7 @@ function deleteSchedule(id) {
 }
 
 function listSchedules() {
-  return knex('broadcast_schedules')
-  .then(rows => {
-    return rows
-  })
+  return knex('broadcast_schedules').then()
 }
 
 module.exports = (k) => {
