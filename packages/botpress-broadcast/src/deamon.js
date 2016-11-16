@@ -4,13 +4,12 @@ import Promise from 'bluebird'
 import DB from './db'
 
 let knex = null
+let skin = null
 
 function scheduleToOutbox() {
   if (!knex) {
     return
   }
-
-  // console.log('>> running schedule to outbox')
 
   knex('broadcast_schedules')
   .where({ outboxed: 0 })
@@ -26,17 +25,37 @@ function scheduleToOutbox() {
   })
   .then(schedules => {
     return Promise.map(schedules, (schedule) => {
-      const userTz = !schedule.ts
-      // console.log('>>> SCHEDULE: ', schedule, userTz)
+      const time = schedule.ts
+        ? schedule.ts
+        : moment('2016-11-15 07:15', 'YYYY-MM-DD HH:mm').format('x') + ' + (timezone * 3600)'
+
+      return knex.raw(`insert into broadcast_outbox (userId, scheduleId, ts)
+        select userId, ?, ?
+        from (select timezone, id as userId from users)`, [schedule.id, knex.raw(time)])
+      .then(() => {
+        return knex('broadcast_schedules')
+        .where({ id: schedule.id })
+        .update({ outboxed: 1 }, '')
+        .then(() => {
+          return knex('broadcast_outbox')
+          .where({ scheduleId: schedule.id })
+          .select(knex.raw('count(*) as count'))
+        })
+        .then().get(0).then(({ count }) => {
+          skin.logger.info('[broadcast] Scheduled broadcast #' 
+          + schedule.id, '. [' + count + ' messages]')
+        })
+      })
     })
   })
 }
 
-module.exports = (skin) => {
+module.exports = (s) => {
 
   // Exclusive locks
   let schedulingLock = false
   let sendingLock = false
+  skin = s
 
   skin.db.get()
   .then(k => {
