@@ -58,6 +58,9 @@ constructor(props){
     this.handleDateChange = this.handleDateChange.bind(this)
     this.handleTimeChange = this.handleTimeChange.bind(this)
     this.handleUserTimezoneChange = this.handleUserTimezoneChange.bind(this)
+    this.handleRequestError = this.handleRequestError.bind(this)
+    this.fetchAllBroadcasts = this.fetchAllBroadcasts.bind(this)
+    this.closeModal = this.closeModal.bind(this)
   }
 
   getAxios() {
@@ -65,78 +68,72 @@ constructor(props){
   }
 
   componentDidMount(){
-    this.getAxios().get("/api/skin-broadcast/broadcasts")
+    this.fetchAllBroadcasts()
+  }
+
+  fetchAllBroadcasts() {
+    this.setState({ loading: true })
+
+    return this.getAxios().get("/api/skin-broadcast/broadcasts")
     .then((res) => {
       this.setState({
         loading: false,
-        broadcasts: res.data.broadcasts
+        broadcasts: res.data
       })
+    })
+  }
+
+  extractBroadcastFromModal() {
+    const { type, content, date, userTimezone, time } = this.state.broadcast
+    return {
+      date: moment(date).format('YYYY-MM-DD'),
+      time: moment().startOf('day').add(time, 'seconds').format('HH:mm'),
+      content: content,
+      type: type,
+      timezone: userTimezone ? null : moment().format('Z')
+    }
+  }
+
+  closeModal() {
+    this.setState({ showModalForm: false, error: null })
+    return Promise.resolve(true)
+  }
+
+  handleRequestError(err) {
+    if (err && err.response) {
+      return this.setState({
+        loading: false,
+        error: err.response.data.message
+      })
+    }
+
+    this.setState({
+      loading: false,
+      error: err ? err.message : 'An unknown error occured'
     })
   }
 
   handleAddBroadcast() {
-    const newBroadcast = Object.assign({}, this.state.broadcast)
-    newBroadcast.timezone = moment(new Date()).format('Z')
-
-    this.getAxios().post("/api/skin-broadcast/broadcasts", newBroadcast)
-    .then(res => {
-      let newBroadcasts = this.state.broadcasts
-      newBroadcasts[res.data.id] = newBroadcast
-
-      this.setState({
-        broadcasts: newBroadcasts,
-        loading: false,
-        error: null,
-        showModalForm: false
-      })
-    })
-    .catch((err) => {
-      this.setState({
-        loading: false,
-        error: err.res.data.message
-      })
-    })
+    const broadcast = this.extractBroadcastFromModal()
+    this.getAxios().post("/api/skin-broadcast/broadcasts", broadcast)
+    .then(this.fetchAllBroadcasts)
+    .then(this.closeModal)
+    .catch(this.handleRequestError)
   }
 
   handleModifyBroadcast() {
-    const newBroadcast = Object.assign({}, this.state.broadcast)
-    newBroadcast.timezone = moment(new Date()).format('Z')
-
-    this.getAxios().put("/api/skin-broadcast/broadcasts", {id: this.state.id, ...newBroadcast})
-    .then(res => {
-      var newBroadcasts = this.state.broadcasts
-      newBroadcasts[this.state.id] = newBroadcast
-
-      this.setState({
-        broadcasts: newBroadcasts,
-        loading: false,
-        error: null,
-        showModalForm: false
-      })
-    })
-    .catch((err) => {
-      this.setState({
-        loading: false,
-        error: err.response.data.message
-      })
-    })
+    const broadcast = this.extractBroadcastFromModal()
+    const { broadcastId: id } = this.state
+    this.getAxios().put("/api/skin-broadcast/broadcasts", { id, ...broadcast })
+    .then(this.fetchAllBroadcasts)
+    .then(this.closeModal)
+    .catch(this.handleRequestError)
   }
 
   handleRemoveBroadcast(id) {
     this.getAxios().delete("/api/skin-broadcast/broadcasts/" + id)
-    .then(res => {
-      this.setState({
-        broadcasts: _.omit(this.state.broadcasts, [id]),
-        loading: false,
-        error: null
-      })
-    })
-    .catch((err) => {
-      this.setState({
-        loading: false,
-        error: err.response.data.message
-      })
-    })
+    .then(this.fetchAllBroadcasts)
+    .catch(this.handleRequestError)
   }
 
   handleCloseModalForm() {
@@ -163,7 +160,7 @@ constructor(props){
       modifyBroadcast: !id ? false : true,
       showModalForm: true,
 
-      id: id,
+      broadcastId: id,
       broadcast: {
         type: broadcast.type,
         content: broadcast.content,
@@ -232,28 +229,27 @@ constructor(props){
   }
 
   renderBroadcasts() {
-    const getDateFormatted = (time, date, timezone) => {
-
-       return moment(date).format('YYYY-MM-DD') +
-       ' ' + moment().startOf('day').add(time, 'seconds').format('HH:mm')
+    const getDateFormatted = (time, date, userTimezone) => {
+      const calendar = moment(date + ' ' + time, 'YYYY-MM-DD HH:mm').calendar()
+      return calendar + (userTimezone ? ' (users time)' : ' (your time)')
     }
 
-    return _.mapValues(this.state.broadcasts, (value, key) => {
+    return _.mapValues(this.state.broadcasts, (value) => {
       return (
-        <tr key={key}>
-          <td>{key}</td>
-          <td>{getDateFormatted(value.time, value.date, value.timezone)}</td>
+        <tr key={value.id}>
+          <td>{value.id}</td>
+          <td>{getDateFormatted(value.time, value.date, value.userTimezone)}</td>
           <td>{value.type}</td>
           <td>{value.content}</td>
           <td>{value.progress}</td>
           <td>
-            <Button onClick={() => this.handleOpenModalForm(value, key)}>
+            <Button onClick={() => this.handleOpenModalForm(value, value.id)}>
               <Glyphicon glyph='file' />
             </Button>
             <Button onClick={() => this.handleOpenModalForm(value)}>
               <Glyphicon glyph='copy' />
             </Button>
-            <Button onClick={() => this.handleRemoveBroadcast(key)}>
+            <Button onClick={() => this.handleRemoveBroadcast(value.id)}>
               <Glyphicon glyph='trash' />
             </Button>
           </td>

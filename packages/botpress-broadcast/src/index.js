@@ -25,59 +25,37 @@ module.exports = {
     router.get('/broadcasts', (req, res, next) => {
       db.listSchedules()
       .then(rows => {
-        let broadcasts = {}
-
-        for (let row of rows) {
-          let date = row.date_time
-          let time = row.date_time
-          let userTimezone = !!row.ts ? false : true
-          let progress = 0
-
-          if (row.total_count != 0) {
-            progress = row.sent_count / row.total_count
-          }
-          let outboxed =  !!row.outboxed ? true : false
-
-          broadcasts[row.id] = {
+        const broadcasts = rows.map(row => {
+          const [date, time] = row.date_time.split(' ')
+          const progress = row.total_count
+            ? row.sent_count / row.total_count
+            : 0
+          return {
             type: row.type,
             content: row.text,
-            outboxed: outboxed,
+            outboxed: !!row.outboxed,
             progress: progress,
-            userTimezone: userTimezone,
+            userTimezone: !row.ts,
             date: date,
-            time: time
+            time: time,
+            id: row.id
           }
-        }
-        console.log(broadcasts)
-        res.send({broadcasts})
+        })
+
+        res.send(broadcasts)
       })
     })
 
     router.post('/broadcasts', (req, res, next) => {
-      const { timestamp, userTimezone, content, type } = req.body
-      db.addSchedule({
-        dateTime: timestamp,
-        userTimezone: userTimezone,
-        content: content,
-        type: type
-      })
-      .then(id => {
-        res.send({ id: id })
-      })
+      const { date, time, timezone, content, type } = req.body
+      db.addSchedule({ date, time, timezone, content, type })
+      .then(id => res.send({ id: id }))
     })
 
     router.put('/broadcasts', (req, res, next) => {
-      const { id, timestamp, userTimezone, content, type } = req.body
-      db.updateSchedule({
-        id: id,
-        dateTime: timestamp,
-        userTimezone: userTimezone,
-        content: content,
-        type: type
-      })
-      .then(() => {
-        res.sendStatus(200)
-      })
+      const { id, date, time, timezone, content, type } = req.body
+      db.updateSchedule({ id, date, time, timezone, content, type })
+      .then(() => res.sendStatus(200))
       .catch((err) => {
         res.status(500).send({ message: err.message })
       })
