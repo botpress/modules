@@ -14,9 +14,17 @@
   text-align: center;
   tbody > tr > td {
     vertical-align: middle;
+
+    button {
+      margin: 1px;
+    }
   }
 
   thead > tr > th {
     text-align: center;
   }
+}
+
+.scheduledDate {
+  text-align: left;
 }
