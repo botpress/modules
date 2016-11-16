@@ -58,7 +58,7 @@ const getEmptyBroadcast = () => {
 }
 
 const convertTimeStampToTime = (timestamp) => {
-  const hours = dateformat(timestamp, 'h')
+  const hours = dateformat(timestamp, 'HH')
   const minutes = dateformat(timestamp, 'MM')
   const count = hours * 3600 + minutes * 60
 
