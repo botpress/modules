@@ -1,5 +1,6 @@
 import deamon from './deamon'
 import DB from './db'
+import moment from 'moment'
 
 let db = null
 
@@ -23,9 +24,32 @@ module.exports = {
 
     router.get('/broadcasts', (req, res, next) => {
       db.listSchedules()
-      .then(broadcasts => {
-        // res.send({broadcasts: broadcasts})
-        res.send({broadcasts: {}})
+      .then(rows => {
+        let broadcasts = {}
+
+        for (let row of rows) {
+          let date = row.date_time
+          let time = row.date_time
+          let userTimezone = !!row.ts ? false : true
+          let progress = 0
+
+          if (row.total_count != 0) {
+            progress = row.sent_count / row.total_count
+          }
+          let outboxed =  !!row.outboxed ? true : false
+
+          broadcasts[row.id] = {
+            type: row.type,
+            content: row.text,
+            outboxed: outboxed,
+            progress: progress,
+            userTimezone: userTimezone,
+            date: date,
+            time: time
+          }
+        }
+        console.log(broadcasts)
+        res.send({broadcasts})
       })
     })
 

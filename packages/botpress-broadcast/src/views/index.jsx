@@ -31,55 +31,10 @@ import _ from 'lodash'
 
 import style from './style.scss'
 
-const TIME_STEP = 30
-
 const broadcastTypes = {
   text: 'Text content here',
   javascript: 'JS function',
   facebook: 'Facebook specific content'
-}
-
-const getEmptyBroadcast = () => {
-
-  var isotimestamp = new Date().toISOString()
-  var date = convertTimeStampToDate(timestamp)
-  var time = convertTimeStampToTime(timestamp)
-  var timestamp = convertTimeDateToTimeStamp(time, date)
-
-  return {
-    type: 'text',
-    content: broadcastTypes['text'],
-    date: date,
-    time: time,
-    timestamp: timestamp,
-    progress: 0,
-    userTimezone: true
-  }
-}
-
-const convertTimeStampToTime = (timestamp) => {
-  const hours = dateformat(timestamp, 'HH')
-  const minutes = dateformat(timestamp, 'MM')
-  const count = hours * 3600 + minutes * 60
-
-  const stepCount = TIME_STEP * 60
-  const roundedByStep = Math.round(count / stepCount) * stepCount
-
-  return roundedByStep
-}
-
-const convertTimeToHoursMinuteSeconds = (time) => {
-  return moment().startOf('day').add(time, 'seconds').format('HH:MM')
-}
-
-const convertTimeStampToDate = (timestamp) => {
-  return moment(timestamp).format('YYYY-MM-DD')
-}
-
-const convertTimeDateToTimeStamp = (time, date) => {
-  const hoursMinutesSeconds = convertTimeToHoursMinuteSeconds(time)
-  const timezone = moment(new Date()).format('Z')
-  return moment(date).format('YYYY-MM-DD') + ' ' + hoursMinutesSeconds + timezone
 }
 
 export default class BroadcastModule extends React.Component {
@@ -116,12 +71,12 @@ constructor(props){
         loading: false,
         broadcasts: res.data.broadcasts
       })
-    });
+    })
   }
 
   handleAddBroadcast() {
     const newBroadcast = Object.assign({}, this.state.broadcast)
-    newBroadcast.timestamp = convertTimeDateToTimeStamp(newBroadcast.time , newBroadcast.date)
+    newBroadcast.timezone = moment(new Date()).format('Z')
 
     this.getAxios().post("/api/skin-broadcast/broadcasts", newBroadcast)
     .then(res => {
@@ -145,7 +100,7 @@ constructor(props){
 
   handleModifyBroadcast() {
     const newBroadcast = Object.assign({}, this.state.broadcast)
-    newBroadcast.timestamp = convertTimeDateToTimeStamp(newBroadcast.time , newBroadcast.date)
+    newBroadcast.timezone = moment(new Date()).format('Z')
 
     this.getAxios().put("/api/skin-broadcast/broadcasts", {id: this.state.id, ...newBroadcast})
     .then(res => {
@@ -194,7 +149,14 @@ constructor(props){
     }
 
     if(!broadcast) {
-      broadcast = getEmptyBroadcast()
+      broadcast = {
+        type: 'text',
+        content: broadcastTypes['text'],
+        date: new Date().toISOString(),
+        time: 0,
+        progress: 0,
+        userTimezone: true
+      }
     }
 
     this.setState({
@@ -208,7 +170,6 @@ constructor(props){
         userTimezone: broadcast.userTimezone,
         date: broadcast.date,
         time: broadcast.time,
-        timestamp: broadcast.timestamp,
         progress: broadcast.progress
       }
     })
@@ -271,15 +232,17 @@ constructor(props){
   }
 
   renderBroadcasts() {
-    const getDateFormatted = (timestamp, userTimezone) => {
-      return moment(new Date(timestamp).toISOString()).calendar()
+    const getDateFormatted = (time, date, timezone) => {
+
+       return moment(date).format('YYYY-MM-DD') +
+       ' ' + moment().startOf('day').add(time, 'seconds').format('HH:mm')
     }
 
     return _.mapValues(this.state.broadcasts, (value, key) => {
       return (
         <tr key={key}>
           <td>{key}</td>
-          <td>{getDateFormatted(value.timestamp, value.userTimezone)}</td>
+          <td>{getDateFormatted(value.time, value.date, value.timezone)}</td>
           <td>{value.type}</td>
           <td>{value.content}</td>
           <td>{value.progress}</td>
