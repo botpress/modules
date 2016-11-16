@@ -22,15 +22,18 @@ module.exports = {
     const router = skin.getRouter('skin-broadcast')
 
     router.get('/broadcasts', (req, res, next) => {
-      // TODO Return all broadcasts
+      db.listSchedules()
+      .then(broadcasts => {
+        // res.send({broadcasts: broadcasts})
+        res.send({broadcasts: {}})
+      })
     })
 
     router.post('/broadcasts', (req, res, next) => {
-      const { date, userTimeZone, content, type } = req.body
-      
-      db.addSchedule({ 
-        dateTime: date,
-        userTimezone: userTimeZone,
+      const { timestamp, userTimezone, content, type } = req.body
+      db.addSchedule({
+        dateTime: timestamp,
+        userTimezone: userTimezone,
         content: content,
         type: type
       })
@@ -39,5 +42,31 @@ module.exports = {
       })
     })
 
+    router.put('/broadcasts', (req, res, next) => {
+      const { id, timestamp, userTimezone, content, type } = req.body
+      db.updateSchedule({
+        id: id,
+        dateTime: timestamp,
+        userTimezone: userTimezone,
+        content: content,
+        type: type
+      })
+      .then(() => {
+        res.sendStatus(200)
+      })
+      .catch((err) => {
+        res.status(500).send({ message: err.message })
+      })
+    })
+
+    router.delete('/broadcasts/:id', (req, res, next) => {
+      db.deleteSchedule(req.params.id)
+      .then(() => {
+        res.sendStatus(200)
+      })
+      .catch((err) => {
+        res.status(500).send({ message: err.message })
+      })
+    })
   }
 }

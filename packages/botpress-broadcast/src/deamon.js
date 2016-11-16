@@ -10,7 +10,7 @@ function scheduleToOutbox() {
     return
   }
 
-  console.log('>> running schedule to outbox')
+  // console.log('>> running schedule to outbox')
 
   knex('broadcast_schedules')
   .where({ outboxed: 0 })
@@ -27,7 +27,7 @@ function scheduleToOutbox() {
   .then(schedules => {
     return Promise.map(schedules, (schedule) => {
       const userTz = !schedule.ts
-      console.log('>>> SCHEDULE: ', schedule, userTz)
+      // console.log('>>> SCHEDULE: ', schedule, userTz)
     })
   })
 }

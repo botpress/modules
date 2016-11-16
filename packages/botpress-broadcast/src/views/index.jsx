@@ -52,8 +52,8 @@ const getEmptyBroadcast = () => {
     date: date,
     time: time,
     timestamp: timestamp,
-    process: 0,
-    userTimeZone: true
+    progress: 0,
+    userTimezone: true
   }
 }
 
@@ -69,10 +69,7 @@ const convertTimeStampToTime = (timestamp) => {
 }
 
 const convertTimeToHoursMinuteSeconds = (time) => {
-  const hours = Math.floor(time / 3600)
-  let minutes = Math.floor((time % 3600) / 60)
-  minutes = ( minutes < 10) ? ("0" + minutes) : minutes;
-  return hours + ':' + minutes
+  return moment().startOf('day').add(time, 'seconds').format('HH:MM')
 }
 
 const convertTimeStampToDate = (timestamp) => {
@@ -93,14 +90,9 @@ constructor(props){
     this.state = {
       loading: true,
       showModalForm: false,
-      broadcast: {},
-      broadcasts: {
-        1 : getEmptyBroadcast(),
-        2 : getEmptyBroadcast()
-      }
+      broadcast: {}
     }
 
-    this.updateBroadcasts = this.updateBroadcasts.bind(this)
     this.handleAddBroadcast = this.handleAddBroadcast.bind(this)
     this.handleModifyBroadcast = this.handleModifyBroadcast.bind(this)
     this.handleRemoveBroadcast = this.handleRemoveBroadcast.bind(this)
@@ -110,7 +102,7 @@ constructor(props){
     this.handleContentChange = this.handleContentChange.bind(this)
     this.handleDateChange = this.handleDateChange.bind(this)
     this.handleTimeChange = this.handleTimeChange.bind(this)
-    this.handleUserTimeZoneChange = this.handleUserTimeZoneChange.bind(this)
+    this.handleUserTimezoneChange = this.handleUserTimezoneChange.bind(this)
   }
 
   getAxios() {
@@ -118,97 +110,78 @@ constructor(props){
   }
 
   componentDidMount(){
-    //updateBroadcasts()
-  }
-
-  updateBroadcasts() {
     this.getAxios().get("/api/skin-broadcast/broadcasts")
     .then((res) => {
       this.setState({
+        loading: false,
         broadcasts: res.data.broadcasts
       })
-    })
+    });
   }
 
   handleAddBroadcast() {
     const newBroadcast = Object.assign({}, this.state.broadcast)
     newBroadcast.timestamp = convertTimeDateToTimeStamp(newBroadcast.time , newBroadcast.date)
 
-    var newBroadcasts = this.state.broadcasts
-    newBroadcasts[12] = newBroadcast
+    this.getAxios().post("/api/skin-broadcast/broadcasts", newBroadcast)
+    .then(res => {
+      let newBroadcasts = this.state.broadcasts
+      newBroadcasts[res.data.id] = newBroadcast
 
-    this.setState({
-      broadcasts: newBroadcasts,
-      loading: false,
-      error: null,
-      showModalForm: false
+      this.setState({
+        broadcasts: newBroadcasts,
+        loading: false,
+        error: null,
+        showModalForm: false
+      })
     })
-
-    // this.getAxios().post("/api/skin-broadcast/broadcasts", broadcast)
-    // .then(res => {
-    //   var newBroadcasts = this.state.broadcasts
-    //   newBroadcasts[333] = broadcast
-    //
-    //   this.setState({
-    //     broadcasts: newBroadcasts,
-    //     loading: false,
-    //     error: null
-    //   })
-    // })
-    // .catch((err) => {
-    //   this.setState({
-    //     loading: false,
-    //     error: err.response.data.message
-    //   })
-    // })
+    .catch((err) => {
+      this.setState({
+        loading: false,
+        error: err.res.data.message
+      })
+    })
   }
 
   handleModifyBroadcast() {
-    const broadcast = this.state.broadcast
-    const time = this.state.broadcast.time
-    const date = this.state.broadcast.date
+    const newBroadcast = Object.assign({}, this.state.broadcast)
+    newBroadcast.timestamp = convertTimeDateToTimeStamp(newBroadcast.time , newBroadcast.date)
 
-    broadcast.timestamp = convertTimeDateToTimeStamp(time, date)
-    var newBroadcasts = this.state.broadcasts
+    this.getAxios().put("/api/skin-broadcast/broadcasts", {id: this.state.id, ...newBroadcast})
+    .then(res => {
+      var newBroadcasts = this.state.broadcasts
+      newBroadcasts[this.state.id] = newBroadcast
 
-    newBroadcasts[this.state.id] = broadcast
-
-    this.setState({
-      broadcasts: newBroadcasts,
-      loading: false,
-      error: null,
-      showModalForm: false
+      this.setState({
+        broadcasts: newBroadcasts,
+        loading: false,
+        error: null,
+        showModalForm: false
+      })
     })
-
-    // this.getAxios().update("/api/skin-broadcast/broadcasts/" + id, broadcast)
-    // .then(res => {
-    //
-    // })
-    // .catch((err) => {
-    //   this.setState({
-    //     loading: false,
-    //     error: err.response.data.message
-    //   })
-    // })
+    .catch((err) => {
+      this.setState({
+        loading: false,
+        error: err.response.data.message
+      })
+    })
   }
 
   handleRemoveBroadcast(id) {
-    this.setState({
-      broadcasts: _.omit(this.state.broadcasts, [id]),
-      loading: false,
-      error: null
+    this.getAxios().delete("/api/skin-broadcast/broadcasts/" + id)
+    .then(res => {
+      this.setState({
+        broadcasts: _.omit(this.state.broadcasts, [id]),
+        loading: false,
+        error: null
+      })
     })
-
-    // this.getAxios().delete("/api/skin-broadcast/broadcasts/" + id)
-    // .then(res => {
-    //
-    // })
-    // .catch((err) => {
-    //   this.setState({
-    //     loading: false,
-    //     error: err.response.data.message
-    //   })
-    // })
+    .catch((err) => {
+      this.setState({
+        loading: false,
+        error: err.response.data.message
+      })
+    })
   }
 
   handleCloseModalForm() {
@@ -232,11 +205,11 @@ constructor(props){
       broadcast: {
         type: broadcast.type,
         content: broadcast.content,
-        userTimeZone: broadcast.userTimeZone,
+        userTimezone: broadcast.userTimezone,
         date: broadcast.date,
         time: broadcast.time,
         timestamp: broadcast.timestamp,
-        process: broadcast.process
+        progress: broadcast.progress
       }
     })
   }
@@ -274,9 +247,9 @@ constructor(props){
     });
   }
 
-  handleUserTimeZoneChange() {
+  handleUserTimezoneChange() {
     var newBroadcast = this.state.broadcast
-    newBroadcast.userTimeZone = !newBroadcast.userTimeZone
+    newBroadcast.userTimezone = !newBroadcast.userTimezone
     this.setState({
       broadcast: newBroadcast
     })
@@ -290,7 +263,7 @@ constructor(props){
           <th>Date</th>
           <th>Type</th>
           <th>Content</th>
-          <th>Process</th>
+          <th>Progress</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -298,14 +271,18 @@ constructor(props){
   }
 
   renderBroadcasts() {
+    const getDateFormatted = (timestamp, userTimezone) => {
+      return moment(new Date(timestamp).toISOString()).calendar()
+    }
+
     return _.mapValues(this.state.broadcasts, (value, key) => {
       return (
         <tr key={key}>
           <td>{key}</td>
-          <td>{moment(new Date(value.timestamp).toISOString()).calendar()}</td>
+          <td>{getDateFormatted(value.timestamp, value.userTimezone)}</td>
           <td>{value.type}</td>
           <td>{value.content}</td>
-          <td>{value.process}</td>
+          <td>{value.progress}</td>
           <td>
             <Button onClick={() => this.handleOpenModalForm(value, key)}>
               <Glyphicon glyph='file' />
@@ -411,15 +388,15 @@ constructor(props){
     )
   }
 
-  renderFormUserTimeZone() {
+  renderFormUserTimezone() {
     return (
-      <FormGroup controlId="formUserTimeZone">
+      <FormGroup controlId="formUserTimezone">
         <Col componentClass={ControlLabel} sm={2}>
           User time zone
         </Col>
         <Col sm={10}>
-          <Checkbox name='userTimeZone' checked={this.state.broadcast.userTimeZone}
-            onChange={this.handleUserTimeZoneChange} />
+          <Checkbox name='userTimezone' checked={this.state.broadcast.userTimezone}
+            onChange={this.handleUserTimezoneChange} />
         </Col>
       </FormGroup>
     )
@@ -432,7 +409,7 @@ constructor(props){
         {this.renderFormContent()}
         {this.renderFormDate()}
         {this.renderFormTime()}
-        {this.renderFormUserTimeZone()}
+        {this.renderFormUserTimezone()}
       </Form>
     )
   }
