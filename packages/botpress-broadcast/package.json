@@ -41,11 +41,11 @@
     "webpack": "^1.13.3"
   },
   "dependencies": {
+    "bluebird": "^3.4.6",
+    "bluebird-retry": "^0.8.0",
     "dateformat": "^1.0.12",
     "moment": "^2.16.0",
     "react-bootstrap-date-picker": "^3.7.0",
-    "react-bootstrap-time-picker": "^1.0.1",
-    "bluebird": "^3.4.6",
-    "moment": "^2.16.0"
+    "react-bootstrap-time-picker": "^1.0.1"
   }
 }
