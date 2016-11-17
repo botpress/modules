@@ -41,24 +41,15 @@ function saveFacebookOut(event) {
 }
 
 function saveInteractionIn(event) {
-  return bp.db.saveUser({
-    id: event.user.id,
-    platform: event.platform,
-    gender: event.user.gender,
-    timezone: event.user.timezone,
-    locale: event.user.locale,
-  })
-  .then(() => {
-    const interactionRow = {
-      ts: moment(new Date()).format('x'),
-      type: event.type,
-      text: event.text,
-      user: event.platform + ':' + event.user.id,
-      direction: 'in'
-    }
+  const interactionRow = {
+    ts: moment(new Date()).format('x'),
+    type: event.type,
+    text: event.text,
+    user: event.platform + ':' + event.user.id,
+    direction: 'in'
+  }
 
-    return knex('analytics_interactions').insert(interactionRow)
-  })
+  return knex('analytics_interactions').insert(interactionRow)
 }
 
 function saveInteractionOut(event) {
