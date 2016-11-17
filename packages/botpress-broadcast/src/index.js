@@ -34,6 +34,7 @@ module.exports = {
             type: row.type,
             content: row.text,
             outboxed: !!row.outboxed,
+            errored: !!row.errored,
             progress: progress,
             userTimezone: !row.ts,
             date: date,
