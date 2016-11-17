@@ -60,7 +60,7 @@ module.exports = {
     }
     const restoreMemory = () => {
       if (fs.existsSync(memoryFile)) {
-        skin.logger.debug('[rivescript] Restoring brain')
+        bp.logger.debug('[rivescript] Restoring brain')
         const content = JSON.parse(fs.readFileSync(memoryFile))
         const users = _.keys(content)
         users.forEach(user => rs.setUservars(user, content[user]))
