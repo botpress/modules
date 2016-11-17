@@ -111,18 +111,19 @@ class Analytics {
     const chartsData = loadDataFromFile(this.chartsDatafile)
 
     if(_.isEmpty(chartsData)) {
-      return {loading: true}
+      return { loading: true, noData: true }
     }
 
     return {
       loading: false,
-      totalUsersChartData: chartsData.totalUsers,
-      activeUsersChartData: chartsData.activeUsers,
-      genderUsageChartData: chartsData.genderUsage,
-      typicalConversationLengthInADay: chartsData.interactionsRange,
-      specificMetricsForLastDays: chartsData.fictiveSpecificMetrics,
-      retentionHeatMap: chartsData.retentionHeatMap,
-      busyHoursHeatMap: chartsData.busyHoursHeatMap
+      noData: false,
+      totalUsersChartData: chartsData.totalUsers || [],
+      activeUsersChartData: chartsData.activeUsers || [],
+      genderUsageChartData: chartsData.genderUsage || [],
+      typicalConversationLengthInADay: chartsData.interactionsRange || [],
+      specificMetricsForLastDays: chartsData.fictiveSpecificMetrics || {},
+      retentionHeatMap: chartsData.retentionHeatMap || [],
+      busyHoursHeatMap: chartsData.busyHoursHeatMap || []
     }
   }
 }
