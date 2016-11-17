@@ -11,16 +11,16 @@ module.exports = {
   outgoing: function(event, next) {
 
   },
-  init: function(skin) {
-    deamon(skin)
-    skin.db.get()
+  init: function(bp) {
+    deamon(bp)
+    bp.db.get()
     .then(knex => {
       db = DB(knex)
     })
   },
-  ready: function(skin) {
+  ready: function(bp) {
 
-    const router = skin.getRouter('skin-broadcast')
+    const router = bp.getRouter('botpress-broadcast')
 
     router.get('/broadcasts', (req, res, next) => {
       db.listSchedules()

@@ -1,10 +1,10 @@
 {
-  "name": "skin-broadcast",
+  "name": "botpress-broadcast",
   "version": "1.0.0",
   "description": "",
   "main": "bin/node.bundle.js",
-  "homepage": "https://github.com/DanyFS/skin-broadcast",
-  "botskin": {
+  "homepage": "https://github.com/botpress/botpress-broadcast",
+  "botpress": {
     "menuText": "Broadcast",
     "menuIcon": "settings_input_antenna",
     "webBundle": "bin/web.bundle.js"
