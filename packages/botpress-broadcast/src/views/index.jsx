@@ -474,7 +474,7 @@ constructor(props){
         <Panel className={style.mainPanel}>
           {this.renderBroadcastsPanel('Upcoming (next 3 days)', upcomingBroadcasts)}
           {this.renderBroadcastsPanel('Past (last 3 days)', pastBroadcasts)}
-          {this.renderBroadcastsPanel('All broadcasts', allBroadcasts)}
+          {this.renderBroadcastsPanel('Other broadcasts', allBroadcasts)}
         </Panel>
         {this.renderModalForm()}
       </div>
