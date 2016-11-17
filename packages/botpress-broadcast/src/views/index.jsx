@@ -1,3 +1,5 @@
+//Errors
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 
@@ -69,6 +71,11 @@ constructor(props){
 
   componentDidMount(){
     this.fetchAllBroadcasts()
+    this.props.skin.events.on('broadcast.changed', this.fetchAllBroadcasts)
+  }
+
+  componentWillUnmount(){
+    this.props.skin.events.off('broadcast.changed', this.fetchAllBroadcasts)
   }
 
   fetchAllBroadcasts() {
@@ -228,20 +235,28 @@ constructor(props){
     )
   }
 
-  renderBroadcasts() {
+  renderBroadcasts(broadcasts) {
     const getDateFormatted = (time, date, userTimezone) => {
       const calendar = moment(date + ' ' + time, 'YYYY-MM-DD HH:mm').calendar()
       return calendar + (userTimezone ? ' (users time)' : ' (your time)')
     }
 
-    const formatProgress = (progress, outboxed) => {
+    const formatProgress = (progress, outboxed, errored) => {
+      let color = '#90a9f4'
+      let text = (progress * 100).toFixed(2) + '%'
       if(progress === 0) {
-        return outboxed ? 'Processing' : 'Not started'
+        text = outboxed ? 'Processing' : 'Not started'
+        color = outboxed ? '#90a9f4' : '#e4e4e4'
       }
       if(progress === 1) {
-        return 'Done'
+        text = 'Done'
+        color = '#6ee681'
       }
-      return (progress * 100).toFixed(2) + '%'
+      if(errored){
+        text = 'Error'
+        color = '#eb6f6f'
+      }
+      return <div><div className={style.dot} style={{backgroundColor:color}}></div>{text}</div>
     }
 
     const renderModificationButton = (value) => {
@@ -251,15 +266,14 @@ constructor(props){
         </Button>
       )
     }
-
-    return _.mapValues(this.state.broadcasts, (value) => {
+    return _.mapValues(broadcasts, (value) => {
       return (
         <tr key={value.id}>
           <td style={{width:'5%'}}>{value.id}</td>
-          <td style={{width:'22%'}} className={style.scheduledDate}>{getDateFormatted(value.time, value.date, value.userTimezone)}</td>
-          <td style={{width:'8%'}}>{value.type}</td>
-          <td style={{maxWidth:'40%'}}>{value.content}</td>
-          <td style={{width:'10%'}}>{formatProgress(value.progress, value.outboxed) }</td>
+          <td style={{width:'24%'}} className={style.scheduledDate}>{getDateFormatted(value.time, value.date, value.userTimezone)}</td>
+          <td style={{width:'7%'}}>{value.type}</td>
+          <td style={{maxWidth:'36%'}}>{value.content}</td>
+          <td style={{width:'13%'}} className={style.progress}>{formatProgress(value.progress, value.outboxed, value.errored) }</td>
           <td style={{width:'15%'}}>
             {!value.outboxed ? renderModificationButton(value) : null}
             <Button onClick={() => this.handleOpenModalForm(value)}>
@@ -274,20 +288,30 @@ constructor(props){
     })
   }
 
-  renderTableBody() {
-    return (
-      <tbody>
-        {_.values(this.renderBroadcasts())}
-      </tbody>
-    )
-  }
-
-  renderPlannedBroadcastTable() {
+  renderTable(broadcasts) {
     return (
       <Table striped bordered condensed hover className={style.scheduledTable}>
         {this.renderTableHeader()}
-        {this.renderTableBody()}
+        <tbody>
+          {_.values(this.renderBroadcasts(broadcasts))}
+        </tbody>
       </Table>
+    )
+  }
+
+  renderEmptyMessage() {
+    return (
+      <div className={style.emptyMessage}>
+        <h5>You have no broadcasts...</h5>
+      </div>
+    )
+  }
+
+  renderBroadcastsPanel(title, broadcasts) {
+    return (
+      <Panel header={title}>
+        {_.isEmpty(broadcasts) ? this.renderEmptyMessage() : this.renderTable(broadcasts)}
+      </Panel>
     )
   }
 
@@ -416,12 +440,6 @@ constructor(props){
   renderNavBar() {
     return (
       <Navbar fluid collapseOnSelect className={style.navbar}>
-        <Navbar.Header>
-          <Navbar.Brand>
-            Scheduled broadcasts
-          </Navbar.Brand>
-          <Navbar.Toggle />
-        </Navbar.Header>
         <Navbar.Collapse>
           <Nav pullRight>
             <NavItem>
@@ -436,11 +454,27 @@ constructor(props){
   }
 
   render() {
+    const allBroadcasts = _.assign([], this.state.broadcasts)
+
+    const upcomingBroadcasts = _.remove(allBroadcasts, function(value) {
+      const datetime = moment(value.date + ' ' + value.time, 'YYYY-MM-DD HH:mm')
+      return datetime.isBefore(moment().add(3, 'days')) &&
+        datetime.isAfter(moment())
+    })
+
+    const pastBroadcasts = _.remove(allBroadcasts, function(value) {
+      const datetime = moment(value.date + ' ' + value.time, 'YYYY-MM-DD HH:mm')
+      return datetime.isBefore(moment()) &&
+        datetime.isAfter(moment().subtract(3, 'days'))
+    })
+
     return (
       <div>
         {this.renderNavBar()}
         <Panel className={style.mainPanel}>
-          {this.renderPlannedBroadcastTable()}
+          {this.renderBroadcastsPanel('Upcoming (next 3 days)', upcomingBroadcasts)}
+          {this.renderBroadcastsPanel('Past (last 3 days)', pastBroadcasts)}
+          {this.renderBroadcastsPanel('All broadcasts', allBroadcasts)}
         </Panel>
         {this.renderModalForm()}
       </div>
