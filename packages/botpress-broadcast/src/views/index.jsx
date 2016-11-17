@@ -501,8 +501,6 @@ constructor(props){
     const allBroadcasts = _.assign([], this.state.broadcasts)
     let hasSomeError = _.some(allBroadcasts, ['errored', true])
 
-    hasSomeError = true
-
     const upcomingBroadcasts = _.remove(allBroadcasts, function(value) {
       const datetime = moment(value.date + ' ' + value.time, 'YYYY-MM-DD HH:mm')
       return datetime.isBefore(moment().add(3, 'days')) &&
