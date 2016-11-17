@@ -138,7 +138,7 @@ function sendBroadcasts() {
           return knex('broadcast_outbox')
           .where({ scheduleId: row.scheduleId })
           .delete()
-          .then()
+          .then(() => emitChanged())
         })
       })
     })
