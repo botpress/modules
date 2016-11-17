@@ -470,7 +470,7 @@ constructor(props){
           return (
             <Alert bsStyle="danger" onDismiss={this.handleAlertDismiss}>
               <h4>An error occured in some broadcasts</h4>
-              <p>Change this and that and try again. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum.</p>
+              <p>If you want to know what happen exactly, take a look to your logs. All details of the errors have been printed in it...</p>
               <p>
                 <Button href="../logs">Look to logs</Button>
                 <span> or </span>
