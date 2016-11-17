@@ -29,7 +29,7 @@ module.exports = {
           const [date, time] = row.date_time.split(' ')
           const progress = row.total_count
             ? row.sent_count / row.total_count
-            : 1
+            : !!row.outboxed ? 1 : 0
           return {
             type: row.type,
             content: row.text,
