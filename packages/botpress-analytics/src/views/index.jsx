@@ -105,7 +105,7 @@ export default class AnalyticsModule extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {loading: true}
+    this.state = { loading: true }
   }
 
   componentDidMount() {
@@ -487,7 +487,7 @@ export default class AnalyticsModule extends React.Component {
     )
   }
 
-  renderAllMetrics(){
+  renderAllMetrics() {
     return (
       <div>
         <StatsHeader axios={this.props.bp.axios}/>
@@ -497,7 +497,26 @@ export default class AnalyticsModule extends React.Component {
     )
   }
 
+  renderNoAnalyticsYet() {
+    return <Grid fluid >
+      <Row>
+        <Col md={12}>
+          <Panel header='Generating analytics data'>
+            <div>
+              There are no analytics available yet. 
+              Generating analytics can take up to 5 minutes after receiving a message.
+            </div>
+          </Panel>
+        </Col>
+      </Row>
+    </Grid>
+  }
+
   render() {
+    if(this.state.noData || !this.state.totalUsersChartData) {
+      return this.renderNoAnalyticsYet()
+    }
+
     return <div>
       {this.state.loading ? <h3>Wait, we are loading graphs...</h3> : this.renderAllMetrics()}
     </div>
