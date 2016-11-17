@@ -1,5 +1,6 @@
 import moment from 'moment'
 import Promise from 'bluebird'
+import _ from 'lodash'
 
 import DB from './db'
 
@@ -12,6 +13,10 @@ let sendingLock = false
 const intervalBase = process.env.NODE_ENV === 'production'
   ? 60 * 1000
   : 1000
+
+const emitChanged = _.throttle(() => {
+  skin && skin.events.emit('broadcast.changed')
+}, 1000)
 
 function scheduleToOutbox() {
   if (!knex || schedulingLock) {
@@ -51,6 +56,8 @@ function scheduleToOutbox() {
           .then(() => {
             skin.logger.info('[broadcast] Scheduled broadcast #' 
             + schedule.id, '. [' + count + ' messages]')
+
+            emitChanged()
           })
         })
       })
@@ -106,7 +113,7 @@ function sendBroadcasts() {
         knex('broadcast_schedules')
         .where({ id: row.scheduleId })
         .update({ sent_count: knex.raw('sent_count + 1') })
-        .then()
+        .then(() => emitChanged())
       })
     })
   })
