@@ -21,7 +21,10 @@ import {
   Checkbox,
   Col,
   Row,
-  ControlLabel
+  ControlLabel,
+  Alert,
+  FlatButton,
+  Link
 } from 'react-bootstrap'
 
 import DatePicker from 'react-bootstrap-date-picker'
@@ -417,7 +420,7 @@ constructor(props){
     const onClickAction = this.state.modifyBroadcast ? this.handleModifyBroadcast : this.handleAddBroadcast
     const buttonName = this.state.modifyBroadcast ? 'Modify' : 'Create'
 
-    return <Button action='' onClick={onClickAction}>{buttonName}</Button>
+    return <Button bsStyle='success' action='' onClick={onClickAction}>{buttonName}</Button>
   }
 
   renderModalForm () {
@@ -431,7 +434,7 @@ constructor(props){
           </Modal.Body>
         <Modal.Footer>
           {this.renderActionButton()}
-          <Button onClick={this.handleCloseModalForm}>Cancel</Button>
+          <Button bsStyle='danger' onClick={this.handleCloseModalForm}>Cancel</Button>
         </Modal.Footer>
       </Modal>
     )
@@ -453,8 +456,52 @@ constructor(props){
     )
   }
 
+  renderErrorBox() {
+
+    const AlertDismissable = React.createClass({
+      getInitialState() {
+        return {
+          alertVisible: true
+        };
+      },
+
+      render() {
+        if (this.state.alertVisible) {
+          return (
+            <Alert bsStyle="danger" onDismiss={this.handleAlertDismiss}>
+              <h4>An error occured in some broadcasts</h4>
+              <p>Change this and that and try again. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum.</p>
+              <p>
+                <Button href="../logs">Look to logs</Button>
+                <span> or </span>
+                <Button onClick={this.handleAlertDismiss}>Hide Alert</Button>
+              </p>
+            </Alert>
+          )
+        }
+        return null
+      },
+
+      handleAlertDismiss() {
+        this.setState({alertVisible: false});
+      },
+
+      handleAlertShow() {
+        this.setState({alertVisible: true});
+      }
+    });
+
+    return (
+      <AlertDismissable />
+    )
+  }
+
+
   render() {
     const allBroadcasts = _.assign([], this.state.broadcasts)
+    let hasSomeError = _.some(allBroadcasts, ['errored', true])
+
+    hasSomeError = true
 
     const upcomingBroadcasts = _.remove(allBroadcasts, function(value) {
       const datetime = moment(value.date + ' ' + value.time, 'YYYY-MM-DD HH:mm')
@@ -472,6 +519,7 @@ constructor(props){
       <div>
         {this.renderNavBar()}
         <Panel className={style.mainPanel}>
+          {hasSomeError ? this.renderErrorBox() : null}
           {this.renderBroadcastsPanel('Upcoming (next 3 days)', upcomingBroadcasts)}
           {this.renderBroadcastsPanel('Past (last 3 days)', pastBroadcasts)}
           {this.renderBroadcastsPanel('Other broadcasts', allBroadcasts)}
