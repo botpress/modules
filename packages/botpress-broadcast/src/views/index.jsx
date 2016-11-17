@@ -38,8 +38,11 @@ import style from './style.scss'
 
 const broadcastTypes = {
   text: '',
-  javascript: 'JS function',
-  facebook: 'Facebook specific content'
+  javascript: '',
+  'facebook-text-quick-replies': `skin.messenger.pipeText(userId, '<YOUR TEXT HERE>', {
+  quick_replies: ['<QUICK_REPLY1>', '<QUICK_REPLY2>']
+})`,
+  'facebook-attachment': `skin.messenger.pipeAttachment(userId, 'image', '<URL>')`
 }
 
 export default class BroadcastModule extends React.Component {
@@ -184,7 +187,14 @@ constructor(props){
 
   handleSelectChange(event) {
     var newBroadcast = this.state.broadcast
+    const oldTypeContent = broadcastTypes[newBroadcast.type] || ''
+
     newBroadcast.type = event.target.value
+
+    if (newBroadcast.content === oldTypeContent) {
+      newBroadcast.content = broadcastTypes[newBroadcast.type]
+    }
+
     this.setState({
       broadcast: newBroadcast
     })
@@ -348,8 +358,7 @@ constructor(props){
         <Col sm={10}>
           <FormControl componentClass="textarea"
             value={this.state.broadcast.content}
-            onChange={this.handleContentChange}
-            placeholder={broadcastTypes[this.state.broadcast.type]}/>
+            onChange={this.handleContentChange}/>
         </Col>
       </FormGroup>
     )
