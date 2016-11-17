@@ -1,9 +1,9 @@
 {
-  "name": "skin-rivescript",
+  "name": "botpress-rivescript",
   "version": "1.0.0",
   "description": "",
   "main": "bin/node.bundle.js",
-  "botskin": {
+  "botpress": {
     "menuText": "RiveScript",
     "webBundle": "bin/web.bundle.js"
   },

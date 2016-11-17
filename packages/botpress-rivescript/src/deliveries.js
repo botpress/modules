@@ -1,19 +1,13 @@
 import _ from 'lodash'
 
-const jsDelivery = { 
+const jsDelivery = {
   test: /^js: (.+)/i,
   name: 'javascript',
-  handler: (match, rs, skin, event) => {
+  handler: (match, rs, bp, event) => {
     const body = match[1]
-    const fn = new Function('rs', 'skin', 'event', body)
-    fn(rs, skin, event)
+    const fn = new Function('rs', 'bp', 'event', body)
+    fn(rs, bp, event)
   }
 }
 
 module.exports = [jsDelivery]
-
-// module.exports = {
-//   list: null,
-//   add: null,
-//   remove: null
-// }

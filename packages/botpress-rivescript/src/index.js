@@ -19,12 +19,12 @@ module.exports = {
       .then(reply => {
         deliveries.forEach(delivery => {
           if(delivery && delivery.test.test(reply)) {
-            delivery.handler(delivery.test.exec(reply), rs, event.skin, event)
+            delivery.handler(delivery.test.exec(reply), rs, event.bp, event)
             next()
             return
           }
         })
-        event.skin.messenger.pipeText(event.user.id, reply)
+        event.bp.messenger.pipeText(event.user.id, reply)
       })
     } else {
       throw new Error('Unsupported platform: ', event.platform)
@@ -34,10 +34,10 @@ module.exports = {
   outgoing: function(event, next) {
 
   },
-  init: function(skin) {},
-  ready: function(skin) {
+  init: function(bp) {},
+  ready: function(bp) {
 
-    const riveDirectory = path.join(skin.dataLocation, 'rivescript')
+    const riveDirectory = path.join(bp.dataLocation, 'rivescript')
 
     if (!fs.existsSync(riveDirectory)) {
       fs.mkdirSync(riveDirectory)
@@ -58,7 +58,7 @@ module.exports = {
 
     reloadRiveScript()
 
-    const router = skin.getRouter('skin-rivescript')
+    const router = bp.getRouter('botpress-rivescript')
 
     router.get('/scripts', (req, res, next) => {
       const data = {}
@@ -87,7 +87,7 @@ module.exports = {
       fs.unlinkSync(filePath)
 
       reloadRiveScript()
-      
+
       res.sendStatus(200)
     })
 
@@ -127,7 +127,7 @@ module.exports = {
             return
           }
         })
-        res.send(reply)  
+        res.send(reply)
       })
     })
 

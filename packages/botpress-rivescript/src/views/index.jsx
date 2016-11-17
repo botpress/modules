@@ -47,9 +47,9 @@ export default class RiveScriptModule extends React.Component {
 
   componentDidMount() {
     this.isUnmounting = false
-    const { axios } = this.props.skin
+    const { axios } = this.props.bp
 
-    axios.get('/api/skin-rivescript/scripts')
+    axios.get('/api/botpress-rivescript/scripts')
     .then(({ data }) => {
       if(this.isUnmounting) {
         return
@@ -88,9 +88,9 @@ export default class RiveScriptModule extends React.Component {
 
   toggleSimulation() {
     if(this.state.simulationOn) {
-      const { axios } = this.props.skin
+      const { axios } = this.props.bp
       this.setState({ discussion: '' })
-      axios.post('/api/skin-rivescript/reset')
+      axios.post('/api/botpress-rivescript/reset')
     }
     if(!this.state.simulationOn) {
       setTimeout(() => ReactDOM.findDOMNode(this.sendMessage).focus(), 300)
@@ -109,13 +109,13 @@ export default class RiveScriptModule extends React.Component {
   }
 
   deleteScript() {
-    const { axios } = this.props.skin
+    const { axios } = this.props.bp
 
     const response = confirm("Are you sure you want to delete this script (" +
       this.state.selected + ")? This can't be undone.")
 
     if(response === true) {
-      axios.delete('/api/skin-rivescript/scripts/' + this.state.selected)
+      axios.delete('/api/botpress-rivescript/scripts/' + this.state.selected)
       .then(() => {
         const newFiles = _.omit(this.state.files, this.state.selected)
         const newSelected = _.first(_.keys(newFiles))
@@ -125,7 +125,7 @@ export default class RiveScriptModule extends React.Component {
   }
 
   saveCurrentFile() {
-    const { axios } = this.props.skin
+    const { axios } = this.props.bp
 
     const data = {
       name: this.state.selected,
@@ -133,7 +133,7 @@ export default class RiveScriptModule extends React.Component {
       overwrite: true
     }
 
-    axios.post('/api/skin-rivescript/scripts', data)
+    axios.post('/api/botpress-rivescript/scripts', data)
     .then(() => {
       this.resetDirtyForOne(this.state.selected)
     })
@@ -141,13 +141,13 @@ export default class RiveScriptModule extends React.Component {
 
 
   sendText(event) {
-    const { axios } = this.props.skin
+    const { axios } = this.props.bp
     const text = this.state.textInput
 
     const youSent = 'You > ' + text
     this.setState({ discussion: this.state.discussion + '\n' + youSent })
 
-    axios.post('/api/skin-rivescript/simulate', { text })
+    axios.post('/api/botpress-rivescript/simulate', { text })
     .then(({ data }) => {
       const botSent = 'Bot > ' + data
       this.setState({ discussion: this.state.discussion + '\n' + botSent })
