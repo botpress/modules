@@ -72,22 +72,22 @@ constructor(props){
   }
 
   getAxios() {
-    return this.props.skin.axios
+    return this.props.bp.axios
   }
 
   componentDidMount(){
     this.fetchAllBroadcasts()
-    this.props.skin.events.on('broadcast.changed', this.fetchAllBroadcasts)
+    this.props.bp.events.on('broadcast.changed', this.fetchAllBroadcasts)
   }
 
   componentWillUnmount(){
-    this.props.skin.events.off('broadcast.changed', this.fetchAllBroadcasts)
+    this.props.bp.events.off('broadcast.changed', this.fetchAllBroadcasts)
   }
 
   fetchAllBroadcasts() {
     this.setState({ loading: true })
 
-    return this.getAxios().get("/api/skin-broadcast/broadcasts")
+    return this.getAxios().get("/api/botpress-broadcast/broadcasts")
     .then((res) => {
       this.setState({
         loading: false,
@@ -128,7 +128,7 @@ constructor(props){
 
   handleAddBroadcast() {
     const broadcast = this.extractBroadcastFromModal()
-    this.getAxios().post("/api/skin-broadcast/broadcasts", broadcast)
+    this.getAxios().post("/api/botpress-broadcast/broadcasts", broadcast)
     .then(this.fetchAllBroadcasts)
     .then(this.closeModal)
     .catch(this.handleRequestError)
@@ -137,14 +137,14 @@ constructor(props){
   handleModifyBroadcast() {
     const broadcast = this.extractBroadcastFromModal()
     const { broadcastId: id } = this.state
-    this.getAxios().put("/api/skin-broadcast/broadcasts", { id, ...broadcast })
+    this.getAxios().put("/api/botpress-broadcast/broadcasts", { id, ...broadcast })
     .then(this.fetchAllBroadcasts)
     .then(this.closeModal)
     .catch(this.handleRequestError)
   }
 
   handleRemoveBroadcast(id) {
-    this.getAxios().delete("/api/skin-broadcast/broadcasts/" + id)
+    this.getAxios().delete("/api/botpress-broadcast/broadcasts/" + id)
     .then(this.fetchAllBroadcasts)
     .catch(this.handleRequestError)
   }

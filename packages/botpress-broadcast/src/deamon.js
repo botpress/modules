@@ -6,7 +6,7 @@ import _ from 'lodash'
 import DB from './db'
 
 let knex = null
-let skin = null
+let bp = null
 
 let schedulingLock = false
 let sendingLock = false
@@ -16,7 +16,7 @@ const intervalBase = process.env.NODE_ENV === 'production'
   : 1000
 
 const emitChanged = _.throttle(() => {
-  skin && skin.events.emit('broadcast.changed')
+  bp && bp.events.emit('broadcast.changed')
 }, 1000)
 
 function scheduleToOutbox() {
@@ -53,9 +53,9 @@ function scheduleToOutbox() {
         .then().get(0).then(({ count }) => {
           return knex('broadcast_schedules')
           .where({ id: schedule.id })
-          .update({ outboxed: 1, total_count: count }) 
+          .update({ outboxed: 1, total_count: count })
           .then(() => {
-            skin.logger.info('[broadcast] Scheduled broadcast #' 
+            bp.logger.info('[broadcast] Scheduled broadcast #'
             + schedule.id, '. [' + count + ' messages]')
 
             emitChanged()
@@ -71,7 +71,7 @@ function scheduleToOutbox() {
 
 const _sendBroadcast = Promise.method(row => {
   if (row.type === 'text') {
-    skin.outgoing({
+    bp.outgoing({
       platform: row.platform,
       type: 'text',
       text: row.text,
@@ -81,8 +81,8 @@ const _sendBroadcast = Promise.method(row => {
       }
     })
   } else {
-    const fn = new Function('skin', 'userId', 'platform', row.text)
-    fn(skin, row.userId, row.platform)
+    const fn = new Function('bp', 'userId', 'platform', row.text)
+    fn(bp, row.userId, row.platform)
   }
 })
 
@@ -129,11 +129,11 @@ function sendBroadcasts() {
       })
       .catch(err => {
         abort = true
-        
-        skin.logger.error('[broadcast] Broadcast #' + row.scheduleId + 
+
+        bp.logger.error('[broadcast] Broadcast #' + row.scheduleId +
           ' failed. Broadcast aborted. Reason: ' + err.message)
 
-        skin.notif({
+        bp.notif({
           level: 'error',
           message: 'Broadcast #' + row.scheduleId + ' failed.'
           + ' Please check logs for the reason why.',
@@ -157,10 +157,10 @@ function sendBroadcasts() {
   })
 }
 
-module.exports = (s) => {
-  skin = s
+module.exports = (botpress) => {
+  bp = botpress
 
-  skin.db.get()
+  bp.db.get()
   .then(k => {
     const { initialize } = DB(k)
     knex = k
