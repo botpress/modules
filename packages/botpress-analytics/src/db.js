@@ -2,7 +2,7 @@ const Promise = require('bluebird')
 const moment = require('moment')
 
 let knex = null
-let skin = null
+let bp = null
 
 function initializeDb() {
   if (!knex) {
@@ -41,7 +41,7 @@ function saveFacebookOut(event) {
 }
 
 function saveInteractionIn(event) {
-  return skin.db.saveUser({
+  return bp.db.saveUser({
     id: event.user.id,
     platform: event.platform,
     gender: event.user.gender,
@@ -67,9 +67,9 @@ function saveInteractionOut(event) {
   }
 }
 
-module.exports = (k, s) => {
+module.exports = (k, botpress) => {
   knex = k
-  skin = s
+  bp = botpress
 
   return {
     initializeDb: initializeDb,

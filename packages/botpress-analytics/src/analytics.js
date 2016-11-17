@@ -20,15 +20,15 @@ const loadDataFromFile = (file) => {
 }
 
 class Analytics {
-  constructor(skin, knex) {
-    if (!skin){
-      throw new Error('You need to specify skin');
+  constructor(bp, knex) {
+    if (!bp){
+      throw new Error('You need to specify botpress');
     }
 
-    this.skin = skin
+    this.bp = bp
     this.knex = knex
     this.stats = Stats(knex)
-    this.chartsDatafile = path.join(skin.projectLocation, skin.botfile.dataDir, 'skin-analytics.charts.json')
+    this.chartsDatafile = path.join(bp.projectLocation, bp.botfile.dataDir, 'botpress-analytics.charts.json')
 
     createEmptyFileIfDoesntExist(this.chartsDatafile)
 
@@ -47,7 +47,7 @@ class Analytics {
   }
 
   getDBSize() {
-    return fs.statSync(this.skin.db.location)['size'] / 1000000.0 // in megabytes
+    return fs.statSync(this.bp.db.location)['size'] / 1000000.0 // in megabytes
   }
 
   getAnalyticsMetadata() {
@@ -67,7 +67,7 @@ class Analytics {
   updateData() {
     if(this.running) return
     this.running = true
-    this.skin.logger.debug('skin-analytics: recompiling analytics')
+    this.bp.logger.debug('botpress-analytics: recompiling analytics')
     this.stats.getTotalUsers()
     .then(data => this.savePartialData('totalUsers', data))
     .then(() => this.stats.getDailyActiveUsers())
@@ -94,7 +94,7 @@ class Analytics {
     .then(data => this.savePartialData('busyHoursHeatMap', data))
     .then(() => {
       const data = this.getChartsGraphData()
-      this.skin.events.emit('data.send', data)
+      this.bp.events.emit('data.send', data)
       this.stats.setLastRun()
     })
     .then(() => this.running = false)
