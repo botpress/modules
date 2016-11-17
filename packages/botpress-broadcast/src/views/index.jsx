@@ -39,10 +39,10 @@ import style from './style.scss'
 const broadcastTypes = {
   text: '',
   javascript: '',
-  'facebook-text-quick-replies': `skin.messenger.pipeText(userId, '<YOUR TEXT HERE>', {
+  'facebook-text-quick-replies': `bp.messenger.pipeText(userId, '<YOUR TEXT HERE>', {
   quick_replies: ['<QUICK_REPLY1>', '<QUICK_REPLY2>']
 })`,
-  'facebook-attachment': `skin.messenger.pipeAttachment(userId, 'image', '<URL>')`
+  'facebook-attachment': `bp.messenger.pipeAttachment(userId, 'image', '<URL>')`
 }
 
 export default class BroadcastModule extends React.Component {
