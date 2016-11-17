@@ -129,8 +129,17 @@ function sendBroadcasts() {
       })
       .catch(err => {
         abort = true
+        
         skin.logger.error('[broadcast] Broadcast #' + row.scheduleId + 
           ' failed. Broadcast aborted. Reason: ' + err.message)
+
+        skin.notif({
+          level: 'error',
+          message: 'Broadcast #' + row.scheduleId + ' failed.'
+          + ' Please check logs for the reason why.',
+          url: '/logs'
+        })
+
         return knex('broadcast_schedules')
         .where({ id: row.scheduleId })
         .update({ errored: true })
