@@ -19,23 +19,23 @@ module.exports = {
     next()
   },
 
-  init: function(skin) {
-    skin.db.get()
+  init: function(bp) {
+    bp.db.get()
     .then(knex => {
-      db = DB(knex, skin)
+      db = DB(knex, bp)
       return db.initializeDb()
-      .then(() => analytics = new Analytics(skin, knex))
+      .then(() => analytics = new Analytics(bp, knex))
     })
   },
 
-  ready: function(skin) {
+  ready: function(bp) {
     
-    skin.getRouter("skin-analytics")
+    bp.getRouter("botpress-analytics")
     .get("/graphs", (req, res, next) => {
       res.send(analytics.getChartsGraphData())
     })
 
-    skin.getRouter('skin-analytics')
+    bp.getRouter('botpress-analytics')
     .get('/metadata', (req, res, next) => {
       analytics.getAnalyticsMetadata()
       .then(metadata => res.send(metadata))

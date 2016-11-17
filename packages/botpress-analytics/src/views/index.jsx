@@ -78,7 +78,7 @@ class StatsHeader extends React.Component {
   }
 
   fetchMetadata() {
-    this.props.axios.get('/api/skin-analytics/metadata')
+    this.props.axios.get('/api/botpress-analytics/metadata')
     .then(({ data }) => {
       this.setState({ ...data })
     })
@@ -111,13 +111,13 @@ export default class AnalyticsModule extends React.Component {
   componentDidMount() {
     this.unmounting = false
     
-    this.props.skin.axios.get('/api/skin-analytics/graphs')
+    this.props.bp.axios.get('/api/botpress-analytics/graphs')
     .then(({ data }) => {
       if (this.unmounting) return
       this.setState({ ...data })
     })
 
-    this.props.skin.events.on('data.send', (data) => {
+    this.props.bp.events.on('data.send', (data) => {
       if (this.unmounting) return
       this.setState({
           ...data
@@ -490,7 +490,7 @@ export default class AnalyticsModule extends React.Component {
   renderAllMetrics(){
     return (
       <div>
-        <StatsHeader axios={this.props.skin.axios}/>
+        <StatsHeader axios={this.props.bp.axios}/>
         {this.renderBasicMetrics()}
         {this.renderAdvancedMetrics()}
       </div>
