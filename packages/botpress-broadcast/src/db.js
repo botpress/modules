@@ -15,6 +15,7 @@ function initialize() {
     table.string('text')
     table.string('type')
     table.boolean('outboxed')
+    table.boolean('errored')
     table.integer('total_count')
     table.integer('sent_count')
     table.timestamp('created_on')
@@ -42,6 +43,7 @@ function addSchedule({ date, time, timezone, content, type }) {
     text: content,
     type: type,
     outboxed: false,
+    errored: false,
     total_count: 0,
     sent_count: 0,
     created_on: moment(new Date()).format('x')

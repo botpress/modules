@@ -1,5 +1,6 @@
 import moment from 'moment'
 import Promise from 'bluebird'
+import retry from 'bluebird-retry'
 import _ from 'lodash'
 
 import DB from './db'
@@ -68,6 +69,23 @@ function scheduleToOutbox() {
   })
 }
 
+const _sendBroadcast = Promise.method(row => {
+  if (row.type === 'text') {
+    skin.outgoing({
+      platform: row.platform,
+      type: 'text',
+      text: row.text,
+      raw: {
+        to: row.userId,
+        message: row.text
+      }
+    })
+  } else {
+    const fn = new Function('skin', 'userId', 'platform', row.text)
+    fn(skin, row.userId, row.platform)
+  }
+})
+
 function sendBroadcasts() {
   if (!knex || sendingLock) {
     return
@@ -90,30 +108,38 @@ function sendBroadcasts() {
     'broadcast_outbox.userId as scheduleUser'
   ])
   .then(rows => {
+    let abort = false
     return Promise.mapSeries(rows, row => {
-      if (row.type === 'text') {
-        skin.outgoing({
-          platform: row.platform,
-          type: 'text',
-          text: row.text,
-          raw: {
-            to: row.userId,
-            message: row.text
-          }
-        })
-      } else {
-        const fn = new Function('skin', 'userId', 'platform', row.text)
-        fn(skin, row.userId, row.platform)
-      }
-
-      return knex('broadcast_outbox')
-      .where({ userId: row.scheduleUser, scheduleId: row.scheduleId })
-      .delete()
+      if (abort) { return }
+      return retry(() => _sendBroadcast(row), {
+        max_tries: 3,
+        interval: 1000,
+        backoff: 3
+      })
       .then(() => {
-        knex('broadcast_schedules')
+        return knex('broadcast_outbox')
+        .where({ userId: row.scheduleUser, scheduleId: row.scheduleId })
+        .delete()
+        .then(() => {
+          knex('broadcast_schedules')
+          .where({ id: row.scheduleId })
+          .update({ sent_count: knex.raw('sent_count + 1') })
+          .then(() => emitChanged())
+        })
+      })
+      .catch(err => {
+        abort = true
+        skin.logger.error('[broadcast] Broadcast #' + row.scheduleId + 
+          ' failed. Broadcast aborted. Reason: ' + err.message)
+        return knex('broadcast_schedules')
         .where({ id: row.scheduleId })
-        .update({ sent_count: knex.raw('sent_count + 1') })
-        .then(() => emitChanged())
+        .update({ errored: true })
+        .then(() => {
+          return knex('broadcast_outbox')
+          .where({ scheduleId: row.scheduleId })
+          .delete()
+          .then()
+        })
       })
     })
   })
