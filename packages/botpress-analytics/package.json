@@ -1,7 +1,7 @@
 {
   "name": "botpress-analytics",
   "version": "1.0.0",
-  "description": "Advanced analytics module to track activities on botpress",
+  "description": "Advanced analytics module for Botpress to track activities of chatbots.",
   "main": "bin/node.bundle.js",
   "homepage": "https://github.com/botpress/botpress-analytics",
   "botpress": {
@@ -15,7 +15,7 @@
     "compile": "node webpack.js --compile",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Protorisk DIFC",
   "license": "AGPL-3.0",
   "dependencies": {
     "bluebird": "^3.4.6",
