@@ -9,6 +9,7 @@
     "menuIcon": "timeline",
     "webBundle": "bin/web.bundle.js"
   },
+  "keywords": ["analytics", "botpress"],
   "scripts": {
     "seed": "node seed.js",
     "watch": "node webpack.js --watch",
