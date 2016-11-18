@@ -14,6 +14,8 @@
     "watch": "node webpack.js --watch",
     "compile": "node webpack.js --compile"
   },
+  "keyword": ["botpress", "rivescript"],
+
   "author": "Protorisk DIFC",
   "license": "AGPL-3.0",
   "devDependencies": {
