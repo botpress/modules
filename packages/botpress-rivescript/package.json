@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Official module for Botpress to integrate RiveScript in chatbot with UI for writing and testing.",
   "main": "bin/node.bundle.js",
+  "homepage": "https://github.com/botpress/botpress-rivescript",
   "botpress": {
     "menuText": "RiveScript",
     "menuIcon": "hearing",
