@@ -1,7 +1,7 @@
 {
   "name": "botpress-broadcast",
   "version": "1.0.0",
-  "description": "",
+  "description": "Official module for Botpress to broadcast messages and specific functions to all your users.",
   "main": "bin/node.bundle.js",
   "homepage": "https://github.com/botpress/botpress-broadcast",
   "botpress": {
@@ -14,7 +14,7 @@
     "watch": "node webpack.js --watch",
     "compile": "node webpack.js --compile"
   },
-  "author": "",
+  "author": "Protorisk DIFC",
   "license": "AGPL-3.0",
   "devDependencies": {
     "webpack-node-externals": "^1.5.4",
