@@ -9,6 +9,7 @@
     "menuIcon": "settings_input_antenna",
     "webBundle": "bin/web.bundle.js"
   },
+  "keywords": ["botpress", "broadcast"],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "node webpack.js --watch",
