@@ -11,31 +11,38 @@ var rs = null
 
 const validateRiveName = (name) => /[A-Z0-9_-]+/i.test(name)
 
-module.exports = {
-  incoming: function(event, next) {
-    if (event.platform === 'facebook') {
-      rs.setUservar(event.user.id, 'platform', event.platform)
-      rs.setUservars(event.user.id, event.user)
-      rs.replyAsync(event.user.id, event.text)
-      .then(reply => {
-        deliveries.forEach(delivery => {
-          if(delivery && delivery.test.test(reply)) {
-            delivery.handler(delivery.test.exec(reply), rs, event.bp, event)
-            next()
-            return
-          }
-        })
-        event.bp.messenger.pipeText(event.user.id, reply)
+const incomingMiddleware = (event, next) => {
+  if (event.platform === 'facebook') {
+    rs.setUservar(event.user.id, 'platform', event.platform)
+    rs.setUservars(event.user.id, event.user)
+    rs.replyAsync(event.user.id, event.text)
+    .then(reply => {
+      deliveries.forEach(delivery => {
+        if(delivery && delivery.test.test(reply)) {
+          delivery.handler(delivery.test.exec(reply), rs, event.bp, event)
+          next()
+          return
+        }
       })
-    } else {
-      throw new Error('Unsupported platform: ', event.platform)
-    }
-    next()
-  },
-  outgoing: function(event, next) {
+      event.bp.messenger.pipeText(event.user.id, reply)
+    })
+  } else {
+    throw new Error('Unsupported platform: ', event.platform)
+  }
+  next()
+}
 
+module.exports = {
+  init: function(bp) {
+    bp.registerMiddleware({
+      name: 'rivescript.processIncomingMessages',
+      order: 10,
+      type: 'incoming',
+      module: 'botpress-rivescript',
+      handler: incomingMiddleware,
+      description: 'Processes incoming messages by the RiveScript engine and pipes responses'
+    })
   },
-  init: function(bp) {},
   ready: function(bp) {
 
     const riveDirectory = path.join(bp.dataLocation, 'rivescript')
