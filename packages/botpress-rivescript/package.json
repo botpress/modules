@@ -1,7 +1,7 @@
 {
   "name": "botpress-rivescript",
-  "version": "1.0.0",
-  "description": "Official module for Botpress to integrate RiveScript in chatbot with UI for writing and testing.",
+  "version": "1.0.2",
+  "description": "Simple scripting language for chatbots with a friendly, easy to learn syntax",
   "main": "bin/node.bundle.js",
   "homepage": "https://github.com/botpress/botpress-rivescript",
   "botpress": {
@@ -15,7 +15,10 @@
     "compile": "node webpack.js --compile"
   },
   "keyword": ["botpress", "rivescript"],
-
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/botpress/botpress-rivescript"
+  },
   "author": "Protorisk DIFC",
   "license": "AGPL-3.0",
   "devDependencies": {
