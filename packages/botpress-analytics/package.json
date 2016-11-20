@@ -1,9 +1,10 @@
 {
   "name": "botpress-analytics",
-  "version": "1.0.0",
-  "description": "Advanced analytics module for Botpress to track activities of chatbots.",
+  "version": "1.0.3",
+  "description": "Provides high level analytics about your bot usage.",
   "main": "bin/node.bundle.js",
   "homepage": "https://github.com/botpress/botpress-analytics",
+  "repository": "botpress/botpress-analytics",
   "botpress": {
     "menuText": "Analytics",
     "menuIcon": "timeline",
