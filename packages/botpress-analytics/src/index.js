@@ -4,22 +4,39 @@ const DB = require('./db')
 let analytics = null
 let db = null
 
-module.exports = {
-  incoming: function(event, next) {
-    if (event.user) {
-      db && db.saveIncoming(event)
-      .then(() => next())
-    } else {
-      next()
-    }
-  },
-
-  outgoing: function(event, next) {
-    db && db.saveOutgoing(event)
+const incomingMiddleware = (event, next) => {
+  if (event.user) {
+    db && db.saveIncoming(event)
+    .then(() => next())
+  } else {
     next()
-  },
+  }
+}
 
+const outgoingMiddleware = (event, next) => {
+  db && db.saveOutgoing(event)
+  next()
+}
+
+module.exports = {
   init: function(bp) {
+
+    bp.registerMiddleware({
+      name: 'analytics.incoming',
+      module: 'botpress-analytics',
+      type: 'incoming',
+      handler: incomingMiddleware,
+      description: 'Tracks incoming messages for Analytics purposes'
+    })
+
+    bp.registerMiddleware({
+      name: 'analytics.outgoing',
+      module: 'botpress-analytics',
+      type: 'outgoing',
+      handler: outgoingMiddleware,
+      description: 'Tracks outgoing messages for Analytics purposes'
+    })
+
     bp.db.get()
     .then(knex => {
       db = DB(knex, bp)
