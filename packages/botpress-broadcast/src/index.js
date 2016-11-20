@@ -5,12 +5,6 @@ import moment from 'moment'
 let db = null
 
 module.exports = {
-  ingoing: function(event, next) {
-
-  },
-  outgoing: function(event, next) {
-
-  },
   init: function(bp) {
     deamon(bp)
     bp.db.get()
