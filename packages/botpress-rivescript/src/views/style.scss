@@ -1,9 +1,14 @@
-:global(.ReactCodeMirror) {
-  border: 1px solid #ccc;
+:global(.CodeMirror) {
+  height: 622px !important;
 }
 
-:global(.CodeMirror) {
-  height: 600px !important;
+:global(.CodeMirror-gutters) {
+  background-color: white !important;
+  border-right: none !important;
+}
+
+:global(.CodeMirror-gutter-elt) {
+  color: #58d1b0 !important;
 }
 
 .navbar {
@@ -20,9 +25,11 @@
   margin-bottom: 0px;
 }
 
-.headerForm {
-  padding-right: 0px;
-  margin: 0px;
+.header {
+  padding-right: 20px;
+  button + button {
+    margin-left: 10px;
+  }
 }
 
 .fileSelection {
@@ -46,38 +53,60 @@
 }
 
 .simulationColumn {
+  border-radius: 3px;
+  background-color: white;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
   padding: 0px;
+
+  form>div {
+    margin: 0;
+
+    span {
+      width: 100%;
+    }
+  }
 }
 
-.contentColumn {
+.filesColumn {
+  border-radius: 3px;
+  background-color: #fdfdfd;
+  border-right: 1px solid #efefef;
+  padding: 10px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+.codeColumn {
   padding: 0px;
-  border-style: solid;
-  border-color: #e2e2e2;
-  border-width: 1px;
+  border-radius: 3px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  background: white;
 }
 
 textarea.discussion {
   background-color: #ffffff !important;
-  font-family: 'Oswald', sans-serif;
-  border-radius: 0px;
-  height: 569px;
+  // font-family: 'Oswald', sans-serif;
+  border: none;
+  height: 587px;
+  border: none;
+  overflow: auto;
+  outline: none !important;
+  box-shadow: none !important;
+  resize: none;
 }
 
 textarea.simulationRunning {
   background-color: #fefd92 !important;
 }
 
-.sendButton {
-  width: 50px;
-  height: 35px;
-  font-size: 16px;
-  border-radius: 0px;
-}
-
 .sendText {
   height: 35px;
   width: 100%;
   border-radius: 0px;
+  background-color: white !important;
+  border: none;
 }
 
 .dirty {

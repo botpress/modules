@@ -161,6 +161,32 @@ export default class RiveScriptModule extends React.Component {
     this.setState({ textInput: event.target.value })
   }
 
+  renderHeader() {
+
+    const saveClass = classnames({
+      [style.dirty]: this.isDirty(this.state.selected)
+    })
+
+    const className = classnames('pull-right', style.header)
+
+    return <Row className={style.headerRow}>
+      <Col className={className}>
+        <Button onClick={this.toggleSimulation.bind(this)}>
+          {this.state.simulationOn ? <Glyphicon glyph='stop'></Glyphicon> : <Glyphicon glyph='play'></Glyphicon> }
+        </Button>
+        <Button onClick={this.saveCurrentFile.bind(this)} className={saveClass}>
+          <Glyphicon glyph='floppy-disk'></Glyphicon>
+        </Button>
+        <Button onClick={this.createNewFile.bind(this)}>
+          <Glyphicon glyph='file'></Glyphicon>
+        </Button>
+        <Button onClick={this.deleteScript.bind(this)}>
+          <Glyphicon glyph='trash'></Glyphicon>
+        </Button>
+      </Col>
+    </Row>
+  }
+
   render() {
 
     if(!this.state.files) {
@@ -196,10 +222,6 @@ export default class RiveScriptModule extends React.Component {
       </Tab.Container>
     )
 
-    const saveClass = classnames({
-      [style.dirty]: this.isDirty(this.state.selected)
-    })
-
     const simulationClass = classnames({
       [style.discussion]: true,
       [style.simulationRunning]: this.state.simulationOn
@@ -208,33 +230,18 @@ export default class RiveScriptModule extends React.Component {
     const simOn = this.state.simulationOn
 
     return <Grid fluid>
-      <Row className={style.headerRow}>
-        <Col>
-          <Navbar fluid className={style.navbar}>
-            <Navbar.Collapse className={style.headerForm}>
-              <Navbar.Form pullRight className={style.headerForm}>
-                <Button onClick={this.toggleSimulation.bind(this)}>
-                  {this.state.simulationOn ? <Glyphicon glyph='stop'></Glyphicon> : <Glyphicon glyph='play'></Glyphicon> }
-                </Button>
-                <Button onClick={this.saveCurrentFile.bind(this)} className={saveClass}>
-                  <Glyphicon glyph='floppy-disk'></Glyphicon>
-                </Button>
-                <Button onClick={this.createNewFile.bind(this)}>
-                  <Glyphicon glyph='file'></Glyphicon>
-                </Button>
-                <Button onClick={this.deleteScript.bind(this)}>
-                  <Glyphicon glyph='trash'></Glyphicon>
-                </Button>
-              </Navbar.Form>
-            </Navbar.Collapse>
-          </Navbar>
-        </Col>
+      
+      <Row>
+        <Panel>
+          {this.renderHeader()}
+        </Panel>
       </Row>
+
       <Row >
-        <Col sm={3} md={3} lg={2} className={style.contentColumn}>
+        <Col sm={3} md={3} lg={2} className={style.filesColumn}>
           {tabsInstance}
         </Col>
-        <Col sm={9} md={9} lg={7} className={style.contentColumn}>
+        <Col sm={9} md={9} lg={7} className={style.codeColumn}>
           {editor}
         </Col>
         <Col sm={12} md={12} lg={3} className={style.simulationColumn}>
@@ -244,11 +251,6 @@ export default class RiveScriptModule extends React.Component {
               <InputGroup>
                 <FormControl ref={i => this.sendMessage = i} className={style.sendText} disabled={!simOn}
                   placeholder="Speak here" value={this.state.textInput} onChange={this.onInputChanged.bind(this)} />
-                <InputGroup.Button>
-                  <Button className={style.sendButton} disabled={!simOn} onClick={this.sendText.bind(this)}>
-                    <Glyphicon glyph='send'></Glyphicon>
-                  </Button>
-                </InputGroup.Button>
               </InputGroup>
             </FormGroup>
           </Form>
