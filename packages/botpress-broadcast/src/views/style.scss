@@ -4,6 +4,7 @@
   li > a {
     padding: 8px !important;
   }
+  background-color: #fff;
 }
 
 .mainPanel {
@@ -11,6 +12,7 @@
   border-style: solid;
   border-color: #e4e0e0;
   border-width: 1px;
+  border-top: none;
 }
 
 .scheduledTable {
