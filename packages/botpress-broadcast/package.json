@@ -15,6 +15,10 @@
     "watch": "node webpack.js --watch",
     "compile": "node webpack.js --compile"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/botpress/botpress-broadcast"
+  },
   "author": "Protorisk DIFC",
   "license": "AGPL-3.0",
   "devDependencies": {
