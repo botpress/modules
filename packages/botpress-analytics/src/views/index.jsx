@@ -106,13 +106,12 @@ class StatsHeader extends React.Component {
             {' | ' + 'DB Size: ' + size + 'mb'}
           </span>
           <OverlayTrigger placement="left" overlay={tooltip}>
-            <span> info</span>
+            <i className="material-icons">info</i>
           </OverlayTrigger>
         </div>
       </Col>
     </Row>
   }
-
 }
 
 export default class AnalyticsModule extends React.Component {
