@@ -1,11 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {
+import Bootstrap, {
   Col,
   Grid,
   Panel,
   Row,
-  Table
+  Table,
+  Tooltip as BTooltip,
+  OverlayTrigger,
+  Button
  } from 'react-bootstrap'
 
 import {
@@ -16,9 +19,9 @@ import {
   CartesianGrid,
   Legend,
   Line,
+  Tooltip,
   LineChart,
   ResponsiveContainer,
-  Tooltip,
   XAxis,
   YAxis
 } from 'recharts'
@@ -89,11 +92,22 @@ class StatsHeader extends React.Component {
     const size = this.state.size.toFixed(2)
     const className = classnames('pull-right', style.metadata)
 
+    const infoText = "Updated periodically depending on size of database. " +
+      "Usually refresh every 5 minutes for DB smaller than 5MB " +
+      "and every hour if your database is bigger ones."
+
+    const tooltip = <BTooltip id="tooltip">{infoText}</BTooltip>
+
     return <Row>
       <Col sm={12}>
         <div className={className}>
-          {'Last updated: ' + this.state.lastUpdated}
-          {' | ' + 'DB Size: ' + size + 'mb'}
+          <span>
+            {'Last updated: ' + this.state.lastUpdated}
+            {' | ' + 'DB Size: ' + size + 'mb'}
+          </span>
+          <OverlayTrigger placement="left" overlay={tooltip}>
+            <span> info</span>
+          </OverlayTrigger>
         </div>
       </Col>
     </Row>
@@ -110,7 +124,7 @@ export default class AnalyticsModule extends React.Component {
 
   componentDidMount() {
     this.unmounting = false
-    
+
     this.props.bp.axios.get('/api/botpress-analytics/graphs')
     .then(({ data }) => {
       if (this.unmounting) return
@@ -503,7 +517,7 @@ export default class AnalyticsModule extends React.Component {
         <Col md={12}>
           <Panel header='Generating analytics data'>
             <div>
-              There are no analytics available yet. 
+              There are no analytics available yet.
               Generating analytics can take up to 5 minutes after receiving a message.
             </div>
           </Panel>
