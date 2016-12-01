@@ -100,12 +100,14 @@ export default class RiveScriptModule extends React.Component {
   }
 
   createNewFile() {
-    const name = prompt('Name of the script', 'Enter the name of the script')
+    const name = prompt('Name of the script', 'name')
 
     this.setState({
       selected: name,
       files: { ...this.state.files, [name]: '' }
     })
+
+    setTimeout(this.saveCurrentFile.bind(this), 500)
   }
 
   deleteScript() {
