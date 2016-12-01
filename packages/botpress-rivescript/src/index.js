@@ -13,6 +13,11 @@ const validateRiveName = (name) => /[A-Z0-9_-]+/i.test(name)
 
 const incomingMiddleware = (event, next) => {
   if (event.platform === 'facebook') {
+
+    if (event.type !== 'message') {
+      return next()
+    }
+
     rs.setUservar(event.user.id, 'platform', event.platform)
     rs.setUservars(event.user.id, event.user)
     rs.replyAsync(event.user.id, event.text)
@@ -34,7 +39,7 @@ const incomingMiddleware = (event, next) => {
 
 module.exports = {
   init: function(bp) {
-    bp.registerMiddleware({
+    bp.middlewares.register({
       name: 'rivescript.processIncomingMessages',
       order: 10,
       type: 'incoming',
