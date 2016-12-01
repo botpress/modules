@@ -71,7 +71,7 @@ function scheduleToOutbox() {
 
 const _sendBroadcast = Promise.method(row => {
   if (row.type === 'text') {
-    bp.outgoing({
+    bp.middlewares.sendOutgoing({
       platform: row.platform,
       type: 'text',
       text: row.text,
@@ -133,7 +133,7 @@ function sendBroadcasts() {
         bp.logger.error('[broadcast] Broadcast #' + row.scheduleId +
           ' failed. Broadcast aborted. Reason: ' + err.message)
 
-        bp.notif({
+        bp.notifications.send({
           level: 'error',
           message: 'Broadcast #' + row.scheduleId + ' failed.'
           + ' Please check logs for the reason why.',
