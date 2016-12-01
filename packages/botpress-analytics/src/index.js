@@ -1,10 +1,24 @@
 const Analytics = require('./analytics')
 const DB = require('./db')
+const _ = require('lodash')
 
 let analytics = null
 let db = null
 
+const interactionsToTrack = [
+  'message', 
+  'text', 
+  'button', 
+  'template', 
+  'quick_reply', 
+  'postback'
+]
+
 const incomingMiddleware = (event, next) => {
+  if (!_.includes(interactionsToTrack, event.type)) {
+    return next()
+  }
+
   if (event.user) {
     db && db.saveIncoming(event)
     .then(() => next())
@@ -14,6 +28,10 @@ const incomingMiddleware = (event, next) => {
 }
 
 const outgoingMiddleware = (event, next) => {
+  if (!_.includes(interactionsToTrack, event.type)) {
+    return next()
+  }
+
   db && db.saveOutgoing(event)
   next()
 }
@@ -21,15 +39,16 @@ const outgoingMiddleware = (event, next) => {
 module.exports = {
   init: function(bp) {
 
-    bp.registerMiddleware({
+    bp.middlewares.register({
       name: 'analytics.incoming',
       module: 'botpress-analytics',
       type: 'incoming',
       handler: incomingMiddleware,
+      order: 5,
       description: 'Tracks incoming messages for Analytics purposes'
     })
 
-    bp.registerMiddleware({
+    bp.middlewares.register({
       name: 'analytics.outgoing',
       module: 'botpress-analytics',
       type: 'outgoing',
