@@ -17,7 +17,7 @@
     "compile": "node webpack.js --compile",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Protorisk DIFC",
+  "author": "Botpress",
   "license": "AGPL-3.0",
   "dependencies": {
     "bluebird": "^3.4.6",
