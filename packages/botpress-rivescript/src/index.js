@@ -29,7 +29,7 @@ const incomingMiddleware = (event, next) => {
           return
         }
       })
-      event.bp.messenger.pipeText(event.user.id, reply)
+      event.bp.messenger.sendText(event.user.id, reply)
     })
   } else {
     throw new Error('Unsupported platform: ', event.platform)
@@ -45,7 +45,7 @@ module.exports = {
       type: 'incoming',
       module: 'botpress-rivescript',
       handler: incomingMiddleware,
-      description: 'Processes incoming messages by the RiveScript engine and pipes responses'
+      description: 'Processes incoming messages by the RiveScript engine and sends responses'
     })
   },
   ready: function(bp) {
