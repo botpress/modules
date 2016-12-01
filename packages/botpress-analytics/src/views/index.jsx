@@ -92,9 +92,9 @@ class StatsHeader extends React.Component {
     const size = this.state.size.toFixed(2)
     const className = classnames('pull-right', style.metadata)
 
-    const infoText = "Updated periodically depending on size of database. " +
-      "Usually refresh every 5 minutes for DB smaller than 5MB " +
-      "and every hour if your database is bigger ones."
+    const infoText = "Updated periodically depending on the size of the database. " +
+      "Usually refresh every 5 minutes for DB smaller than 5MB, " +
+      "and every hour for larger databases."
 
     const tooltip = <BTooltip id="tooltip">{infoText}</BTooltip>
 
