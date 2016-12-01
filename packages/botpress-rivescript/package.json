@@ -22,7 +22,7 @@
     "type": "git",
     "url": "https://github.com/botpress/botpress-rivescript"
   },
-  "author": "Protorisk DIFC",
+  "author": "Botpress",
   "license": "AGPL-3.0",
   "devDependencies": {
     "babel-core": "^6.18.2",
