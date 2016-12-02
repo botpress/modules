@@ -1,4 +1,4 @@
-<a href='http://botpress.io'><img src='/assets/screenshot-rivescript.png'></a>
+<a href='http://botpress.io'><img src='/assets/screenshot-rivescript.png' height='120px'></a>
 # botpress-rivescript
 
 [RiveScript](https://www.rivescript.com/) is a simple scripting language for chatbots with a friendly, easy to learn syntax.
