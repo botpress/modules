@@ -82,7 +82,7 @@ const _sendBroadcast = Promise.method(row => {
     })
   } else {
     const fn = new Function('bp', 'userId', 'platform', row.text)
-    fn(bp, row.userId, row.platform)
+    return fn(bp, row.userId, row.platform)
   }
 })
 

@@ -128,7 +128,7 @@ constructor(props){
 
   handleAddBroadcast() {
     const broadcast = this.extractBroadcastFromModal()
-    this.getAxios().post("/api/botpress-broadcast/broadcasts", broadcast)
+    this.getAxios().put("/api/botpress-broadcast/broadcasts", broadcast)
     .then(this.fetchAllBroadcasts)
     .then(this.closeModal)
     .catch(this.handleRequestError)
@@ -137,7 +137,7 @@ constructor(props){
   handleModifyBroadcast() {
     const broadcast = this.extractBroadcastFromModal()
     const { broadcastId: id } = this.state
-    this.getAxios().put("/api/botpress-broadcast/broadcasts", { id, ...broadcast })
+    this.getAxios().post("/api/botpress-broadcast/broadcasts", { id, ...broadcast })
     .then(this.fetchAllBroadcasts)
     .then(this.closeModal)
     .catch(this.handleRequestError)
