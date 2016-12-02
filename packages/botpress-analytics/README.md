@@ -6,6 +6,8 @@ Analytics for Botpress provides an interface to view graphs and data of your cha
 
 <img src='/assets/analytics-screenshot.png' height='300px'>
 
+**Note**: All graphic captures have been taken on an empty bot then it's not looking pretty well... Pull requests will be appreciate to show full potential of this module.
+
 ## Get started
 
 ```
@@ -21,8 +23,6 @@ The analytics module should now be available in your bot UI, you can access all 
 You can see graphically your total number of users per platform and compare results to know exactly where to focus your attention.
 
 <img src='/assets/total-users-screenshot.png' height='300px'>
-
-Note: Graphic captures have been taken on an empty bot then it's not looking pretty well...
 
 ### Gender usage in last week
 
