@@ -1,9 +1,10 @@
-<img src='/assets/screenshot-broadcast.png'>
 # botpress-broadcast
 
 Provides an interface and APIs to schedule and send messages to your bot audience.
 
 **Support connectors: ** [botpress-messenger](https://github.com/botpress/botpress-messenger)
+
+<img src='/assets/screenshot-broadcast.png' height='300px'>
 
 ## Get started
 
