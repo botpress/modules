@@ -41,13 +41,13 @@ module.exports = {
       })
     })
 
-    router.post('/broadcasts', (req, res, next) => {
+    router.put('/broadcasts', (req, res, next) => {
       const { date, time, timezone, content, type } = req.body
       db.addSchedule({ date, time, timezone, content, type })
       .then(id => res.send({ id: id }))
     })
 
-    router.put('/broadcasts', (req, res, next) => {
+    router.post('/broadcasts', (req, res, next) => {
       const { id, date, time, timezone, content, type } = req.body
       db.updateSchedule({ id, date, time, timezone, content, type })
       .then(() => res.sendStatus(200))
