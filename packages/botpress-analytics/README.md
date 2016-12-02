@@ -1,76 +1,64 @@
-# botpress-broadcast
+# botpress-analytics
 
-Provides an interface and APIs to schedule and send messages to your bot audience.
+Analytics for Botpress provides an interface to view graphs and data of your chatbot typical usage. Bu using this module, you can have a look to your retention, daily active users, busy hours and a lot more...
 
 **Support connectors: ** [botpress-messenger](https://github.com/botpress/botpress-messenger)
 
-<img src='/assets/screenshot-broadcast.png' height='300px'>
+<img src='/assets/analytics-screenshot.png' height='300px'>
 
 ## Get started
 
 ```
-botpress install broadcast
+botpress install analytics
 ```
 
-The broadcast module should now be available in your bot UI, and the APIs exposed.
+The analytics module should now be available in your bot UI, you can access all graphs and data directly in the UI.
 
 ## Features
 
-### Send according to Users timezone
+### Total number of users
 
-You can decide wether the scheduled time is abolute to the bot's time or to individual users. If no timezone information available for the user, GMT is chosen.
+You can see graphically your total number of users per platform and compare results to know exactly where to focus your attention.
 
-### Send as Javascript snippet
+<img src='/assets/total-users-screenshot.png' height='300px'>
 
-Instead of sending text, you can decide the behavior of the sending function and do basically anything. The function will be called for every message (so for every user).
+Note: Graphic captures have been taken on an empty bot then it's not looking pretty well...
 
-Variables exposed: 
+### Gender usage in last week
 
-- `bp` botpress instance
-- `userId` the userId to send the message to
-- `platform` the platform on which the user is on
+Analytics module offers a view of your gender usage which can be useful to increase engagement of women or men.
 
-The built-in Facebook Messenger snippets are example of Javascript execution (see UI).
+<img src='/assets/gender-usage-screenshot.png' height='300px'>
 
-## Roadmap
+### Active users in last 2 weeks
 
-- User segmentation
+You can visually see your active users for the last 2 weeks which can indicate you progression and active days.
 
-## API
+<img src='/assets/active-users-screenshot.png' height='300px'>
 
-### `GET /api/botpress-broadcast/broadcasts`
+### Average incoming interactions
 
-Returns a list of the scheduled broadcasts.
+This graphic helps to quickly view what is the average of incoming interactions your users typically have in a day with your bots.
 
-### `PUT /api/botpress-broadcast/broadcasts`
+<img src='/assets/average-incoming-interaction-screenshot.png' height='300px'>
 
-Schedules a new broadcast.
+### Insights
 
-#### Body
+These specific metrics might be useful to see average usage of your bots.
 
-```js
-{
-  date: string, // *required*, 'YYYY-MM-DD'
-  time: string, // *required*, 'HH:mm'
-  timezone: null|int, // null (users timezone), or integer (absolute timezone)
-  type: string, // *required*, 'text' or 'javascript'
-  content: string // *required*, the text to be sent or the javascript code to execute
-}
-```
+<img src='/assets/insights-screenshot.png' height='300px'>
 
-#### Response
+### Retention for last 7 days
 
-```
-"Hello, Human!"
-```
+You can see exactly see your retention by days in this table.
 
-### `POST /api/botpress-broadcast/broadcasts`
+<img src='/assets/retention-screenshot.png' height='300px'>
 
-Update an existing broadcast. Same as PUT except that `id` is also necessary. You can't modify a processing broadcast.
+### Busy hours for last 7 days
 
-### `DELETE /api/botpress-broadcast/broadcasts/:id`
+Analytics module also offer a view of busy hours of your bot which can help you to track exactly when it's the time to send them messages.
 
-Delete an existing broadcast. You can't delete a processing broadcast.
+<img src='/assets/busy-hours-screenshot.png' height='300px'>
 
 ## Community
 
@@ -80,4 +68,4 @@ We have a [Public Chatroom](https://gitter.im/botpress/core), everybody is invit
 
 ## License
 
-botpress-broadcast is licensed under [AGPL-3.0](/LICENSE)
+botpress-analytics is licensed under [AGPL-3.0](/LICENSE)
