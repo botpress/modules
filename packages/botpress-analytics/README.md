@@ -6,7 +6,7 @@ Analytics for Botpress provides an interface to view graphs and data of your cha
 
 <img src='/assets/analytics-screenshot.png' height='300px'>
 
-**Note**: All graphic captures have been taken on an empty bot then it's not looking pretty well... Pull requests will be appreciate to show full potential of this module.
+**Note**: All graphic captures have been taken on an empty bot then it's not looking pretty well... Pull requests would be appreciate to show full potential of this module on a real chatbot.
 
 ## Get started
 
