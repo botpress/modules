@@ -1,11 +1,12 @@
-<img src='/assets/screenshot-rivescript.png' height='250px'>
 # botpress-rivescript
 
 [RiveScript](https://www.rivescript.com/) is a simple scripting language for chatbots with a friendly, easy to learn syntax.
 
 **botpress-rivescript** implements the RiveScript language as an incoming middleware and adds extra support for executing arbitraty code. Combining the simplicity of RiveScript and the flexibility of Botpress allows people to create very complex and rich dialogs, including sending Cards, Quick Replies, Buttons, Webviews, etc...
 
-**Support connectors: ** [botpress-messenger](https://github.com/botpress/botpress-messenger)
+**Supported connectors:** [botpress-messenger](https://github.com/botpress/botpress-messenger)
+
+<img src='/assets/screenshot-rivescript.png' height='250px'>
 
 ## Get started
 
