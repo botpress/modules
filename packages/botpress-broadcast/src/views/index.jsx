@@ -24,7 +24,8 @@ import {
   ControlLabel,
   Alert,
   FlatButton,
-  Link
+  Link,
+  ListGroupItem
 } from 'react-bootstrap'
 
 import DatePicker from 'react-bootstrap-date-picker'
@@ -67,6 +68,11 @@ constructor(props){
     this.handleTimeChange = this.handleTimeChange.bind(this)
     this.handleUserTimezoneChange = this.handleUserTimezoneChange.bind(this)
     this.handleRequestError = this.handleRequestError.bind(this)
+
+    this.renderFilteringConditionElement = this.renderFilteringConditionElement.bind(this)
+    this.handleAddToFilteringConditions = this.handleAddToFilteringConditions.bind(this)
+    this.handleRemoveFromFilteringConditions = this.handleRemoveFromFilteringConditions.bind(this)
+
     this.fetchAllBroadcasts = this.fetchAllBroadcasts.bind(this)
     this.closeModal = this.closeModal.bind(this)
   }
@@ -165,7 +171,8 @@ constructor(props){
         date: new Date().toISOString(),
         time: 0,
         progress: 0,
-        userTimezone: true
+        userTimezone: true,
+        filteringConditions:[]
       }
     }
 
@@ -180,6 +187,7 @@ constructor(props){
         userTimezone: broadcast.userTimezone,
         date: broadcast.date,
         time: broadcast.time,
+        filteringConditions : broadcast.filteringConditions,
         progress: broadcast.progress
       }
     })
@@ -233,6 +241,28 @@ constructor(props){
     })
   }
 
+  handleAddToFilteringConditions() {
+    const input = ReactDOM.findDOMNode(this.filterInput)
+    if (input && input.value !== '') {
+      var newBroadcast = this.state.broadcast
+      newBroadcast.filteringConditions = _.concat(newBroadcast.filteringConditions, input.value)
+
+      this.setState({
+        broadcast: newBroadcast
+      })
+      input.value = ''
+    }
+  }
+
+  handleRemoveFromFilteringConditions(filter) {
+    var newBroadcast = this.state.broadcast
+    newBroadcast.filteringConditions = _.without(newBroadcast.filteringConditions, filter)
+
+    this.setState({
+      broadcast: newBroadcast
+    })
+  }
+
   renderTableHeader() {
     return (
       <thead>
@@ -241,6 +271,7 @@ constructor(props){
           <th>Date</th>
           <th>Type</th>
           <th>Content</th>
+          <th>Filters</th>
           <th>Progress</th>
           <th>Action</th>
         </tr>
@@ -279,15 +310,25 @@ constructor(props){
         </Button>
       )
     }
+
+    const renderFilteringCondition = (filters) => {
+      if (_.isEmpty(filters)) {
+        return 'No filter'
+      }
+
+      return filters.toString()
+    }
+
     return _.mapValues(broadcasts, (value) => {
       return (
         <tr key={value.id}>
           <td style={{width:'5%'}}>{value.id}</td>
-          <td style={{width:'24%'}} className={style.scheduledDate}>{getDateFormatted(value.time, value.date, value.userTimezone)}</td>
-          <td style={{width:'7%'}}>{value.type}</td>
-          <td style={{maxWidth:'36%'}}>{value.content}</td>
-          <td style={{width:'13%'}} className={style.progress}>{formatProgress(value.progress, value.outboxed, value.errored) }</td>
-          <td style={{width:'15%'}}>
+          <td style={{width:'22%'}} className={style.scheduledDate}>{getDateFormatted(value.time, value.date, value.userTimezone)}</td>
+          <td style={{width:'6%'}}>{value.type}</td>
+          <td style={{maxWidth:'32%'}}>{value.content}</td>
+          <td style={{width: '7%'}}>{renderFilteringCondition(value.filteringConditions)}</td>
+          <td style={{width:'12%'}} className={style.progress}>{formatProgress(value.progress, value.outboxed, value.errored) }</td>
+          <td style={{width:'12%'}}>
             {!value.outboxed ? renderModificationButton(value) : null}
             <Button onClick={() => this.handleOpenModalForm(value)}>
               <Glyphicon glyph='copy' />
@@ -413,6 +454,45 @@ constructor(props){
     )
   }
 
+  renderFilteringConditionElement(filter) {
+    const removeHandler = () => this.handleRemoveFromFilteringConditions(filter)
+
+    return <ListGroupItem key={filter}>
+      {filter}
+      <Glyphicon className="pull-right" glyph="remove" onClick={removeHandler} />
+    </ListGroupItem>
+  }
+
+
+  renderFiltering() {
+    let filteringConditionElements = <ControlLabel>No filtering condition</ControlLabel>
+
+    const filters = this.state.broadcast.filteringConditions
+    if (filters && !_.isEmpty(filters)) {
+      filteringConditionElements = this.state.broadcast.filteringConditions.map(this.renderFilteringConditionElement)
+    }
+
+    return <div>
+      <FormGroup controlId="filtering">
+        <Col componentClass={ControlLabel} sm={2}>
+          Filtering conditions
+        </Col>
+        <Col sm={10}>
+          {filteringConditionElements}
+        </Col>
+      </FormGroup>
+      <FormGroup>
+        <Col smOffset={2} sm={10}>
+          <ControlLabel>Add a new filter:</ControlLabel>
+          <FormControl ref={(input) => this.filterInput = input} type="text"/>
+          <Button bsStyle="success" onClick={() => this.handleAddToFilteringConditions()}>
+            Add
+          </Button>
+        </Col>
+      </FormGroup>
+    </div>
+  }
+
   renderForm() {
     return (
       <Form horizontal>
@@ -421,6 +501,7 @@ constructor(props){
         {this.renderFormDate()}
         {this.renderFormTime()}
         {this.renderFormUserTimezone()}
+        {this.renderFiltering()}
       </Form>
     )
   }
@@ -507,6 +588,10 @@ constructor(props){
 
 
   render() {
+    if (this.state.loading) {
+      return <h3>Loading...</h3>
+    }
+
     const allBroadcasts = _.assign([], this.state.broadcasts)
     let hasSomeError = _.some(allBroadcasts, ['errored', true])
 
