@@ -19,6 +19,7 @@ function initialize() {
     table.integer('total_count')
     table.integer('sent_count')
     table.timestamp('created_on')
+    table.string('filters')
   })
   .then(function() {
     return knex.schema.createTableIfNotExists('broadcast_outbox', function (table) {
@@ -30,7 +31,7 @@ function initialize() {
   })
 }
 
-function addSchedule({ date, time, timezone, content, type }) {
+function addSchedule({ date, time, timezone, content, type, filters }) {
   let dateTime = date + ' ' + time
   let ts = null
   if (timezone) {
@@ -46,7 +47,8 @@ function addSchedule({ date, time, timezone, content, type }) {
     errored: false,
     total_count: 0,
     sent_count: 0,
-    created_on: moment(new Date()).format('x')
+    created_on: moment(new Date()).format('x'),
+    filters: JSON.stringify(filters)
   }
 
   return knex('broadcast_schedules')
@@ -54,7 +56,7 @@ function addSchedule({ date, time, timezone, content, type }) {
   .then().get(0)
 }
 
-function updateSchedule({ id, date, time, timezone, content, type }) {
+function updateSchedule({ id, date, time, timezone, content, type, filters }) {
   let dateTime = date + ' ' + time
   let ts = null
   if (timezone) {
@@ -65,7 +67,8 @@ function updateSchedule({ id, date, time, timezone, content, type }) {
     date_time: dateTime,
     ts: ts,
     text: content,
-    type: type
+    type: type,
+    filters: JSON.stringify(filters)
   }
 
   return knex('broadcast_schedules')
