@@ -33,7 +33,8 @@ module.exports = {
             userTimezone: !row.ts,
             date: date,
             time: time,
-            id: row.id
+            id: row.id,
+            filteringConditions: row.filters && JSON.parse(row.filters)
           }
         })
 
@@ -42,14 +43,14 @@ module.exports = {
     })
 
     router.put('/broadcasts', (req, res, next) => {
-      const { date, time, timezone, content, type } = req.body
-      db.addSchedule({ date, time, timezone, content, type })
+      const { date, time, timezone, content, type, filters } = req.body
+      db.addSchedule({ date, time, timezone, content, type, filters })
       .then(id => res.send({ id: id }))
     })
 
     router.post('/broadcasts', (req, res, next) => {
-      const { id, date, time, timezone, content, type } = req.body
-      db.updateSchedule({ id, date, time, timezone, content, type })
+      const { id, date, time, timezone, content, type, filters } = req.body
+      db.updateSchedule({ id, date, time, timezone, content, type, filters })
       .then(() => res.sendStatus(200))
       .catch((err) => {
         res.status(500).send({ message: err.message })

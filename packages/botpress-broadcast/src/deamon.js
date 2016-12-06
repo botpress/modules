@@ -58,6 +58,11 @@ function scheduleToOutbox() {
             bp.logger.info('[broadcast] Scheduled broadcast #'
             + schedule.id, '. [' + count + ' messages]')
 
+            if (schedule.filters && JSON.parse(schedule.filters).length > 0) {
+              bp.logger.info('[broadcast] Filters found on broadcast #' +
+                schedule.id, '. Filters are applied at sending time.')
+            }
+
             emitChanged()
           })
         })
@@ -70,20 +75,53 @@ function scheduleToOutbox() {
 }
 
 const _sendBroadcast = Promise.method(row => {
-  if (row.type === 'text') {
-    bp.middlewares.sendOutgoing({
-      platform: row.platform,
-      type: 'text',
-      text: row.text,
-      raw: {
-        to: row.userId,
-        message: row.text
+  
+  var dropPromise = Promise.resolve(false)
+
+  if (row.filters) {
+    dropPromise = Promise.mapSeries(JSON.parse(row.filters), filter => {
+      let fnBody = filter.trim()
+      if (!/^return /i.test(fnBody)) {
+        fnBody = 'return ' + fnBody
       }
+
+      const fn = new Function('bp', 'userId', 'platform', fnBody)
+      return Promise.method(fn)(bp, row.userId, row.platform)
     })
-  } else {
-    const fn = new Function('bp', 'userId', 'platform', row.text)
-    return fn(bp, row.userId, row.platform)
+    .then(values => {
+      return _.some(values, v => {
+        if (v !== true && v !== false) {
+          bp.logger.warn('[broadcast] Filter returned something other ' +
+            'than a boolean (or a Promise of a boolean)')
+        }
+
+        return typeof(v) !== 'undefined' && v !== null && v !== true
+      })
+    })
   }
+
+  return dropPromise.then(drop => {
+    if (drop) {
+      bp.logger.debug('[broadcast] Drop sending #' + row.scheduleId 
+        + ' to user: ' + row.userId + '. Reason = Filters')
+      return
+    }
+
+    if (row.type === 'text') {
+      bp.middlewares.sendOutgoing({
+        platform: row.platform,
+        type: 'text',
+        text: row.text,
+        raw: {
+          to: row.userId,
+          message: row.text
+        }
+      })
+    } else {
+      const fn = new Function('bp', 'userId', 'platform', row.text)
+      return fn(bp, row.userId, row.platform)
+    }
+  })
 })
 
 function sendBroadcasts() {
@@ -104,6 +142,7 @@ function sendBroadcasts() {
     'broadcast_schedules.text as text',
     'broadcast_schedules.type as type',
     'broadcast_schedules.id as scheduleId',
+    'broadcast_schedules.filters as filters',
     'broadcast_outbox.ts as sendTime',
     'broadcast_outbox.userId as scheduleUser'
   ])

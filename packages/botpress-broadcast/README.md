@@ -32,6 +32,49 @@ Variables exposed:
 
 The built-in Facebook Messenger snippets are example of Javascript execution (see UI).
 
+### Filtering
+
+You can apply filters to the broadcasts. Filters are small javascript functions that will be evaluated before sending the broadcast to a user. The condition is called for every users the broadcast is scheduled to.
+
+Variables exposed to the filter function:
+- `bp` botpress instance
+- `userId` the userId to send the message to
+- `platform` the platform on which the user is on
+
+The function needs to return a **boolean** or a **Promise of a boolean**.
+
+**Note:** Starting your function with `return ` is optional.
+
+#### Examples
+
+##### Send a message only to users on Facebook
+
+```js
+["platform === 'facebook'"]
+```
+
+##### Send a message only to subscribed users 
+
+**Note**: Assuming your bot has a `subscriptions` table that holds userId and platform
+
+```js
+// in your bot's index.js
+
+bp.isUserSubscribed = (userId, platform) => {
+  return bp.db.get()
+  .then(knex => 
+    knex('subscriptions')
+    .where({ userId, platform })
+    .select('count(*) as count')
+    then().get(0).then(({count}) => count > 0)
+  )
+}
+```
+
+```js
+["bp.isUserSubscribed(userId)"]
+```
+
 ## Roadmap
 
 - User segmentation
@@ -54,7 +97,8 @@ Schedules a new broadcast.
   time: string, // *required*, 'HH:mm'
   timezone: null|int, // null (users timezone), or integer (absolute timezone)
   type: string, // *required*, 'text' or 'javascript'
-  content: string // *required*, the text to be sent or the javascript code to execute
+  content: string // *required*, the text to be sent or the javascript code to execute,
+  filters: [string] // filtering conditions, Javascript code
 }
 ```
 

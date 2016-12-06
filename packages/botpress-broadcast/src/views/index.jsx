@@ -25,7 +25,8 @@ import {
   Alert,
   FlatButton,
   Link,
-  ListGroupItem
+  ListGroupItem,
+  Label
 } from 'react-bootstrap'
 
 import DatePicker from 'react-bootstrap-date-picker'
@@ -103,13 +104,14 @@ constructor(props){
   }
 
   extractBroadcastFromModal() {
-    const { type, content, date, userTimezone, time } = this.state.broadcast
+    const { type, content, date, userTimezone, time, filteringConditions } = this.state.broadcast
     return {
       date: moment(date).format('YYYY-MM-DD'),
       time: moment().startOf('day').add(time, 'seconds').format('HH:mm'),
       content: content,
       type: type,
-      timezone: userTimezone ? null : moment().format('Z')
+      timezone: userTimezone ? null : moment().format('Z'),
+      filters: filteringConditions
     }
   }
 
@@ -316,7 +318,9 @@ constructor(props){
         return 'No filter'
       }
 
-      return filters.toString()
+      return <Label bsStyle="primary">
+        {filters.length + ' filters'}
+      </Label>
     }
 
     return _.mapValues(broadcasts, (value) => {
