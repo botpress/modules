@@ -1,0 +1,44 @@
+[ ] Main
+  [ ] Show toggle - Previous and Upcoming
+  [ ] Show all upcoming schedule
+  [ ] Show all previous schedule
+  [ ] Display Add button
+  [ ] Pop modal when add is clicked
+  [ ] Display <no schedule> when empty
+
+[ ] Upcoming
+  [ ] Display title
+  [ ] Display 'in 5 minutes'
+  [ ] Display 'occurs'
+  [ ] Display actions details [modification]
+  [ ] Display enable/disable
+  [ ] Display save button
+  [ ] Display delete button
+
+[ ] Previous
+  [ ] Display title
+  [ ] Display 'past 5 minutes'
+  [ ] Display 'occurs'
+  [ ] Display actions details [no modification]
+  [ ] Display logs
+  [ ] Display delete button
+
+[ ] Modal
+  [ ] Diplay error
+  [ ] Display name
+  [ ] Display schedule (dropdown)
+  [ ] Display one-off
+  [ ] Display 'cron expression'
+  [ ] Display textual
+  [ ] Display prospected
+  [ ] Display action input
+  [ ] Display add
+
+[ ] Link to server
+  [ ] Get all previous (onload -> previous)
+  [ ] Get all upcoming (onload -> upcoming)
+  [ ] Post changes to a schedule (button -> save)
+  [ ] Put new schedule (button -> add -> modal)
+    [ ] Catch error (if same name)
+      [ ] Show error in modal
+  [ ] Delete a schedule (button -> delete)
