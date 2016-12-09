@@ -39,5 +39,11 @@
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
     "webpack": "^1.13.3"
+  },
+  "dependencies": {
+    "cronstrue": "^0.8.0",
+    "later": "^1.2.0",
+    "lodash": "^4.17.2",
+    "moment": "^2.17.1"
   }
 }
