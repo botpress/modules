@@ -1,0 +1,23 @@
+
+DATABASE:
+
+schedules: {
+   id(name),
+   enabled(bool),
+   schedule_type(string, [cron, exp, once]),
+   schedule(string, [date for once, strings for exp and cron]),
+   schedule_human(string, human-friendly),
+   created_on(date),
+   action(string)
+}
+
+schedules_tasks: {
+  scheduleId,
+  scheduleOn,
+  status,
+  logs,
+  finishedOn,
+  returned
+}
+
+UI: 
