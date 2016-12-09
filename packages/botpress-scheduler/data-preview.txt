@@ -34,5 +34,5 @@ UI:
   status,
   logs,
   finishedOn,
-  returned
+  returnednpm 
 }

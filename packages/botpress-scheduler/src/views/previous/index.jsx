@@ -5,6 +5,6 @@ import style from './style.scss'
 export default class Previous extends React.Component {
 
   render() {
-    return <h4>This module is empty...</h4>
+    return <h4>Previous</h4>
   }
 }
