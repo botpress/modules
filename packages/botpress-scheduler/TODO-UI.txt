@@ -6,14 +6,15 @@
   [ ] Pop modal when add is clicked
   [ ] Display <no schedule> when empty
 
-[ ] Upcoming
-  [ ] Display title
-  [ ] Display 'in 5 minutes'
-  [ ] Display 'occurs'
-  [ ] Display actions details [modification]
-  [ ] Display enable/disable
-  [ ] Display save button
-  [ ] Display delete button
+[X] Upcoming
+  [X] Display title
+  [X] Display 'in 5 minutes'
+  [X] Display 'occurs'
+  [X] Display actions details [modification]
+  [X] Display enable/disable
+  [X] Display save button
+  [X] Display delete button
+  [X] Dirty while changing some stuff 
 
 [ ] Previous
   [ ] Display title
