@@ -1,5 +1,5 @@
-[ ] Database schema
-  [ ] schedules:
+[X] Database schema
+  [X] schedules:
     id(name),
     enabled(bool), 
     schedule_type(string, [cron, exp, once]), 
@@ -7,22 +7,20 @@
     schedule_human(string, human-friendly),
     created_on(date), 
     action(string)
-  [ ] schedules_tasks: scheduleId, scheduleOn, status, logs, finishedOn, returned
+  [X] schedules_tasks: scheduleId, scheduleOn, status, logs, finishedOn, returned
 
-[ ] Scheduler: compute next occurence
+[X] Scheduler: compute next occurence
 
 [ ] Loop: run expired (every 5s)
   [ ] Run: reschedule next occurence
   [ ] Update task status
-  [ ] Execute action
+  [ ] Execute action if ENABLED
   [ ] Update task status + returned + logs
 
 [ ] API
   [ ] Create new schedule
+    [ ] Validate type and expression
   [ ] Modify schedule
-    [ ] On disable: unschedule tasks
-    [ ] On enable: schedule task
-    [ ] Modify props
   [ ] Delete schedule
     [ ] Delete scheduled tasks
   [ ] Get upcoming tasks
