@@ -9,9 +9,18 @@
     "webBundle": "bin/web.bundle.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --compilers js:babel-core/register",
     "watch": "node webpack.js --watch",
     "compile": "node webpack.js --compile"
+  },
+  "babel": {
+    "presets": [
+      "latest",
+      "stage-0"
+    ],
+    "plugins": [
+      "transform-object-rest-spread"
+    ]
   },
   "author": "Botpress Team",
   "license": "AGPL-3.0",
@@ -24,6 +33,7 @@
     "babel-preset-react": "^6.16.0",
     "babel-preset-stage-0": "^6.16.0",
     "babel-register": "^6.18.0",
+    "chai": "^3.5.0",
     "classnames": "^2.2.5",
     "copy-webpack-plugin": "^4.0.0",
     "core-js": "^2.4.1",
@@ -31,9 +41,15 @@
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.9.0",
     "json-loader": "^0.5.4",
+    "mocha": "^3.2.0",
     "node-sass": "^3.11.2",
+    "react": "^15.3.2",
+    "react-bootstrap": "^0.30.6",
+    "react-dom": "^15.3.2",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
+    "webpack": "^1.13.3",
+    "webpack-node-externals": "^1.5.4"
   },
   "dependencies": {
     "cronstrue": "^0.8.0",
