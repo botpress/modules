@@ -1,7 +1,7 @@
 {
   "name": "botpress-broadcast",
-  "version": "1.0.8",
-  "description": "Official module for Botpress to broadcast messages and specific functions to all your users.",
+  "version": "1.0.9",
+  "description": "Broadcast messages to all (or a subset) of your users",
   "main": "bin/node.bundle.js",
   "homepage": "https://github.com/botpress/botpress-broadcast",
   "botpress": {
