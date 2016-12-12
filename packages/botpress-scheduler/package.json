@@ -4,8 +4,8 @@
   "description": "Schedule one-off and recurring tasks",
   "main": "bin/node.bundle.js",
   "botpress": {
-    "menuText": "botpress-scheduler",
-    "menuIcon": "view_module",
+    "menuText": "Scheduler",
+    "menuIcon": "alarm_on",
     "webBundle": "bin/web.bundle.js"
   },
   "scripts": {
