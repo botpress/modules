@@ -19,6 +19,10 @@ module.exports = bp => {
       return bp.db.get()
       .then(knex => update(knex, id, options))
     },
+    updateTask: (id, time, status, logs, returned) => {
+      return db.db.get()
+      .then(knex => updateTask(knex, id, time, status, logs, returned))
+    },
     delete: (id) => {
       return bp.db.get()
       .then(knex => remove(knex, id))
@@ -30,6 +34,18 @@ module.exports = bp => {
     listPrevious: () => {
       return bp.db.get()
       .then(knex => listPrevious(knex))
+    },
+    listExpired: () => {
+      return bp.db.get()
+      .then(knex => listExpired(knex))
+    },
+    scheduleNext: (id, time) => {
+      return bp.db.get()
+      .then(knex => scheduleNext(knex, id, time))
+    },
+    reviveAllExecuting: () => {
+      return bp.db.get()
+      .then(knex => reviveAllExecuting(knex))
     }
   }
 }
@@ -86,6 +102,26 @@ function update(knex, id, options) {
   .then()
 }
 
+function updateTask(knex, id, time, status, logs, returned) {
+  const options = { status, logs, returned }
+
+  if (status === 'done') {
+    options.finishedOn = moment().format('x')
+  }
+
+  return knex('scheduler_tasks')
+  .where({ scheduleId: id, scheduledOn: time })
+  .update(options)
+  .then()
+}
+
+function reviveAllExecuting(knex) {
+  return knex('scheduler_tasks')
+  .where({ status: 'executing' })
+  .update({ status: 'pending' })
+  .then()
+}
+
 function remove(knex, id) {
   return knex('scheduler_schedules')
   .where({ id })
@@ -107,6 +143,15 @@ function listPrevious(knex) {
   return knex('scheduler_tasks')
   .where('scheduledOn', '<=', now)
   .andWhere('status', '!=', 'pending')
+  .join('scheduler_schedules', 'scheduler_tasks.scheduleId', 'scheduler_schedules.id')
+  .then()
+}
+
+function listExpired(knex) {
+  const now = moment().format('x')
+  return knex('scheduler_tasks')
+  .where('scheduledOn', '<=', now)
+  .andWhere('status', '=', 'pending')
   .join('scheduler_schedules', 'scheduler_tasks.scheduleId', 'scheduler_schedules.id')
   .then()
 }

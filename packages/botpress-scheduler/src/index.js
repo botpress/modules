@@ -1,8 +1,14 @@
 import db from './db'
+import deamon from './deamon'
 
 module.exports = {
   init: function(bp) {
     db(bp).bootstrap()
+    .then(() => {
+      const d = deamon(bp)
+      return d.revive()
+      .then(() => d.start())
+    })
   },
   ready: function(bp) {
 

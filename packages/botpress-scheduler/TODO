@@ -11,11 +11,11 @@
 
 [X] Scheduler: compute next occurence
 
-[ ] Loop: run expired (every 5s)
-  [ ] Run: reschedule next occurence
-  [ ] Update task status
-  [ ] Execute action if ENABLED
-  [ ] Update task status + returned + logs
+[X] Loop: run expired (every 5s)
+  [X] Run: reschedule next occurence
+  [X] Update task status
+  [X] Execute action if ENABLED
+  [X] Update task status + returned + logs
 
 [X] API
   [X] Create new schedule
@@ -26,6 +26,6 @@
   [X] Get upcoming tasks
   [X] Get previous/past tasks
 
-[ ] Events API
-  [ ] On task started
-  [ ] On task finished
+[X] Events API
+  [X] On task started
+  [X] On task finished
