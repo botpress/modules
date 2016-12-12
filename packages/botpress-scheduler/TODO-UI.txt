@@ -14,7 +14,8 @@
   [X] Display enable/disable
   [X] Display save button
   [X] Display delete button
-  [X] Dirty while changing some stuff 
+  [ ] Dirty while changing some stuff
+  [ ] Collapsible header
 
 [ ] Previous
   [ ] Display title
