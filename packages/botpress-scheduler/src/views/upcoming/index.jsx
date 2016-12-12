@@ -25,15 +25,10 @@ export default class Upcoming extends React.Component {
   }
 
   renderOccuring() {
-    const nextOccuring = "in 2 days at 12:00"
-    return <div>
-      <h4>
-        Next occurence
-      </h4>
-      <p>
+    const nextOccuring = "Occurs every 2 days at 12:00"
+    return <h4>
         {nextOccuring}
-      </p>
-    </div>
+      </h4>
   }
 
   renderEnableToggle() {
@@ -44,12 +39,9 @@ export default class Upcoming extends React.Component {
 
   renderActionDetails() {
     const action = "bp.messenger.sendText(...)"
-    return <div>
-      <h4>Action</h4>
-      <FormControl
-        componentClass="textarea"
-        value={action} />
-    </div>
+    return <FormControl
+      componentClass="textarea"
+      value={action} />
   }
 
   renderButtons() {
