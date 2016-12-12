@@ -21,7 +21,7 @@ module.exports = bp => {
     },
     delete: (id) => {
       return bp.db.get()
-      .then(knex => delete(knex, id))
+      .then(knex => remove(knex, id))
     },
     listUpcoming: () => {
       return bp.db.get()
@@ -63,12 +63,18 @@ function create(knex, id, options) {
   options.schedule_human =
     util.getHumanExpression(options.schedule_type, options.schedule)
 
+  const firstOccurence = util.getNextOccurence(options.schedule_type, options.schedule)
+
   return knex('scheduler_schedules').insert({
     id: id,
     created_on: moment().format('x'),
     ...options
   })
-  .then() // TODO Schedule next occurence
+  .then(() => {
+    if (options.enabled) {
+      return scheduleNext(knex, id, firstOccurence.format('x'))
+    }
+  })
 }
 
 function update(knex, id, options) {
@@ -80,11 +86,11 @@ function update(knex, id, options) {
   .then()
 }
 
-function delete(knex, id) {
+function remove(knex, id) {
   return knex('scheduler_schedules')
   .where({ id })
   .del()
-  .then()
+  .then(() => deleteScheduled(knex, id))
 }
 
 function listUpcoming(knex) {
@@ -135,7 +141,7 @@ function validateCreateOptions(options) {
     throw args.errorString()
   }
 
-  // TODO Validate type + expression
+  util.validateExpression(options.schedule_type, options.schedule)
 
   return _.pick(options, [
     'enabled', 
