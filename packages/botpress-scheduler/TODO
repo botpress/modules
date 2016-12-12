@@ -17,14 +17,14 @@
   [ ] Execute action if ENABLED
   [ ] Update task status + returned + logs
 
-[ ] API
-  [ ] Create new schedule
-    [ ] Validate type and expression
-  [ ] Modify schedule
-  [ ] Delete schedule
-    [ ] Delete scheduled tasks
-  [ ] Get upcoming tasks
-  [ ] Get previous/past tasks
+[X] API
+  [X] Create new schedule
+    [X] Validate type and expression
+  [X] Modify schedule
+  [X] Delete schedule
+    [X] Delete scheduled tasks
+  [X] Get upcoming tasks
+  [X] Get previous/past tasks
 
 [ ] Events API
   [ ] On task started
