@@ -2,7 +2,7 @@ import Promise from 'bluebird'
 
 import db from './db'
 import util from './util'
-
+import moment from 'moment'
 let timerInterval = null
 
 module.exports = (bp) => {
@@ -11,7 +11,7 @@ module.exports = (bp) => {
     if (task.schedule_type.toLowerCase() === 'once') {
       return Promise.resolve(null)
     }
-    
+
     const nextOccurence = util.getNextOccurence(task.schedule_type, task.schedule)
 
     return db(bp).scheduleNext(task.id, nextOccurence.format('x'))
@@ -78,7 +78,7 @@ module.exports = (bp) => {
   }
 
   const revive = () => db(bp).reviveAllExecuting()
-  const start = () => timerInterval = setInterval(run, 30000)
+  const start = () => timerInterval = setInterval(run, 5000)
   const stop = () => clearInterval(timerInterval)
 
   return { start, stop, revive }
