@@ -7,7 +7,9 @@ import {
   ButtonToolbar,
   ButtonGroup,
   Button,
-  Badge
+  Badge,
+  OverlayTrigger,
+  Tooltip
 } from 'react-bootstrap'
 
 import classnames from 'classnames'
@@ -74,29 +76,52 @@ export default class SchedulerModule extends React.Component {
   }
 
   renderUpcoming() {
-    if (this.state.upcoming.length === 0) {
-      return <h3>There are no upcoming tasks</h3>
-    }
     const axios = this.props.bp.axios
     const elements = this.state.upcoming.map((el, i) => <Upcoming key={i} task={el} axios={axios}/>)
-    return <ListGroup>
-        {elements}
-      </ListGroup>
+
+    const contain = this.state.previous.length === 0
+      ? <div className={style.emptyText}>There are no upcoming tasks</div>
+      : <ListGroup>{elements}</ListGroup>
+
+    return <div>
+      <div className={style.sectionHeader}>
+        <h4>
+          {'Upcoming'}
+          <Badge className={style.historyBadge}>
+            <p>{this.state.upcoming.length}</p>
+          </Badge>
+        </h4>
+        {this.renderCreateButton()}
+      </div>
+      <div className={style.historyContain}>
+        {contain}
+      </div>
+    </div>
   }
 
   renderPrevious() {
     const elements = this.state.previous.map((el, i) => <Previous key={i} task={el}/>)
 
     const contain = this.state.previous.length === 0
-      ? <h3>There are no previously run tasks</h3>
+      ? <div className={style.emptyText}>There are no previously run tasks</div>
       : <ListGroup>{elements}</ListGroup>
 
+    const tooltip = <Tooltip id="tooltip">Trash all</Tooltip>
+
     return <div>
-      <div className={style.historyHeader}>
-        <h4>{'History'}</h4>
-        <a className={style.trashAll} href="#" onClick={::this.trashAllDone}>
-          <i className='material-icons'>delete</i>
-        </a>
+      <div className={style.sectionHeader }>
+        <h4>
+          {'History'}
+          <Badge className={style.historyBadge}>
+            <p>{this.state.previous.length}</p>
+          </Badge>
+        </h4>
+
+          <OverlayTrigger placement="top" overlay={tooltip}>
+            <a className={style.trashAll} href="#" onClick={::this.trashAllDone}>
+              <i className='material-icons'>delete</i>
+            </a>
+          </OverlayTrigger>
       </div>
       <div className={style.historyContain}>
         {contain}
@@ -110,12 +135,8 @@ export default class SchedulerModule extends React.Component {
 
 
   renderCreateButton() {
-
     const click = () => this.createModal.show()
-
-    return <div className="pull-right">
-      <Button bsStyle="primary" onClick={click}>Create</Button>
-    </div>
+    return <Button bsStyle="primary" onClick={click}>Create</Button>
   }
 
   render() {
@@ -134,9 +155,6 @@ export default class SchedulerModule extends React.Component {
             <Col md={4}>
               {this.renderPrevious()}
             </Col>
-          </Row>
-          <Row>
-            <Col sm={12}>{this.renderCreateButton()}</Col>
           </Row>
         </Grid>
         <CreateModal ref={r => this.createModal = r} axios={this.props.bp.axios}/>

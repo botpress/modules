@@ -43,13 +43,14 @@ export default class Upcoming extends React.Component {
     }
 
     const doDelete = () => {
-      axios.delete(modifyUrl + '?id=' + task.id) 
+      axios.delete(modifyUrl + '?id=' + task.id)
     }
 
     const header = <div>
       <span className={style.header_id}>{task.id}</span>
       {'  '}
       <span className={whenClass}>({when.fromNow()})</span>
+      <Glyphicon className={style.delete} glyph="trash" onClick={doDelete} />
       <Toggle className={classnames(style.toggle, style.enabled)}
         defaultChecked={task.enabled}
         onChange={toggleEnabled}/>
@@ -63,7 +64,6 @@ export default class Upcoming extends React.Component {
         className={style.action}
         change={changeAction}
         propName="textarea" />
-      <Glyphicon className={style.delete} glyph="trash" onClick={doDelete} />
     </ListGroupItem>
   }
 

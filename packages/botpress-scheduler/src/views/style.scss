@@ -6,7 +6,7 @@
   }
 }
 
-.historyHeader {
+.sectionHeader {
   border: solid 1px #ddd;
   padding: 15px;
   margin: 0;
@@ -14,14 +14,48 @@
   position: relative;
 
   h4 {
+    font-weight: bolder;
+    color: gray;
     font-size: 22px;
     margin: 0;
+
   }
   a {
     position: absolute;
     right: 10px;
     top: 14px;
   }
+
+  .historyBadge {
+    margin-left: 10px;
+    vertical-align: middle;
+
+    p {
+      line-height: 16px;
+      padding-top: 1px;
+      padding-right: 1px;
+    }
+  }
+
+  button {
+    position: absolute;
+    right: 10px;
+    top: 12px;
+    background-color: #56c0b2;
+    border: none;
+
+    &:hover {
+      background-color: #36baa9;
+    }
+  }
+}
+
+.emptyText {
+  border: solid 1px #ddd;
+  border-top: none;
+  padding: 15px;
+  margin: 0;
+  background-color: white;
 }
 
 .row-centered {

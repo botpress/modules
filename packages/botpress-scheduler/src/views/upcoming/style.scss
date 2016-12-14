@@ -1,8 +1,8 @@
 
 .task {
-  margin-bottom: 5px;
-  border-radius: 10px !important;
+  border-top: none;
   text-align: left;
+  border-radius: 0 !important;
 }
 
 .header_id {
@@ -35,12 +35,10 @@
 }
 
 .delete {
-  display: inline-block;
-  position: absolute;
   bottom: 10px;
-  top: initial;
-  right: 10px;
   font-size: 16px;
+  margin-left: 5px;
+  vertical-align: middle;
   transition: color ease-in-out .15s, opacity ease-in-out .15s;
   opacity: 0;
   color: #ccc;
