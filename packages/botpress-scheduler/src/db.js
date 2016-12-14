@@ -20,7 +20,7 @@ module.exports = bp => {
       .then(knex => update(knex, id, options))
     },
     updateTask: (id, time, status, logs, returned) => {
-      return db.db.get()
+      return bp.db.get()
       .then(knex => updateTask(knex, id, time, status, logs, returned))
     },
     delete: (id) => {

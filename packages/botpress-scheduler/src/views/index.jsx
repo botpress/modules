@@ -10,6 +10,8 @@ import {
   Badge
 } from 'react-bootstrap'
 
+import classnames from 'classnames'
+
 import Previous from './previous'
 import Upcoming from './upcoming'
 import CreateModal from './create'
@@ -26,7 +28,8 @@ export default class SchedulerModule extends React.Component {
       loading: true,
       upcoming: [],
       previous: [],
-      showCreate: false
+      showCreate: false,
+      active: 'Upcoming'
     }
   }
 
@@ -39,6 +42,7 @@ export default class SchedulerModule extends React.Component {
 
   fetchAll() {
     return this.fetchUpcoming()
+    .then(() => this.fetchPrevious())
   }
 
   fetchUpcoming() {
@@ -46,6 +50,17 @@ export default class SchedulerModule extends React.Component {
     .then(({data}) => {
       this.setState({ upcoming: data })
     })
+  }
+
+  fetchPrevious() {
+    return this.props.bp.axios.get(api('schedules/past'))
+    .then(({data}) => {
+      this.setState({ previous: data })
+    })
+  }
+
+  setActive(view) {
+    return () => this.setState({ active: view })
   }
 
   renderUpcoming() {
@@ -59,6 +74,17 @@ export default class SchedulerModule extends React.Component {
     </ListGroup>
   }
 
+  renderPrevious() {
+    if (this.state.previous.length === 0) {
+      return <h3>There are no previously run tasks</h3>
+    }
+
+    const elements = this.state.previous.map((el, i) => <Upcoming key={i} task={el}/>)
+    return <ListGroup>
+      {elements}
+    </ListGroup>
+  }
+
   renderLoading() {
     return <h1>Loading...</h1>
   }
@@ -66,11 +92,11 @@ export default class SchedulerModule extends React.Component {
   renderToolbar() {
     return <ButtonToolbar className={style.topbar}>
       <ButtonGroup>
-        <Button>
+        <Button active={this.state.active === 'Upcoming'} onClick={this.setActive('Upcoming')}>
           <span>Upcoming</span>
           <Badge>{this.state.upcoming.length}</Badge>
         </Button>
-        <Button>
+        <Button active={this.state.active === 'Previous'} onClick={this.setActive('Previous')}>
           <span>Previous</span>
           <Badge>{this.state.previous.length}</Badge>
         </Button>
@@ -104,9 +130,9 @@ export default class SchedulerModule extends React.Component {
               {this.renderToolbar()}
             </Col>
           </Row>
-          <Row className={style['row-centered']}>
+          <Row className={classnames(style['row-centered'], style.tasks)}>
             <Col sm={12} md={8} lg={4} className={style['col-centered']}>
-              {this.renderUpcoming()}
+              {this.state.active === 'Upcoming' ? this.renderUpcoming() : this.renderPrevious()}
             </Col>
           </Row>
         </Grid>
