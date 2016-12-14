@@ -1,11 +1,26 @@
-.topbar {
-  margin: auto;
-  float: none;
-  display: inline-block;
+.mainContainer{
+  :global(.container){
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+}
 
-  button span+span {
-    margin-left: 5px;
-    background-color: lightgrey !important;
+.historyHeader {
+  border: solid 1px #ddd;
+  padding: 15px;
+  margin: 0;
+  background-color: white;
+  position: relative;
+
+  h4 {
+    font-size: 22px;
+    margin: 0;
+  }
+  a {
+    position: absolute;
+    right: 10px;
+    top: 14px;
   }
 }
 
