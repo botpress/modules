@@ -136,8 +136,7 @@ function remove(knex, id) {
 function listUpcoming(knex) {
   const now = moment().format('x')
   return knex('scheduler_tasks')
-  .where('scheduledOn', '>=', now)
-  .andWhere({ status: 'pending' })
+  .where({ status: 'pending' })
   .join('scheduler_schedules', 'scheduler_tasks.scheduleId', 'scheduler_schedules.id')
   .then()
 }
@@ -145,7 +144,7 @@ function listUpcoming(knex) {
 function listPrevious(knex) {
   const now = moment().format('x')
   return knex('scheduler_tasks')
-  .where('scheduledOn', '<=', now)
+  .where(knex.raw("julianday('now') >= julianday(scheduledOn/1000, 'unixepoch')"))
   .andWhere('status', '!=', 'pending')
   .join('scheduler_schedules', 'scheduler_tasks.scheduleId', 'scheduler_schedules.id')
   .then()
@@ -154,7 +153,7 @@ function listPrevious(knex) {
 function listExpired(knex) {
   const now = moment().format('x')
   return knex('scheduler_tasks')
-  .where('scheduledOn', '<=', now)
+  .where(knex.raw("julianday('now') >= julianday(scheduledOn/1000, 'unixepoch')"))
   .andWhere('status', '=', 'pending')
   .join('scheduler_schedules', 'scheduler_tasks.scheduleId', 'scheduler_schedules.id')
   .then()
