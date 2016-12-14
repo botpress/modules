@@ -1,3 +1,6 @@
+import moment from 'moment'
+import _ from 'lodash'
+
 import db from './db'
 import deamon from './deamon'
 
@@ -21,7 +24,13 @@ module.exports = {
 
     router.get('/schedules/upcoming', (req, res) => {
       db(bp).listUpcoming()
-      .then(schedules => res.send(schedules))
+      .then(schedules => {
+        res.send(_.sortBy(schedules, 'scheduledOn').map(s => {
+          s.scheduleOn = moment(s.scheduledOn).format()
+          s.enabled = !!s.enabled
+          return s
+        }))
+      })
       .catch(catchError(res))
     })
 

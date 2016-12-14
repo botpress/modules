@@ -67,11 +67,13 @@ export default class SchedulerModule extends React.Component {
     if (this.state.upcoming.length === 0) {
       return <h3>There are no upcoming tasks</h3>
     }
-
-    const elements = this.state.upcoming.map((el, i) => <Upcoming key={i} task={el}/>)
-    return <ListGroup>
-      {elements}
-    </ListGroup>
+    const axios = this.props.bp.axios
+    const elements = this.state.upcoming.map((el, i) => <Upcoming key={i} task={el} axios={axios}/>)
+    return <Col sm={12} md={8} lg={6} className={style['col-centered']}>
+      <ListGroup>
+        {elements}
+      </ListGroup>
+    </Col>
   }
 
   renderPrevious() {
@@ -79,10 +81,12 @@ export default class SchedulerModule extends React.Component {
       return <h3>There are no previously run tasks</h3>
     }
 
-    const elements = this.state.previous.map((el, i) => <Upcoming key={i} task={el}/>)
-    return <ListGroup>
-      {elements}
-    </ListGroup>
+    const elements = this.state.previous.map((el, i) => <Previous key={i} task={el}/>)
+    return <Col sm={12} md={8} lg={8} className={style['col-centered']}>
+      <ListGroup>
+        {elements}
+      </ListGroup>
+    </Col>
   }
 
   renderLoading() {
@@ -131,9 +135,7 @@ export default class SchedulerModule extends React.Component {
             </Col>
           </Row>
           <Row className={classnames(style['row-centered'], style.tasks)}>
-            <Col sm={12} md={8} lg={4} className={style['col-centered']}>
-              {this.state.active === 'Upcoming' ? this.renderUpcoming() : this.renderPrevious()}
-            </Col>
+            {this.state.active === 'Upcoming' ? this.renderUpcoming() : this.renderPrevious()}
           </Row>
         </Grid>
         <CreateModal ref={r => this.createModal = r} axios={this.props.bp.axios}/>

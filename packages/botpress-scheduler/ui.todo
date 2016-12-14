@@ -1,11 +1,11 @@
 Upcoming:
-  ☐ Header
+  ✔ Header @done (16-12-13 20:10)
   ☐ Delete
-  ☐ Enabled / disabled
-  ☐ Modify action
+  ✔ Enabled / disabled @done (16-12-13 20:21)
+  ✔ Modify action @done (16-12-13 20:42)
   ☐ Real-time update trigger time
-  ☐ Order by trigger time
-  ☐ Modify modal
+  ✔ Order by trigger time @done (16-12-13 20:10)
+  ✔ Modify modal @done (16-12-13 20:42)
 
  Past:
    ☐ Header (name, status, timeago)
@@ -21,9 +21,3 @@ Creation Modal:
   ✔ Create button @done (16-12-13 16:39)
   ✔ Close on success @done (16-12-13 16:39)
   ✔ Enabled by default @done (16-12-13 17:01)
-
-Modify Modal:
-  ☐ All greyed out
-  ☐ Except Action
-  ☐ Button = Save
-  ☐ Close on success
