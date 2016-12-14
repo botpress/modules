@@ -36,7 +36,13 @@ module.exports = {
 
     router.get('/schedules/past', (req, res) => {
       db(bp).listPrevious()
-      .then(schedules => res.send(schedules))
+      .then(schedules => {
+        res.send(_.sortBy(schedules, s => -s.scheduledOn).map(s => {
+          s.scheduleOn = moment(s.scheduledOn).format()
+          s.enabled = !!s.enabled
+          return s
+        }))
+      })
       .catch(catchError(res))
     })
 

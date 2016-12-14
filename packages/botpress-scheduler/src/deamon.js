@@ -74,7 +74,7 @@ module.exports = (bp) => {
   }
 
   const revive = () => db(bp).reviveAllExecuting()
-  const start = () => timerInterval = setInterval(run, 5000)
+  const start = () => timerInterval = setInterval(run, 30000)
   const stop = () => clearInterval(timerInterval)
 
   return { start, stop, revive }

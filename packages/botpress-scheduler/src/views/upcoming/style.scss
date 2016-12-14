@@ -36,14 +36,15 @@
   top: initial;
   right: 10px;
   font-size: 16px;
-  transition: color ease-in-out .15s;
-  color: white;
+  transition: color ease-in-out .15s, opacity ease-in-out .15s;
+  opacity: 0;
+  color: #ccc;
 }
 
 .task:hover {
   .delete {
     cursor: pointer;
-    color: #ccc;
+    opacity: 1;
 
     &:hover {
       color: #888;
@@ -53,15 +54,20 @@
 
 .action {
   display: block;
-  margin-top: 5px;
-  border-left: 4px solid #90E9E1;
+  margin: 10px 0;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  border-left: 4px solid #ddd;
+  color: #999;
   padding: 10px;
-  height: 100px;
+  height: 50px;
+  overflow: hidden;
 }
 
 textarea.action {
   width: 100%;
-  height: 100px;
+  height: 200px;
+  padding: 10px 0;
 }
 
 .toggle {
