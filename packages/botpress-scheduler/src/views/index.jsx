@@ -79,50 +79,35 @@ export default class SchedulerModule extends React.Component {
     }
     const axios = this.props.bp.axios
     const elements = this.state.upcoming.map((el, i) => <Upcoming key={i} task={el} axios={axios}/>)
-    return <Col sm={12} md={8} lg={6} className={style['col-centered']}>
-      <ListGroup>
+    return <ListGroup>
         {elements}
       </ListGroup>
-    </Col>
   }
 
   renderPrevious() {
-    if (this.state.previous.length === 0) {
-      return <h3>There are no previously run tasks</h3>
-    }
-
-    const trashAll = <h4 className={style.trashAll}>
-      <a href="#" onClick={::this.trashAllDone}>Trash all</a>
-      {' done'}
-    </h4>
-
     const elements = this.state.previous.map((el, i) => <Previous key={i} task={el}/>)
-    return <Col sm={12} md={8} lg={8} className={style['col-centered']}>
-      {trashAll}
-      <ListGroup>
-        {elements}
-      </ListGroup>
-    </Col>
+
+    const contain = this.state.previous.length === 0
+      ? <h3>There are no previously run tasks</h3>
+      : <ListGroup>{elements}</ListGroup>
+
+    return <div>
+      <div className={style.historyHeader}>
+        <h4>{'History'}</h4>
+        <a className={style.trashAll} href="#" onClick={::this.trashAllDone}>
+          <i className='material-icons'>delete</i>
+        </a>
+      </div>
+      <div className={style.historyContain}>
+        {contain}
+      </div>
+    </div>
   }
 
   renderLoading() {
     return <h1>Loading...</h1>
   }
 
-  renderToolbar() {
-    return <ButtonToolbar className={style.topbar}>
-      <ButtonGroup>
-        <Button active={this.state.active === 'Upcoming'} onClick={this.setActive('Upcoming')}>
-          <span>Upcoming</span>
-          <Badge><p>{this.state.upcoming.length}</p></Badge>
-        </Button>
-        <Button active={this.state.active === 'Previous'} onClick={this.setActive('Previous')}>
-          <span>Previous</span>
-          <Badge><p>{this.state.previous.length}</p></Badge>
-        </Button>
-      </ButtonGroup>
-    </ButtonToolbar>
-  }
 
   renderCreateButton() {
 
@@ -140,18 +125,18 @@ export default class SchedulerModule extends React.Component {
     }
 
     return (
-      <div>
+      <div className={style.mainContainer}>
         <Grid>
           <Row>
-            <Col sm={12}>{this.renderCreateButton()}</Col>
-          </Row>
-          <Row className={style['row-centered']}>
-            <Col sm={12} md={8} lg={4} className={style['col-centered']}>
-              {this.renderToolbar()}
+            <Col md={8}>
+              {this.renderUpcoming()}
+            </Col>
+            <Col md={4}>
+              {this.renderPrevious()}
             </Col>
           </Row>
-          <Row className={classnames(style['row-centered'], style.tasks)}>
-            {this.state.active === 'Upcoming' ? this.renderUpcoming() : this.renderPrevious()}
+          <Row>
+            <Col sm={12}>{this.renderCreateButton()}</Col>
           </Row>
         </Grid>
         <CreateModal ref={r => this.createModal = r} axios={this.props.bp.axios}/>
