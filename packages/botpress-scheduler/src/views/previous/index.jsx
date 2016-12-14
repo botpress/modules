@@ -47,10 +47,12 @@ export default class Previous extends React.Component {
       <span className={whenClass}>({when.fromNow()})</span>
     </div>
 
-    return <ListGroupItem className={style.task} header={header}>
-      <span className={style.line}>Status: <span className={style['status-' + task.status]}>{task.status}</span></span>
-      <span className={style.line}>Logs: {showLogs}</span>
-    </ListGroupItem>
+    return <div>
+      <ListGroupItem className={style.task} header={header}>
+        <span className={style.line}>Status: <span className={style['status-' + task.status]}>{task.status}</span></span>
+        <span className={style.line}>Logs: {showLogs}</span>
+      </ListGroupItem>
+    </div>
   }
 
 }

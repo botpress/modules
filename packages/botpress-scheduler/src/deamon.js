@@ -54,7 +54,11 @@ module.exports = (bp) => {
 
           return logsQueryPromise
           .then(logs => {
-            return db(bp).updateTask(expired.id, expired.scheduledOn, 'done', logs, returned)
+            if (expired.enabled) {
+              return db(bp).updateTask(expired.id, expired.scheduledOn, 'done', logs, returned)
+            } else {
+              return db(bp).updateTask(expired.id, expired.scheduledOn, 'skipped', null, null)
+            }
           })
           .then(() => {
             bp.events.emit('scheduler.update')

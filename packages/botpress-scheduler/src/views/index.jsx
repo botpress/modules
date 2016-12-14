@@ -69,6 +69,10 @@ export default class SchedulerModule extends React.Component {
     return () => this.setState({ active: view })
   }
 
+  trashAllDone() {
+    this.props.bp.axios.delete(api('done'))
+  }
+
   renderUpcoming() {
     if (this.state.upcoming.length === 0) {
       return <h3>There are no upcoming tasks</h3>
@@ -87,8 +91,14 @@ export default class SchedulerModule extends React.Component {
       return <h3>There are no previously run tasks</h3>
     }
 
+    const trashAll = <h4 className={style.trashAll}>
+      <a href="#" onClick={::this.trashAllDone}>Trash all</a>
+      {' done'}
+    </h4>
+
     const elements = this.state.previous.map((el, i) => <Previous key={i} task={el}/>)
     return <Col sm={12} md={8} lg={8} className={style['col-centered']}>
+      {trashAll}
       <ListGroup>
         {elements}
       </ListGroup>

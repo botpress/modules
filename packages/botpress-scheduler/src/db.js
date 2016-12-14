@@ -27,6 +27,10 @@ module.exports = bp => {
       return bp.db.get()
       .then(knex => remove(knex, id))
     },
+    deleteDone: () => {
+      return bp.db.get()
+      .then(knex => deleteDone(knex))
+    },
     listUpcoming: () => {
       return bp.db.get()
       .then(knex => listUpcoming(knex))
@@ -105,7 +109,7 @@ function update(knex, id, options) {
 function updateTask(knex, id, time, status, logs, returned) {
   const options = { status, logs, returned }
 
-  if (status === 'done' || status === 'error') {
+  if (status === 'done' || status === 'error' || status === 'skipped') {
     options.finishedOn = moment().format('x')
   }
 
@@ -171,6 +175,13 @@ function scheduleNext(knex, id, time) {
     scheduledOn: ts,
     status: 'pending'
   })
+  .then()
+}
+
+function deleteDone(knex) {
+  return knex('scheduler_tasks')
+  .whereNotNull('finishedOn')
+  .del()
   .then()
 }
 
