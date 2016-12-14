@@ -29,6 +29,28 @@
   }
 }
 
+.delete {
+  display: inline-block;
+  position: absolute;
+  bottom: 10px;
+  top: initial;
+  right: 10px;
+  font-size: 16px;
+  transition: color ease-in-out .15s;
+  color: white;
+}
+
+.task:hover {
+  .delete {
+    cursor: pointer;
+    color: #ccc;
+
+    &:hover {
+      color: #888;
+    }
+  }
+}
+
 .action {
   display: block;
   margin-top: 5px;

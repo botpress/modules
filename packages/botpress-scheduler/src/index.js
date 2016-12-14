@@ -1,5 +1,6 @@
 import moment from 'moment'
 import _ from 'lodash'
+import Promise from 'bluebird'
 
 import db from './db'
 import deamon from './deamon'
@@ -14,7 +15,6 @@ module.exports = {
     })
   },
   ready: function(bp) {
-
     const router = bp.getRouter('botpress-scheduler')
 
     const catchError = res => err => {
@@ -42,19 +42,28 @@ module.exports = {
 
     router.put('/schedules', (req, res) => {
       db(bp).create(req.body.id, req.body)
-      .then(schedules => res.send(schedules))
+      .then(schedules => {
+        res.send(schedules)
+        bp.events.emit('scheduler.update')
+      })
       .catch(catchError(res))
     })
 
     router.post('/schedules', (req, res) => {
       db(bp).update(req.body.id, req.body)
-      .then(() => res.sendStatus(200))
+      .then(() => {
+        res.sendStatus(200)
+        bp.events.emit('scheduler.update')
+      })
       .catch(catchError(res))
     })
 
     router.delete('/schedules', (req, res) => {
-      db(bp).delete(req.body.id)
-      .then(() => res.sendStatus(200))
+      db(bp).delete(req.query.id)
+      .then(() => {
+        res.sendStatus(200)
+        bp.events.emit('scheduler.update')
+      })
       .catch(catchError(res))
     })
 

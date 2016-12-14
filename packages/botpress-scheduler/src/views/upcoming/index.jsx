@@ -7,7 +7,8 @@ import {
   Button,
   FormControl,
   ListGroup,
-  ListGroupItem
+  ListGroupItem,
+  Glyphicon
 } from 'react-bootstrap'
 import Toggle from 'react-toggle'
 import moment from 'moment'
@@ -41,6 +42,10 @@ export default class Upcoming extends React.Component {
       axios.post(modifyUrl, Object.assign({}, task, { action: value.textarea }))
     }
 
+    const doDelete = () => {
+      axios.delete(modifyUrl + '?id=' + task.id) 
+    }
+
     const header = <div>
       <span className={style.header_id}>{task.id}</span>
       {'  '}
@@ -58,6 +63,7 @@ export default class Upcoming extends React.Component {
         className={style.action}
         change={changeAction}
         propName="textarea" />
+      <Glyphicon className={style.delete} glyph="trash" onClick={doDelete} />
     </ListGroupItem>
   }
 
