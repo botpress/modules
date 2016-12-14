@@ -28,7 +28,7 @@
   cursor: pointer;
   background-color: #eee;
   color: #333;
-  
+
   &:hover {
     background-color: #ccc;
   }
@@ -50,6 +50,11 @@
 .status-executing {
   color: #DDDA5C;
   border-bottom: 2px solid #DDDA5C;
+}
+
+.status-skipped {
+  color: #999;
+  border-bottom: 2px solid #999;
 }
 
 .status-done {

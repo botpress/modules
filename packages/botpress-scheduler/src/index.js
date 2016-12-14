@@ -73,5 +73,14 @@ module.exports = {
       .catch(catchError(res))
     })
 
+    router.delete('/done', (req, res) => {
+      db(bp).deleteDone()
+      .then(() => {
+        res.sendStatus(200)
+        bp.events.emit('scheduler.update')
+      })
+      .catch(catchError(res))
+    })
+
   }
 }
