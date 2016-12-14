@@ -114,11 +114,11 @@ export default class SchedulerModule extends React.Component {
       <ButtonGroup>
         <Button active={this.state.active === 'Upcoming'} onClick={this.setActive('Upcoming')}>
           <span>Upcoming</span>
-          <Badge>{this.state.upcoming.length}</Badge>
+          <Badge><p>{this.state.upcoming.length}</p></Badge>
         </Button>
         <Button active={this.state.active === 'Previous'} onClick={this.setActive('Previous')}>
           <span>Previous</span>
-          <Badge>{this.state.previous.length}</Badge>
+          <Badge><p>{this.state.previous.length}</p></Badge>
         </Button>
       </ButtonGroup>
     </ButtonToolbar>
