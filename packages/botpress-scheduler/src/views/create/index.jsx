@@ -76,7 +76,8 @@ export default class CreateModal extends React.Component {
     } else if (this.state.expressionType === '2') { // Natural
       later.date.localTime()
       const sched = later.parse.text(this.state.expression)
-      later.schedule(sched).next(3).map(o => occurences.push(o))
+      later.schedule(sched).next(4).map(o => occurences.push(o))
+      occurences.shift()
     } else { // ONCE
       occurences.push(chrono.casual.parseDate(this.state.expression))
     }
