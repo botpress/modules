@@ -20,6 +20,15 @@
   margin-right: -4px;
 }
 
+:global(.badge) {
+  p {
+    font-size: 12px;
+    line-height: 12px;
+    padding-top: 2px;
+    margin: 0;
+  }
+}
+
 .tasks {
   margin-top: 15px;
 }
