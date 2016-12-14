@@ -1,1 +1,58 @@
+.task {
+  text-align: left;
+}
 
+.header_id {
+  font-size: 20px;
+  font-weight: 300;
+}
+
+.header_when {
+  margin-left: 5px;
+  font-size: 16px;
+  font-weight: 100;
+  color: #888;
+}
+
+.line {
+  display: block;
+  font-weight: 400;
+  margin-bottom: 5px;
+
+  span {
+    font-weight: 200;
+  }
+}
+
+.toggleLogs {
+  cursor: pointer;
+  background-color: #eee;
+  color: #333;
+  
+  &:hover {
+    background-color: #ccc;
+  }
+}
+
+.action {
+  display: block;
+  margin-top: 5px;
+  border-left: 4px solid #90E9E1;
+  padding: 10px;
+  height: 100px;
+}
+
+.status-error {
+  color: #B0140D;
+  border-bottom: 2px solid #B0140D;
+}
+
+.status-executing {
+  color: #DDDA5C;
+  border-bottom: 2px solid #DDDA5C;
+}
+
+.status-done {
+  color: #14A656;
+  border-bottom: 2px solid #14A656;
+}

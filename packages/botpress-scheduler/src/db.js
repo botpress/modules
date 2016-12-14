@@ -105,7 +105,7 @@ function update(knex, id, options) {
 function updateTask(knex, id, time, status, logs, returned) {
   const options = { status, logs, returned }
 
-  if (status === 'done') {
+  if (status === 'done' || status === 'error') {
     options.finishedOn = moment().format('x')
   }
 
