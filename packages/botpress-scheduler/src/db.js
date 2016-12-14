@@ -158,7 +158,7 @@ function listExpired(knex) {
 
 function deleteScheduled(knex, id) {
   return knex('scheduler_tasks')
-  .where({ id })
+  .where({ scheduleId: id })
   .del()
   .then()
 }

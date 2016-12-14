@@ -8,8 +8,6 @@ let timerInterval = null
 module.exports = (bp) => {
 
   const reschedule = task => {
-    console.log('>>>>>', task)
-    return Promise.resolve()
     if (task.schedule_type.toLowerCase() === 'once') {
       return Promise.resolve(null)
     }
@@ -32,6 +30,7 @@ module.exports = (bp) => {
           if (expired.enabled) {
             fromDate = new Date()
             var fn = new Function('bp', 'task', expired.action)
+            bp.events.emit('scheduler.update')
             bp.events.emit('scheduler.started', expired)
             return fn(bp, expired)
           } else {
@@ -58,8 +57,17 @@ module.exports = (bp) => {
             return db(bp).updateTask(expired.id, expired.scheduledOn, 'done', logs, returned)
           })
           .then(() => {
+            bp.events.emit('scheduler.update')
             bp.events.emit('scheduler.finished', expired)
           })
+        })
+        .catch(err => {
+          bp.logger.error('[scheduler]', err.message, err.stack)
+          bp.notifications.send({
+            message: 'An error occured while running task: ' + expired.id + '. Please check the logs for more info.',
+            level: 'error'
+          })
+          return db(bp).updateTask(expired.id, expired.scheduledOn, 'error', null, null)
         })
       })
     })

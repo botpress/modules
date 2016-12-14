@@ -38,6 +38,12 @@ export default class SchedulerModule extends React.Component {
     .then(() => {
       this.setState({ loading: false })
     })
+
+    this.props.bp.events.on('scheduler.update', ::this.fetchAll)
+  }
+
+  componentWillUnmount() {
+    this.props.bp.events.off('scheduler.update', ::this.fetchAll)
   }
 
   fetchAll() {
