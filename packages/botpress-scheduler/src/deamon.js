@@ -54,8 +54,9 @@ module.exports = (bp) => {
 
           return logsQueryPromise
           .then(logs => {
+            const flattenLogs = (logs.file && logs.file.map(x => x.message) || []).join('\n')
             if (expired.enabled) {
-              return db(bp).updateTask(expired.id, expired.scheduledOn, 'done', logs, returned)
+              return db(bp).updateTask(expired.id, expired.scheduledOn, 'done', flattenLogs, returned)
             } else {
               return db(bp).updateTask(expired.id, expired.scheduledOn, 'skipped', null, null)
             }
