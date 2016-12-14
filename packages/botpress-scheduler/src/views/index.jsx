@@ -79,7 +79,7 @@ export default class SchedulerModule extends React.Component {
     const axios = this.props.bp.axios
     const elements = this.state.upcoming.map((el, i) => <Upcoming key={i} task={el} axios={axios}/>)
 
-    const contain = this.state.previous.length === 0
+    const contain = this.state.upcoming.length === 0
       ? <div className={style.emptyText}>There are no upcoming tasks</div>
       : <ListGroup>{elements}</ListGroup>
 
