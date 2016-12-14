@@ -5,7 +5,9 @@ import {
   Row,
   Col,
   Button,
-  FormControl
+  FormControl,
+  ListGroup,
+  ListGroupItem
 } from 'react-bootstrap'
 import Toggle from 'react-toggle'
 
@@ -18,70 +20,10 @@ export default class Upcoming extends React.Component {
     super()
   }
 
-  renderTitle() {
-    const name = 'Name'
-    const time = 'in 5 minutes'
-    return <h3><strong>{name}</strong> {time}</h3>
-  }
-
-  renderOccuring() {
-    const nextOccuring = "Occurs every 2 days at 12:00"
-    return <h4>
-        {nextOccuring}
-      </h4>
-  }
-
-  renderEnableToggle() {
-    return <Toggle className={style.toggle}
-      defaultChecked={true}
-      onChange={() => console.log('toggle')} />
-  }
-
-  renderActionDetails() {
-    const action = "bp.messenger.sendText(...)"
-    return <FormControl
-      componentClass="textarea"
-      value={action} />
-  }
-
-  renderButtons() {
-    return <div className={style.buttons}>
-      <Button bsStyle='success'>Save</Button>
-      <Button bsStyle='danger'>Delete</Button>
-    </div>
-  }
-
   render() {
-    return <Panel className={style.panel}>
-      <Grid fluid>
-        <Row className={style.header}>
-          <Col md={8}>
-            {this.renderTitle()}
-          </Col>
-          <Col md={4}>
-            {this.renderEnableToggle()}
-          </Col>
-        </Row>
-        <Row className={style.content}>
-          <Col md={12}>
-            <Row>
-              <Col md={12}>
-                {this.renderOccuring()}
-              </Col>
-            </Row>
-            <Row>
-              <Col md={12}>
-                {this.renderActionDetails()}
-              </Col>
-            </Row>
-            <Row>
-              <Col md={12}>
-                {this.renderButtons()}
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-      </Grid>
-    </Panel>
+    return <ListGroupItem>
+    
+    </ListGroupItem>
   }
+
 }

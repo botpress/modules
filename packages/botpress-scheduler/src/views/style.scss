@@ -1,1 +1,21 @@
+.topbar {
+  margin: auto;
+  float: none;
+  display: inline-block;
 
+  button span+span {
+    margin-left: 5px;
+    background-color: lightgrey !important;
+  }
+}
+
+.row-centered {
+  text-align: center;
+}
+
+.col-centered {
+  display: inline-block;
+  float: none;
+  text-align: middle;
+  margin-right: -4px;
+}

@@ -1,0 +1,29 @@
+Upcoming:
+  ☐ Header
+  ☐ Delete
+  ☐ Enabled / disabled
+  ☐ Modify action
+  ☐ Real-time update trigger time
+  ☐ Order by trigger time
+  ☐ Modify modal
+
+ Past:
+   ☐ Header (name, status, timeago)
+   ☐ Logs
+   ☐ FinishedOn
+
+Creation Modal:
+  ✔ Name @done (16-12-13 15:25)
+  ✔ Expression type @done (16-12-13 15:39)
+  ✔ Expression @done (16-12-13 16:16)
+  ✔ Next 3 dates @done (16-12-13 16:16)
+  ✔ Action @done (16-12-13 16:39)
+  ✔ Create button @done (16-12-13 16:39)
+  ✔ Close on success @done (16-12-13 16:39)
+  ✔ Enabled by default @done (16-12-13 17:01)
+
+Modify Modal:
+  ☐ All greyed out
+  ☐ Except Action
+  ☐ Button = Save
+  ☐ Close on success
