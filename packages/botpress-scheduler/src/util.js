@@ -10,7 +10,7 @@ const getNextOccurence = (type, exp) => {
       cronstrue.toString(exp) // Validation
       later.date.localTime()
       const sched1 = later.parse.cron(exp)
-      const next1 = later.schedule(sched1).next(2, new Date())[1]
+      const next1 = later.schedule(sched1).next(2, new Date())[0]
       return moment(new Date(next1))
     case "natural":
       later.date.localTime()
