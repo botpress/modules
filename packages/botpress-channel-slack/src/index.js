@@ -1,4 +1,4 @@
-import { RtmClient, CLIENT_EVENTS } from '@slack/client'
+import { RtmClient, CLIENT_EVENTS, RTM_EVENTS } from '@slack/client'
 
 const token = process.env.PROTORISK_SLACK_TOKEN
 if (!token) throw new Error('env variable not set: PROTORISK_SLACK_TOKEN')
@@ -22,6 +22,10 @@ module.exports = {
     rtm.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, function () {
       console.log('connection opened')
       rtm.sendMessage('this is a test message from slack bot api: Hello!', channel.id)
+    })
+
+    rtm.on(RTM_EVENTS.MESSAGE, (message) => {
+      rtm.sendMessage(`${message.text} from channel ${message.channel}`, channel.id)
     })
   },
 
