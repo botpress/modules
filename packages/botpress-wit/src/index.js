@@ -12,7 +12,7 @@ const saveConfig = (config) => {
 const loadConfig = () => {
   if (!fs.existsSync(configFile)) {
     const config = { accessToken : '', selectedMode: 'understanding' }
-    saveConfig(config,file)
+    saveConfig(config, configFile)
   }
 
   const overrides = {}
@@ -63,6 +63,7 @@ module.exports = {
     router.post('/config', (req, res) => {
       const { accessToken, selectedMode } = req.body
       saveConfig({ accessToken, selectedMode })
+      wit.setConfiguration(loadConfig())
       res.sendStatus(200)
     })
 
