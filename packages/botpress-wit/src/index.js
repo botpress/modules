@@ -16,7 +16,7 @@ const loadConfig = () => {
   }
 
   const overrides = {}
-  process.env.WIT_TOKEN && overrides.accessToken = process.env.WIT_TOKEN
+  if (process.env.WIT_TOKEN) overrides.accessToken = process.env.WIT_TOKEN
 
   return Object.assign(JSON.parse(fs.readFileSync(configFile, 'utf-8')), overrides)
 }
