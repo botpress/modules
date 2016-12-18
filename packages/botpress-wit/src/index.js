@@ -1,49 +1,73 @@
+import path from 'path'
+import fs from 'fs'
+
 import wit from './wit'
 
-const config = {
-  accessToken: 'IOUVNYYZF6J6JT4V4OC5JRUY2NHES7ZC'
+let configFile = null
+
+const saveConfig = (config) => {
+  fs.writeFileSync(configFile, JSON.stringify(config))
+}
+
+const loadConfig = () => {
+  if (!fs.existsSync(configFile)) {
+    const config = { accessToken : '', selectedMode: 'understanding' }
+    saveConfig(config,file)
+  }
+
+  const overrides = {}
+  process.env.WIT_TOKEN && overrides.accessToken = process.env.WIT_TOKEN
+
+  return Object.assign(JSON.parse(fs.readFileSync(configFile, 'utf-8')), overrides)
 }
 
 const incomingMiddleware = (event, next) => {
   if (event.type === 'message') {
-
-    wit.getEntities(event.text)
-    .then((entities) => {
-      //console.log(entities)
-    })
-
-
-
-    const context = {
-      platform: event.platform,
-      user: event.user
+    if (wit.mode === 'understanding') {
+      wit.getEntities(event.user.id, event.text)
+      .then((entities) => {
+        //console.log(entities)
+      })
+    } else {
+      wit.runActions(event.user.id, event.text)
     }
-
-    wit.runActions(event.text, event.user.id, context)
-
-    // TODO: Implement call actions
-    // wit.callActions(event)
-    // .then(() => {
-    //   console.log('Action has been called')
-    // })
+  } else {
+    next()
   }
 }
 
 module.exports = {
   init: function(bp) {
+    configFile = path.join(bp.projectLocation, bp.botfile.modulesConfigDir, 'botpress-wit.json')
+
     bp.middlewares.register({
       name: 'wit.incoming',
       module: 'botpress-wit',
       type: 'incoming',
       handler: incomingMiddleware,
       order: 10,
-      description: 'Understand entities from incoming message and suggest or execute actions.'
+      description: 'Understands entities from incoming message and suggests or executes actions.'
     })
 
     wit.setConfiguration(config)
+
+
+
   },
 
   ready: function(bp) {
+
+    const router = bp.getRouter('botpress-wit')
+
+    router.get('/config', (req, res) => {
+      res.send(loadConfig())
+    })
+
+    router.post('/config', (req, res) => {
+      const { accessToken, selectedMode } = req.body
+      saveConfig({ accessToken, selectedMode })
+      res.sendStatus(200)
+    })
 
     bp.getRouter("botpress-wit")
     .get("/entities", (req, res, next) => {
