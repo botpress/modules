@@ -49,10 +49,7 @@ module.exports = {
       description: 'Understands entities from incoming message and suggests or executes actions.'
     })
 
-    wit.setConfiguration(config)
-
-
-
+    wit.setConfiguration(loadConfig())
   },
 
   ready: function(bp) {
@@ -69,18 +66,15 @@ module.exports = {
       res.sendStatus(200)
     })
 
-    bp.getRouter("botpress-wit")
-    .get("/entities", (req, res, next) => {
+    router.get("/entities", (req, res, next) => {
       // TODO: req message and return entities
 
 
     })
 
-    bp.getRouter("botpress-wit")
-    .get("/actions", (req, res, next) => {
+    router.get("/actions", (req, res, next) => {
       // TODO: req message and return entities
 
     })
-
   }
 }
