@@ -24,7 +24,7 @@ const initializeClient = () => {
         return Promise.resolve(context);
       }
     }
-  })
+  });
 }
 
 const getEntities = (message) => {
@@ -38,21 +38,18 @@ const getEntities = (message) => {
   });
 }
 
-const getActions = (message, userId, context = {}) => {
-  const sessionId = userId;
-  return client.runActions(sessionId, message, context)
-  .then((data) => {
-    return data
+const runActions = (message, sessionId, context0 = {}) => {
+  client.runActions(sessionId, message, context0)
+  .then((context1) => {
+    console.log('The session state is now: ' + JSON.stringify(context1));
+    return client.runActions(sessionId, 'and in Brussels?', context1);
   })
-  .catch((e) => {
-    // TODO: Handle errors
-    console.log('Error from wit API: ' + e);
-  });
+
 }
 
 
 module.exports = {
   setConfiguration: setConfiguration,
   getEntities: getEntities,
-  getActions: getActions
+  runActions: runActions
 }

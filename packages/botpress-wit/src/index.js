@@ -19,10 +19,7 @@ const incomingMiddleware = (event, next) => {
       user: event.user
     }
 
-    wit.getActions(event.text, event.user.id, context)
-    .then((actions) => {
-      console.log(actions)
-    })
+    wit.runActions(event.text, event.user.id, context)
 
     // TODO: Implement call actions
     // wit.callActions(event)
