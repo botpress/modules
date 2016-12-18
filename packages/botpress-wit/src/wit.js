@@ -33,7 +33,6 @@ const getEntities = (message) => {
     return data.entities;
   })
   .catch((e) => {
-    // TODO: Handle errors
     console.log('Error from wit API: ' + e);
   });
 }
@@ -44,7 +43,6 @@ const runActions = (message, sessionId, context0 = {}) => {
     console.log('The session state is now: ' + JSON.stringify(context1));
     return client.runActions(sessionId, 'and in Brussels?', context1);
   })
-
 }
 
 
