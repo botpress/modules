@@ -1,53 +1,78 @@
-const {Wit, log} = require('node-wit');
-const clientConfig = {};
-var client = null;
+import Wit from 'node-wit'
+import moment from 'moment'
 
-const setConfiguration = (config) => {
-  clientConfig.accessToken = config.accessToken;
-  initializeClient();
+let latestConfig = null
+let client = null
+
+const contexts = {}
+
+const resetContext = userId => {
+  contexts[userId] = {
+    begin: moment(),
+    sessionId: userId + '-' + Math.random().toString().substr(2, 5),
+    context: {}
+  }
 }
 
-const initializeClient = () => {
+const contextExpired = userId => {
+  return moment().diff(contexts[userId].begin, 'hours') > 5
+}
+
+const getUserContext = userId => {
+  if (!contexts[userId] || contextExpired(userId)) {
+    resetContext(userId)
+  }
+
+  return contexts[userId]
+}
+
+const setConfiguration = bp => config => {
+  latestConfig = config
+  initializeClient(bp, config)
+}
+
+const reinitializeClient = bp => () => {
+  initializeClient(bp, latestConfig)
+}
+
+const initializeClient = (bp, config) => {
   client = new Wit({
-    accessToken: clientConfig.accessToken,
-    actions: {
-      send(request, response) {
-        return new Promise(function(resolve, reject) {
-          console.log(JSON.stringify(response));
-          return resolve();
-        });
-      },
-      myAction({sessionId, context, text, entities}) {
-        console.log(`Session ${sessionId} received ${text}`);
-        console.log(`The current context is ${JSON.stringify(context)}`);
-        console.log(`Wit extracted ${JSON.stringify(entities)}`);
-        return Promise.resolve(context);
-      }
-    }
-  });
-}
-
-const getEntities = (message) => {
-  return client.message(message, {})
-  .then((data) => {
-    return data.entities;
-  })
-  .catch((e) => {
-    console.log('Error from wit API: ' + e);
-  });
-}
-
-const runActions = (message, sessionId, context0 = {}) => {
-  client.runActions(sessionId, message, context0)
-  .then((context1) => {
-    console.log('The session state is now: ' + JSON.stringify(context1));
-    return client.runActions(sessionId, 'and in Brussels?', context1);
+    accessToken: config.accessToken,
+    actions: bp.wit.actions,
+    logger: bp.logger
   })
 }
 
+const getEntities = (userId, message) => {
+  const { context } = getUserContext(userId)
+  return client.message(message, context)
+  .then(({ entities }) => entities)
+}
 
-module.exports = {
-  setConfiguration: setConfiguration,
-  getEntities: getEntities,
-  runActions: runActions
+const runActions = (userId, message) => {
+  const { context, sessionId } = getUserContext(userId)
+  client.runActions(sessionId, message, context)
+  .then(newContext => {
+    getUserContext(userId).context = newContext
+  })
+}
+
+const defaultSendAction = (request, response) => {
+
+}
+
+module.exports = bp => {
+
+  bp.wit = {
+    actions: {},
+    reinitializeClient: reinitializeClient(bp)
+  }
+
+  return {
+    reinitializeClient: reinitializeClient(bp),
+    setConfiguration: setConfiguration(bp),
+    getEntities: getEntities,
+    runActions: runActions,
+    getUserContext: getUserContext
+  }
 }

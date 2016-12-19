@@ -25,11 +25,15 @@ const incomingMiddleware = (event, next) => {
   if (event.type === 'message') {
     if (wit.mode === 'understanding') {
       wit.getEntities(event.user.id, event.text)
-      .then((entities) => {
-        //console.log(entities)
+      .then(entities => {
+        event.wit = { entities, context: wit.getUserContext(event.user.id) }
+        next()
       })
     } else {
       wit.runActions(event.user.id, event.text)
+      .then(() => {
+        event.wit = { run: true, context: wit.getUserContext(event.user.id) }
+      })
     }
   } else {
     next()
@@ -68,14 +72,11 @@ module.exports = {
     })
 
     router.get("/entities", (req, res, next) => {
-      // TODO: req message and return entities
-
-
+      
     })
 
-    router.get("/actions", (req, res, next) => {
-      // TODO: req message and return entities
-
+    router.post("/actions", (req, res, next) => {
+      
     })
   }
 }
