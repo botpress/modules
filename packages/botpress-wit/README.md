@@ -30,6 +30,8 @@ bp.hear({'wit.entities.intent[0].value': 'weather'}, (event, next) => {
 
 This mode will run your Wit.ai stories automatically given that you defined the **Actions** in botpress.
 
+For more information about Actions and how they are run, make sure to read [node-wit](https://github.com/wit-ai/node-wit)'s documentation.
+
 #### Example
 
 ```js
