@@ -19,6 +19,8 @@ This mode will inject understanding metadata inside incoming messages through th
 
 Events will have a `wit` property populated with the extracted `entities` and the `context`.
 
+**Tip:** Use this mode if you want to handle the conversation flow yourself and only want to extract entities from incoming text. This is great for programmers.
+
 ```js
 bp.hear({'wit.entities.intent[0].value': 'weather'}, (event, next) => {
   console.log('>> Weather')
@@ -31,6 +33,8 @@ bp.hear({'wit.entities.intent[0].value': 'weather'}, (event, next) => {
 This mode will run your Wit.ai stories automatically given that you defined the **Actions** in botpress.
 
 For more information about Actions and how they are run, make sure to read [node-wit](https://github.com/wit-ai/node-wit)'s documentation.
+
+**Tip:** Use this mode if you created a conversation flow on Wit.ai's User Interface and want it to run automatically in your bot. This is great for non-programmers.
 
 #### Example
 
