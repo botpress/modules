@@ -12,7 +12,53 @@ import {
   Button
 } from 'react-bootstrap'
 
+import Markdown from 'react-markdown'
+
 import style from './style.scss'
+
+const documentation = {
+  understanding: `
+  ### Understanding
+
+  This mode will inject understanding metadata inside incoming messages through the Wit.ai middleware.
+
+  Events will have a \`wit\` property populated with the extracted \`entities\` and the \`context\`.
+
+  **Tip:** Use this mode if you want to handle the conversation flow yourself and only want to extract entities from incoming text. This is great for programmers.
+
+  \`\`\`js
+  bp.hear({'wit.entities.intent[0].value': 'weather'}, (event, next) => {
+    console.log('>> Weather')
+    bp.messenger.sendText(event.user.id, 'Weather intent')
+  })
+  \`\`\`
+  `
+  ,
+  stories: `### Stories
+
+  This mode will run your Wit.ai stories automatically given that you defined the **Actions** in botpress.
+
+  For more information about Actions and how they are run, make sure to read [node-wit](https://github.com/wit-ai/node-wit)'s documentation.
+
+  **Tip:** Use this mode if you created a conversation flow on Wit.ai's User Interface and want it to run automatically in your bot. This is great for non-programmers.
+
+  #### Example
+
+  \`\`\`js
+  // Implement your Actions like this
+  bp.wit.actions['getWeather'] = request => {
+    return new Promise((resolve, reject) => {
+      bp.logger.info('Get Weather called', request)
+      // Do something here
+      resolve(request.context)
+    })
+  }
+
+  // You need to call this method once you are done implementing the Actions
+  bp.wit.reinitializeClient()
+  \`\`\`
+  `
+}
 
 export default class TemplateModule extends React.Component {
 
@@ -103,7 +149,7 @@ export default class TemplateModule extends React.Component {
           <Col componentClass={ControlLabel} sm={3}>
             Access Token
           </Col>
-          <Col sm={9}>
+          <Col sm={8}>
             <FormControl type="text" value={this.state.accessToken} onChange={this.handleAccesTokenChange}/>
           </Col>
         </FormGroup>
@@ -131,7 +177,7 @@ export default class TemplateModule extends React.Component {
           <Col componentClass={ControlLabel} sm={3}>
             Mode
           </Col>
-          <Col sm={9}>
+          <Col sm={8}>
             {this.renderRadioButton('Understanding', 'understanding')}
             {this.renderRadioButton('Stories', 'stories')}
           </Col>
@@ -142,17 +188,10 @@ export default class TemplateModule extends React.Component {
 
   renderExplication() {
     return (
-      <Row>
-        <FormGroup>
-          <Col componentClass={ControlLabel} sm={3}>
-            Explication
-          </Col>
-          <Col sm={9}>
-            <FormControl readOnly name="explication"
-              componentClass="textarea" rows="6"
-              value={this.state.explication} />
-          </Col>
-        </FormGroup>
+      <Row className={style.explication}>
+        <Col sm={12}>
+          <Markdown source={documentation[this.state.selectedMode]} />
+        </Col>
       </Row>
     )
   }
@@ -164,10 +203,11 @@ export default class TemplateModule extends React.Component {
   }
 
   renderSaveButton() {
-    return (this.state.initialStateHash && this.state.initialStateHash !== this.getStateHash())
-      ? <Button bsStyle="success" onClick={this.handleSaveChanges}>Save</Button>
-      : null
+    const opacityStyle = (this.state.initialStateHash && this.state.initialStateHash !== this.getStateHash())
+      ? {opacity:1}
+      : {opacity:0}
 
+    return <Button style={opacityStyle} bsStyle="success" onClick={this.handleSaveChanges}>Save</Button>
   }
 
   render() {
@@ -180,11 +220,15 @@ export default class TemplateModule extends React.Component {
         <Row>
           <Col md={8} mdOffset={2}>
             {this.renderMessageAlert()}
-            <Panel className={style.panel} header="settings">
+            <Panel className={style.panel} header="Settings">
+              {this.renderSaveButton()}
+              <div className={style.settings}>
                 {this.renderAccessToken()}
                 {this.renderMode()}
-                {this.renderExplication()}
-                {this.renderSaveButton()}
+              </div>
+            </Panel>
+            <Panel header="Documentation">
+              {this.renderExplication()}
             </Panel>
           </Col>
         </Row>
