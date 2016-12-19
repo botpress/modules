@@ -6,7 +6,10 @@ import {
   Col,
   ControlLabel,
   FormGroup,
-  FormControl
+  FormControl,
+  Alert,
+  FieldGroup,
+  Button
 } from 'react-bootstrap'
 
 import style from './style.scss'
@@ -21,10 +24,9 @@ export default class TemplateModule extends React.Component {
       message: null,
       initialStateHash: null,
       modes: {
-        Understanding: 'Understanding mode is...',
-        Story: 'Sroty mode is...'
-      },
-      selectedMode: 'Understanding'
+        understanding: 'Understanding mode is...',
+        stories: 'Stories mode is...'
+      }
     }
 
     this.renderAccessToken = this.renderAccessToken.bind(this)
@@ -106,24 +108,21 @@ export default class TemplateModule extends React.Component {
             Access Token
           </Col>
           <Col sm={7}>
-            <FormControl name="access-token"
-              componentClass="text"
-              value={this.state.accessToken}
-              onChange={this.handleAccesTokenChange} />
+            <FormControl type="text" value={this.state.accessToken} onChange={this.handleAccesTokenChange}/>
           </Col>
         </FormGroup>
       </Row>
     )
   }
 
-  renderRadioButton(license, key) {
+  renderRadioButton(label, key) {
     return (
       <span key={key}>
         <label>
           <input type="radio" value={key}
             checked={this.state.selectedMode === key}
             onChange={this.handleRadioChange} />
-          {license.name}
+          {label}
         </label>
       </span>
     )
@@ -137,7 +136,8 @@ export default class TemplateModule extends React.Component {
             Mode
           </Col>
           <Col>
-            {_.values(_.mapValues(this.state.modes, this.renderRadioButton))}
+            {this.renderRadioButton('Understanding', 'understanding')}
+            {this.renderRadioButton('Stories', 'stories')}
           </Col>
         </FormGroup>
       </Row>
@@ -173,6 +173,10 @@ export default class TemplateModule extends React.Component {
       : null
   }
 
+  renderSaveButton() {
+    return <Button onClick={this.handleSave}>Save</Button>
+  }
+
   render() {
     if (this.state.loading) {
       return <h4>Module is loading...</h4>
@@ -187,6 +191,7 @@ export default class TemplateModule extends React.Component {
             {this.renderAccessToken()}
             {this.renderMode()}
             {this.renderExplication()}
+            {this.renderSaveButton()}
           </Grid>
         </Panel>
       </div>
