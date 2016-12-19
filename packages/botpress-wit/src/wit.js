@@ -1,5 +1,6 @@
-import Wit from 'node-wit'
 import moment from 'moment'
+
+const {Wit} = require('node-wit')
 
 let latestConfig = null
 let client = null
@@ -36,11 +37,16 @@ const reinitializeClient = bp => () => {
 }
 
 const initializeClient = (bp, config) => {
-  client = new Wit({
+  let witConfig = {
     accessToken: config.accessToken,
-    actions: bp.wit.actions,
     logger: bp.logger
-  })
+  }
+
+  if (config.selectedMode === 'stories') {
+    witConfig.actions = bp.wit.actions
+  }
+
+  client = new Wit(witConfig)
 }
 
 const getEntities = (userId, message) => {

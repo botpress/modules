@@ -1,8 +1,10 @@
 import path from 'path'
 import fs from 'fs'
 
-import wit from './wit'
+import Wit from './wit'
 
+
+let wit = null
 let configFile = null
 
 const saveConfig = (config) => {
@@ -42,6 +44,8 @@ const incomingMiddleware = (event, next) => {
 
 module.exports = {
   init: function(bp) {
+    wit = Wit(bp)
+
     configFile = path.join(bp.projectLocation, bp.botfile.modulesConfigDir, 'botpress-wit.json')
 
     bp.middlewares.register({
