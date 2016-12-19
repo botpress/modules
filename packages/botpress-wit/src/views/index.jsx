@@ -107,7 +107,7 @@ export default class TemplateModule extends React.Component {
           <Col componentClass={ControlLabel} sm={3}>
             Access Token
           </Col>
-          <Col sm={7}>
+          <Col sm={9}>
             <FormControl type="text" value={this.state.accessToken} onChange={this.handleAccesTokenChange}/>
           </Col>
         </FormGroup>
@@ -135,7 +135,7 @@ export default class TemplateModule extends React.Component {
           <Col componentClass={ControlLabel} sm={3}>
             Mode
           </Col>
-          <Col>
+          <Col sm={9}>
             {this.renderRadioButton('Understanding', 'understanding')}
             {this.renderRadioButton('Stories', 'stories')}
           </Col>
@@ -151,7 +151,7 @@ export default class TemplateModule extends React.Component {
           <Col componentClass={ControlLabel} sm={3}>
             Explication
           </Col>
-          <Col sm={7}>
+          <Col sm={9}>
             <FormControl readOnly name="explication"
               componentClass="textarea" rows="6"
               value={this.state.explication} />
@@ -183,18 +183,21 @@ export default class TemplateModule extends React.Component {
     }
 
     return (
-      <div className={style.wit}>
-        {this.renderMessageAlert()}
-        {this.renderUnsavedAlert()}
-        <Panel className={style.panel} header="settings">
-          <Grid>
-            {this.renderAccessToken()}
-            {this.renderMode()}
-            {this.renderExplication()}
-            {this.renderSaveButton()}
-          </Grid>
-        </Panel>
-      </div>
+      <Grid className={style.wit}>
+        <Row>
+          <Col md={8} mdOffset={2}>
+            {this.renderMessageAlert()}
+            {this.renderUnsavedAlert()}
+            <Panel className={style.panel} header="settings">
+                {this.renderAccessToken()}
+                {this.renderMode()}
+                {this.renderExplication()}
+                {this.renderSaveButton()}
+            </Panel>
+          </Col>
+        </Row>
+      </Grid>
+
     )
   }
 }

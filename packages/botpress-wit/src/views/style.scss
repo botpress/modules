@@ -1,21 +1,37 @@
 .wit{
+  :global(.row) {
+    margin-bottom: 10px;
+  }
+
   .panel {
     position:relative;
   }
 
+  label {
+    text-align: right;
+    padding-top: 7px;
+  }
+
   button {
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: 7px;
+    right: 10px;
 
-    color: #fff;
-    background-color: #4cbeb9;
-    border-color: #4cbeb9;
-    transition: background-color ease-in-out .15s;
+    font-size: 14px;
+    color: white;
+    background-color: #58d1b0;
+    opacity: 0.7;
+    border: none;
+    text-align: center;
+    padding-left: 20px;
+    padding-right: 20px;
+
+    transition: opacity .5s ease-in-out, background-color .15s ease-in-out;
 
     &:hover {
-      background-color: #46B0AC;
-      border-color: #46B0AC;
+      background-color: #58d1b0;
+      opacity: 1;
+      color: white;
     }
   }
 }
