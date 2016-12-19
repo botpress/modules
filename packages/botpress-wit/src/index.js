@@ -3,7 +3,6 @@ import fs from 'fs'
 
 import Wit from './wit'
 
-
 let wit = null
 let configFile = null
 
