@@ -1,1 +1,21 @@
+.wit{
+  .panel {
+    position:relative;
+  }
 
+  button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+
+    color: #fff;
+    background-color: #4cbeb9;
+    border-color: #4cbeb9;
+    transition: background-color ease-in-out .15s;
+
+    &:hover {
+      background-color: #46B0AC;
+      border-color: #46B0AC;
+    }
+  }
+}

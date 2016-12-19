@@ -174,7 +174,7 @@ export default class TemplateModule extends React.Component {
   }
 
   renderSaveButton() {
-    return <Button onClick={this.handleSave}>Save</Button>
+    return <Button bsStyle="success" onClick={this.handleSaveChanges}>Save</Button>
   }
 
   render() {
@@ -183,10 +183,10 @@ export default class TemplateModule extends React.Component {
     }
 
     return (
-      <div>
+      <div className={style.wit}>
         {this.renderMessageAlert()}
         {this.renderUnsavedAlert()}
-        <Panel header="settings">
+        <Panel className={style.panel} header="settings">
           <Grid>
             {this.renderAccessToken()}
             {this.renderMode()}
