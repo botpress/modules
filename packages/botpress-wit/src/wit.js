@@ -28,7 +28,14 @@ const getUserContext = userId => {
 }
 
 const setConfiguration = bp => config => {
+  bp.wit.mode = config.selectedMode
   latestConfig = config
+
+  if (bp.wit.mode === 'stories' && !bp.wit.actions.send) {
+    bp.logger.debug('[Wit.ai] In <stories> mode, Wit must be initialized manually')
+    return
+  }
+
   initializeClient(bp, config)
 }
 
@@ -57,20 +64,38 @@ const getEntities = (userId, message) => {
 
 const runActions = (userId, message) => {
   const { context, sessionId } = getUserContext(userId)
-  client.runActions(sessionId, message, context)
+  return client.runActions(sessionId, message, context)
   .then(newContext => {
     getUserContext(userId).context = newContext
   })
 }
 
-const defaultSendAction = (request, response) => {
-
+const defaultSendAction = bp => ({sessionId, context}, {text, quickreplies}) => {
+  return new Promise((resolve, reject) => {
+    const userId = sessionId.split('-')[0]
+    if (context.botpress_platform === 'facebook') {
+      return bp.messenger.sendText(userId, text, { quick_replies: quickreplies })
+      .then(() => resolve())
+      .catch(reject)
+    } 
+    // default platform
+    bp.middlewares.sendOutgoing({
+      type: 'text',
+      platform: context.botpress_platform,
+      text: text,
+      raw: {
+        to: userId,
+        message: text
+      }
+    })
+  })
 }
 
 module.exports = bp => {
 
   bp.wit = {
-    actions: {},
+    mode: null,
+    actions: { send: defaultSendAction(bp) },
     reinitializeClient: reinitializeClient(bp)
   }
 

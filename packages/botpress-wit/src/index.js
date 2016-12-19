@@ -25,17 +25,28 @@ const loadConfig = () => {
 
 const incomingMiddleware = (event, next) => {
   if (event.type === 'message') {
-    if (wit.mode === 'understanding') {
+    if (event.bp.wit.mode === 'understanding') {
+      Object.assign(wit.getUserContext(event.user.id).context, {
+        botpress_platform: event.platform,
+        botpress_type: event.type
+      })
       wit.getEntities(event.user.id, event.text)
       .then(entities => {
         event.wit = { entities, context: wit.getUserContext(event.user.id) }
         next()
       })
+      .catch(err => next(err))
     } else {
+      Object.assign(wit.getUserContext(event.user.id).context, {
+        botpress_platform: event.platform,
+        botpress_type: event.type
+      })
+
       wit.runActions(event.user.id, event.text)
       .then(() => {
         event.wit = { run: true, context: wit.getUserContext(event.user.id) }
       })
+      .catch(err => next(err))
     }
   } else {
     next()
@@ -73,14 +84,6 @@ module.exports = {
       saveConfig({ accessToken, selectedMode })
       wit.setConfiguration(loadConfig())
       res.sendStatus(200)
-    })
-
-    router.get("/entities", (req, res, next) => {
-      
-    })
-
-    router.post("/actions", (req, res, next) => {
-      
     })
   }
 }
