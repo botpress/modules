@@ -1,6 +1,6 @@
 {
   "name": "botpress-wit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This module integrates Wit.ai inside Botpress for NLP",
   "main": "bin/node.bundle.js",
   "botpress": {
@@ -40,6 +40,7 @@
     "react": "^15.3.2",
     "react-bootstrap": "^0.30.6",
     "react-dom": "^15.3.2",
+    "react-markdown": "^2.4.2",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
     "webpack": "^1.13.3",
@@ -47,7 +48,6 @@
   },
   "dependencies": {
     "moment": "^2.17.1",
-    "node-wit": "^4.2.0",
-    "react-markdown": "^2.4.2"
+    "node-wit": "^4.2.0"
   }
 }
