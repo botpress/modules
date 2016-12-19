@@ -80,10 +80,6 @@ export default class TemplateModule extends React.Component {
     })
     .then(() => {
       this.setState({
-        message: {
-          type: 'success',
-          text: 'Your configuration have been saved correctly.'
-        },
         loading: false,
         initialStateHash: this.getStateHash()
       })
@@ -115,9 +111,9 @@ export default class TemplateModule extends React.Component {
     )
   }
 
-  renderRadioButton(label, key) {
+  renderRadioButton(label, key, props) {
     return (
-      <span key={key}>
+      <span className={style.radio} key={key}>
         <label>
           <input type="radio" value={key}
             checked={this.state.selectedMode === key}
@@ -161,12 +157,6 @@ export default class TemplateModule extends React.Component {
     )
   }
 
-  renderUnsavedAlert() {
-    return (this.state.initialStateHash && this.state.initialStateHash !== this.getStateHash())
-      ? <Alert bsStyle='warning'>Be careful, you have unsaved changes in your configuration...</Alert>
-      : null
-  }
-
   renderMessageAlert() {
     return this.state.message
       ? <Alert bsStyle={this.state.message.type}>{this.state.message.text}</Alert>
@@ -174,7 +164,10 @@ export default class TemplateModule extends React.Component {
   }
 
   renderSaveButton() {
-    return <Button bsStyle="success" onClick={this.handleSaveChanges}>Save</Button>
+    return (this.state.initialStateHash && this.state.initialStateHash !== this.getStateHash())
+      ? <Button bsStyle="success" onClick={this.handleSaveChanges}>Save</Button>
+      : null
+
   }
 
   render() {
@@ -187,7 +180,6 @@ export default class TemplateModule extends React.Component {
         <Row>
           <Col md={8} mdOffset={2}>
             {this.renderMessageAlert()}
-            {this.renderUnsavedAlert()}
             <Panel className={style.panel} header="settings">
                 {this.renderAccessToken()}
                 {this.renderMode()}
