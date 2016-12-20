@@ -30,18 +30,18 @@ function scheduleToOutbox() {
   .andWhere(function() {
     this.where(function() {
       this.whereNotNull('ts')
-      .andWhere(knex.raw("julianday('now', '+5 minutes') >= julianday(ts/1000, 'unixepoch')"))
+      .andWhere(knex.raw("julianday('now', '+5 minutes', 'utc') >= julianday(ts/1000, 'unixepoch', 'utc')"))
     })
     .orWhere(function() {
       this.whereNull('ts')
-      .andWhere(knex.raw("julianday('now', '+14 hours', '+5 minutes') >= julianday(date_time)"))
+      .andWhere(knex.raw("julianday('now', '+14 hours', '+5 minutes', 'utc') >= julianday(date_time, 'utc')"))
     })
   })
   .then(schedules => {
     return Promise.map(schedules, (schedule) => {
       const time = schedule.ts
         ? schedule.ts
-        : moment(schedule.date_time + 'Z', 'YYYY-MM-DD HH:mm').format('x') + ' + (timezone * 3600)'
+        : moment(schedule.date_time + '+00', 'YYYY-MM-DD HH:mmZ').format('x') + ' - (timezone * 3600000)'
 
       return knex.raw(`insert into broadcast_outbox (userId, scheduleId, ts)
         select userId, ?, ?
@@ -132,7 +132,7 @@ function sendBroadcasts() {
   sendingLock = true
 
   knex('broadcast_outbox')
-  .where(knex.raw("julianday(broadcast_outbox.ts/1000, 'unixepoch') <= julianday('now')"))
+  .where(knex.raw("julianday(broadcast_outbox.ts/1000, 'unixepoch', 'utc') <= julianday('now', 'utc')"))
   .join('users', 'users.id', 'broadcast_outbox.userId')
   .join('broadcast_schedules', 'scheduleId', 'broadcast_schedules.id')
   .limit(1000)
