@@ -25,6 +25,7 @@ export default class SlackModule extends React.Component {
   }
 
   // TODO handle error
+  // TODO add eslint about missing class method
 
   getAxios = () => this.props.bp.axios
 
