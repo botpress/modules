@@ -1,4 +1,5 @@
 import { RtmClient, CLIENT_EVENTS, RTM_EVENTS } from '@slack/client'
+import setupApi from './api'
 
 const token = process.env.PROTORISK_SLACK_TOKEN
 if (!token) throw new Error('env variable not set: PROTORISK_SLACK_TOKEN')
@@ -7,6 +8,7 @@ const rtm = new RtmClient(token)
 
 const channelName = 'slack-module-test'
 let channel = null
+const getChannel = () => channel
 
 module.exports = {
   init(bp) {
@@ -29,7 +31,10 @@ module.exports = {
     })
   },
 
-  ready() {
+  ready(bp) {
+    const router = bp.getRouter('botpress-slack')
+    setupApi(rtm, getChannel, router)
+
     rtm.start()
   }
 }
