@@ -10,6 +10,40 @@ const channelName = 'slack-module-test'
 let channel = null
 const getChannel = () => channel
 
+/* following is reference code from botpress-messenger */
+/* TODO remove this */
+// let messenger = null
+//
+//
+// module.exports = {
+//   init: function(bp) {
+//
+//     ...
+//
+//     bp.messenger = {}
+//     _.forIn(actions, (action, name) => {
+//       var sendName = name.replace(/^create/, 'send')
+//       bp.messenger[sendName] = function() {
+//         var msg = action.apply(this, arguments)
+//         bp.middlewares.sendOutgoing(msg)
+//       }
+//     })
+
+const outgoingMiddleware = (event, next) => {
+  if (event.platform !== 'slack') {
+    return next()
+  }
+
+  // if (!outgoing[event.type]) {
+  //   return next('Unsupported event type: ' + event.type)
+  // }
+  //
+  // outgoing[event.type](event, next, messenger)
+
+  const {text, raw: {channelId}} = event
+  rtm.sendMessage(text, channelId)
+}
+
 module.exports = {
   init(bp) {
     bp.logger.debug('log in botpress slack')
@@ -29,11 +63,22 @@ module.exports = {
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
       rtm.sendMessage(`${message.text} from channel ${message.channel}`, channel.id)
     })
+
+    // TODO refactor this
+    bp.middlewares.register({
+      name: 'slack.sendMessages',
+      type: 'outgoing',
+      order: 100,
+      handler: outgoingMiddleware,
+      module: 'botpress-slack',
+      description: 'Sends out messages that targets platform = slack.' +
+      ' This middleware should be placed at the end as it swallows events once sent.'
+    })
   },
 
   ready(bp) {
     const router = bp.getRouter('botpress-slack')
-    setupApi(rtm, getChannel, router)
+    setupApi(bp, getChannel, router)
 
     rtm.start()
   }
