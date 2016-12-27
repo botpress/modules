@@ -28,6 +28,29 @@ const getChannel = () => channel
 //         bp.middlewares.sendOutgoing(msg)
 //       }
 //     })
+//
+
+const incomingMiddleware = (event, next) => {
+  const {
+    platform,
+    type,
+    text,
+    raw: { channel }
+  } = event
+
+  if (platform !== 'slack' || type !== 'message') return next()
+
+  // TODO
+  // event.bp.slack.sendText()
+  event.bp.middlewares.sendOutgoing({
+    type: 'text',
+    platform: 'slack',
+    text: `${text} from channel ${channel}`,
+    raw: {
+      channelId: channel
+    }
+  })
+}
 
 const outgoingMiddleware = (event, next) => {
   if (event.platform !== 'slack') {
@@ -61,7 +84,30 @@ module.exports = {
     })
 
     rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-      rtm.sendMessage(`${message.text} from channel ${message.channel}`, channel.id)
+      /*
+       * { type: 'message',
+       *   channel: 'C3G5ALKR9',
+       *   user: 'U0LFNE5J9',
+       *   text: 'test',
+       *   ts: '1482827691.000008',
+       *   team: 'T0F3U2VU3' }
+       */
+      bp.middlewares.sendIncoming({
+        platform: 'slack',
+        type: 'message',
+        user: message.user,
+        text: message.text,
+        raw: message
+      })
+    })
+
+    bp.middlewares.register({
+      name: 'slack.testIncomingMiddleware',
+      type: 'incoming',
+      order: 100,
+      handler: incomingMiddleware,
+      module: 'botpress-slack',
+      description: 'test incoming middleware for slack connector'
     })
 
     // TODO refactor this
