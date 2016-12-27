@@ -21,13 +21,34 @@ import style from './style.scss'
 export default class SlackModule extends React.Component {
 
   state = {
-    message: null
+    message: ''
   }
 
   // TODO handle error
   // TODO add eslint about missing class method
 
   getAxios = () => this.props.bp.axios
+
+  // ----- event handle functions -----
+  handleChange = event => {
+    var { name, value } = event.target
+
+    this.setState({
+      [name]: value
+    })
+  }
+
+  handleSendTestMessage = () => {
+    const { message } = this.state
+
+    // TODO handle error
+    this.getAxios().post('/api/botpress-slack/sendMessage', { message })
+      .then(() => {
+        this.setState({ message: '' })
+      })
+  }
+
+  // ----- render functions -----
 
   renderLabel = label => {
     return (
@@ -62,9 +83,10 @@ export default class SlackModule extends React.Component {
             {this.renderTextAreaInput('Message', 'message', {
               placeholder: 'type test message here'
             })}
+
             <FormGroup>
               <Col smOffset={3} sm={7}>
-                <Button className={style.formButton} onClick={this.handleConnection}>
+                <Button className={style.formButton} onClick={this.handleSendTestMessage}>
                   Send
                 </Button>
               </Col>
