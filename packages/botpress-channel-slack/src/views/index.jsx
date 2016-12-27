@@ -21,7 +21,7 @@ import style from './style.scss'
 export default class SlackModule extends React.Component {
 
   state = {
-    message: 'init message'
+    message: null
   }
 
   // TODO handle error
@@ -59,10 +59,16 @@ export default class SlackModule extends React.Component {
             <h4>Test Area</h4>
           </div>
           <div>
-            {this.renderTextAreaInput('Message', 'message')}
-            <Button className={style.messengerButton} onClick={this.handleConnection}>
-              Send
-            </Button>
+            {this.renderTextAreaInput('Message', 'message', {
+              placeholder: 'type test message here'
+            })}
+            <FormGroup>
+              <Col smOffset={3} sm={7}>
+                <Button className={style.formButton} onClick={this.handleConnection}>
+                  Send
+                </Button>
+              </Col>
+            </FormGroup>
           </div>
         </div>
       </Form>
