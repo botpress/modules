@@ -1,5 +1,6 @@
 import { RtmClient, CLIENT_EVENTS, RTM_EVENTS } from '@slack/client'
 import setupApi from './api'
+import createSendFuncs from './sendFuncs'
 
 const token = process.env.PROTORISK_SLACK_TOKEN
 if (!token) throw new Error('env variable not set: PROTORISK_SLACK_TOKEN')
@@ -39,17 +40,7 @@ const incomingMiddleware = (event, next) => {
   } = event
 
   if (platform !== 'slack' || type !== 'message') return next()
-
-  // TODO
-  // event.bp.slack.sendText()
-  event.bp.middlewares.sendOutgoing({
-    type: 'text',
-    platform: 'slack',
-    text: `${text} from channel ${channel}`,
-    raw: {
-      channelId: channel
-    }
-  })
+  event.bp.slack.sendText(`${text} from channel ${channel}`, channel)
 }
 
 const outgoingMiddleware = (event, next) => {
@@ -70,6 +61,8 @@ const outgoingMiddleware = (event, next) => {
 module.exports = {
   init(bp) {
     bp.logger.debug('log in botpress slack')
+
+    bp.slack = createSendFuncs(bp.middlewares.sendOutgoing)
 
     rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function (rtmStartData) {
       channel = rtmStartData.channels.filter(c => c.name === channelName)[0]
@@ -95,7 +88,6 @@ module.exports = {
       bp.middlewares.sendIncoming({
         platform: 'slack',
         type: 'message',
-        user: message.user,
         text: message.text,
         raw: message
       })
