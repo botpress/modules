@@ -9,26 +9,6 @@ const channelName = 'slack-module-test'
 let channel = null
 const getChannel = () => channel
 
-/* following is reference code from botpress-messenger */
-/* TODO remove this */
-// let messenger = null
-//
-//
-// module.exports = {
-//   init: function(bp) {
-//
-//     ...
-//
-//     bp.messenger = {}
-//     _.forIn(actions, (action, name) => {
-//       var sendName = name.replace(/^create/, 'send')
-//       bp.messenger[sendName] = function() {
-//         var msg = action.apply(this, arguments)
-//         bp.middlewares.sendOutgoing(msg)
-//       }
-//     })
-//
-
 const incomingMiddleware = (event, next) => {
   const {
     platform,
@@ -96,6 +76,7 @@ module.exports = {
       })
     })
 
+    // TODO this is only for test and will remove later
     bp.middlewares.register({
       name: 'slack.testIncomingMiddleware',
       type: 'incoming',
