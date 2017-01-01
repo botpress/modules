@@ -22,7 +22,8 @@ export default (slackApiToken, sendIncoming) => {
     isConnected = true
   })
 
-  /** messge example
+  /**
+   * messge example
    *
    * { type: 'message',
    *   channel: 'C3G5ALKR9',
