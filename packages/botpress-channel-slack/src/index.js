@@ -1,11 +1,9 @@
 import { RtmClient, CLIENT_EVENTS, RTM_EVENTS } from '@slack/client'
 import setupApi from './api'
 import createSendFuncs from './sendFuncs'
+import createConfig from './config'
 
-const token = process.env.PROTORISK_SLACK_TOKEN
-if (!token) throw new Error('env variable not set: PROTORISK_SLACK_TOKEN')
-
-const rtm = new RtmClient(token)
+let rtm
 
 const channelName = 'slack-module-test'
 let channel = null
@@ -40,10 +38,10 @@ const incomingMiddleware = (event, next) => {
   } = event
 
   if (platform !== 'slack' || type !== 'message') return next()
-  event.bp.slack.sendText(`${text} from channel ${channel}`, channel)
+  event.bp.slack.sendText(`${text} from channel ${channel}`, getChannel().id)
 }
 
-const outgoingMiddleware = (event, next) => {
+const outgoingMiddleware = rtm => (event, next) => {
   if (event.platform !== 'slack') {
     return next()
   }
@@ -60,7 +58,12 @@ const outgoingMiddleware = (event, next) => {
 
 module.exports = {
   init(bp) {
+
     bp.logger.debug('log in botpress slack')
+
+    const config = createConfig(bp)
+
+    rtm = new RtmClient(config.slackApiToken.get())
 
     bp.slack = createSendFuncs(bp.middlewares.sendOutgoing)
 
@@ -107,7 +110,7 @@ module.exports = {
       name: 'slack.sendMessages',
       type: 'outgoing',
       order: 100,
-      handler: outgoingMiddleware,
+      handler: outgoingMiddleware(rtm),
       module: 'botpress-slack',
       description: 'Sends out messages that targets platform = slack.' +
       ' This middleware should be placed at the end as it swallows events once sent.'
