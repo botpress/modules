@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@slack/client": "^3.7.0",
+    "bluebird": "^3.4.7",
     "lodash": "^4.17.3"
   }
 }

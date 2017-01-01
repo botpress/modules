@@ -1,9 +1,9 @@
-import { RtmClient, CLIENT_EVENTS, RTM_EVENTS } from '@slack/client'
 import setupApi from './api'
 import createSendFuncs from './sendFuncs'
 import createConfig from './config'
+import SlackConnector from './slackConnector'
 
-let rtm
+let slackConn
 
 const channelName = 'slack-module-test'
 let channel = null
@@ -21,7 +21,7 @@ const incomingMiddleware = (event, next) => {
   event.bp.slack.sendText(`${text} from channel ${channel}`, getChannel().id)
 }
 
-const outgoingMiddleware = rtm => (event, next) => {
+const outgoingMiddleware = (event, next) => {
   if (event.platform !== 'slack') {
     return next()
   }
@@ -33,48 +33,14 @@ const outgoingMiddleware = rtm => (event, next) => {
   // outgoing[event.type](event, next, messenger)
 
   const {text, raw: {channelId}} = event
-  rtm.sendMessage(text, channelId)
+  slackConn.rtm.sendMessage(text, channelId)
 }
 
 module.exports = {
   init(bp) {
-
-    bp.logger.debug('log in botpress slack')
-
     const config = createConfig(bp)
 
-    rtm = new RtmClient(config.slackApiToken.get())
-
     bp.slack = createSendFuncs(bp.middlewares.sendOutgoing)
-
-    rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function (rtmStartData) {
-      channel = rtmStartData.channels.filter(c => c.name === channelName)[0]
-      console.log(`Logged in as ${rtmStartData.self.name} of team ${rtmStartData.team.name}, but not yet connected to a channel`)
-      console.log(channel)
-    })
-
-    // you need to wait for the client to fully connect before you can send messages
-    rtm.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, function () {
-      console.log('connection opened')
-      rtm.sendMessage('this is a test message from slack bot api: Hello!', channel.id)
-    })
-
-    rtm.on(RTM_EVENTS.MESSAGE, (message) => {
-      /*
-       * { type: 'message',
-       *   channel: 'C3G5ALKR9',
-       *   user: 'U0LFNE5J9',
-       *   text: 'test',
-       *   ts: '1482827691.000008',
-       *   team: 'T0F3U2VU3' }
-       */
-      bp.middlewares.sendIncoming({
-        platform: 'slack',
-        type: 'message',
-        text: message.text,
-        raw: message
-      })
-    })
 
     // TODO this is only for test and will remove later
     bp.middlewares.register({
@@ -91,10 +57,20 @@ module.exports = {
       name: 'slack.sendMessages',
       type: 'outgoing',
       order: 100,
-      handler: outgoingMiddleware(rtm),
+      handler: outgoingMiddleware,
       module: 'botpress-slack',
       description: 'Sends out messages that targets platform = slack.' +
       ' This middleware should be placed at the end as it swallows events once sent.'
+    })
+
+    const slackApiToken = config.slackApiToken.get()
+    // TODO check token
+    slackConn = SlackConnector(slackApiToken, bp.middlewares.sendIncoming)
+
+    // TODO channel list api
+    // TODO select channel api
+    slackConn.authenticateP.done(data => {
+      channel = data.channels.filter(c => c.name === channelName)[0]
     })
   },
 
@@ -102,6 +78,6 @@ module.exports = {
     const router = bp.getRouter('botpress-slack')
     setupApi(bp, getChannel, router)
 
-    rtm.start()
+    slackConn.connect()
   }
 }
