@@ -26,7 +26,7 @@ export default bp => {
   // inner config memory
   const config = configStorage.load()
 
-  const createConfigAccessMethods = (key) => ({
+  const createConfigAccessMethods = key => ({
     get: () => {
       if (!_.has(config, key)) {
         throw new Error(`config variable not set: ${key}`)
@@ -40,8 +40,8 @@ export default bp => {
     }
   })
 
-  return _.reduce((acc, key) => ({
+  return _.reduce(configKeys, (acc, key) => ({
     ...acc,
     [key]: createConfigAccessMethods(key)
-  }), {}, configKeys)
+  }), {})
 }
