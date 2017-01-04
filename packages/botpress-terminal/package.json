@@ -1,11 +1,11 @@
 {
   "name": "botpress-terminal",
   "version": "1.0.0",
-  "description": "🖥 A command-line interface to make your bot do custom stuff while running",
+  "description": "🖥 A command-line interface to run custom code on your bot while running",
   "main": "bin/node.bundle.js",
   "botpress": {
-    "menuText": "botpress-terminal",
-    "menuIcon": "view_module",
+    "menuText": "Terminal",
+    "menuIcon": "dvr",
     "webBundle": "bin/web.bundle.js"
   },
   "repository": {
@@ -21,10 +21,6 @@
   "author": "Botpress Team",
   "license": "AGPL-3.0",
   "devDependencies": {
-    "webpack-node-externals": "^1.5.4",
-    "react": "^15.3.2",
-    "react-bootstrap": "^0.30.6",
-    "react-dom": "^15.3.2",
     "babel-core": "^6.18.2",
     "babel-loader": "^6.2.7",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
@@ -41,8 +37,18 @@
     "file-loader": "^0.9.0",
     "json-loader": "^0.5.4",
     "node-sass": "^3.11.2",
+    "react": "^15.3.2",
+    "react-bootstrap": "^0.30.6",
+    "react-codemirror": "^0.3.0",
+    "react-dom": "^15.3.2",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
-    "webpack": "^1.13.3"
+    "webpack": "^1.13.3",
+    "webpack-node-externals": "^1.5.4"
+  },
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "circular-json": "^0.3.1",
+    "moment": "^2.17.1"
   }
 }
