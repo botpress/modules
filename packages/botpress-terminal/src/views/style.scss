@@ -1,11 +1,21 @@
 .container {
   :global(.CodeMirror) {
-    height: 150px;
+    height: 250px;
   }
 }
 
+.terminal {
+  position: relative;
+}
+
 .run {
-  width: 100%;
+  position: absolute;
+  right: 30px;
+  top: 10px;
+  width: 50px;
+  background-color: #36bc98;
+  border: none;
+  color: white;
 }
 
 .logsRow {
