@@ -135,10 +135,8 @@ export default class TemplateModule extends React.Component {
         </Col>
       </Row>
       <Row>
-        <Col sm={10}>
+        <Col sm={12} className={style.terminal}>
           {editor}
-        </Col>
-        <Col sm={2}>
           <Button 
             disabled={this.state.executing} 
             onClick={::this.run}
