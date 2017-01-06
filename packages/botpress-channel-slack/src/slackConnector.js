@@ -4,6 +4,8 @@ import { RtmClient, CLIENT_EVENTS, RTM_EVENTS } from '@slack/client'
 // TODO handle all events from slack
 //
 // - connection failed
+// - rate limited
+// - disconnected
 //
 export default (slackApiToken, sendIncoming) => {
   let data
@@ -11,6 +13,8 @@ export default (slackApiToken, sendIncoming) => {
 
   const rtm = new RtmClient(slackApiToken)
 
+  // TODO add rejection if 30 sec time out
+  // TODO add rejection for authentication failed
   const authenticateP = new Promise((resolve) => {
     rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, (rtmStartData) => {
       data = rtmStartData
