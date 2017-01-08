@@ -50,6 +50,7 @@ export default (slackApiToken, sendIncoming) => {
     rtm,
     isConnected: () => isConnected,
     getData: () => data,
-    connect: () => rtm.start()
+    connect: () => rtm.start(),
+    disconnect: () => rtm.disconnect()
   }
 }

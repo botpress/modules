@@ -27,21 +27,27 @@ export default bp => {
   const config = configStorage.load()
 
   const createConfigAccessMethods = key => ({
-    get: () => {
-      if (!_.has(config, key)) {
-        throw new Error(`config variable not set: ${key}`)
-      }
-
-      return config[key]
-    },
+    get: () => config[key],
     set: value => {
       config[key] = value
       configStorage.save(config)
     }
   })
 
-  return _.reduce(configKeys, (acc, key) => ({
+  const accessMethods = _.reduce(configKeys, (acc, key) => ({
     ...acc,
     [key]: createConfigAccessMethods(key)
   }), {})
+
+  const extraMethods = {
+    getAll: () => config,
+    setAll: (newConfig) => _.forEach(configKeys, key => {
+      accessMethods[key].set(newConfig[key])
+    })
+  }
+
+  return {
+    ...accessMethods,
+    ...extraMethods,
+  }
 }

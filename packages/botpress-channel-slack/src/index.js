@@ -17,7 +17,7 @@ let channel = null
 const getChannel = () => channel
 
 // TODO
-// 2. aggregate SlackConnector creation
+// 2. aggregate SlackConnector creation -- done
 // 3. configurable slack api token
 //    - status management
 //      - no token
@@ -36,36 +36,52 @@ module.exports = {
   },
 
   ready(bp) {
+    const config = createConfig(bp)
+
     const router = bp.getRouter('botpress-slack')
 
     // TODO handle channel == null
     const sendText = message => {
-      bp.slack.sendText(message, getChannel().id)
+      const channel = getChannel()
+      if (!channel) return
+      bp.slack.sendText(message, channel.id)
     }
 
     const getStatus = () => ({
-      hasSlackApiToken: false,
+      hasSlackApiToken: !!config.slackApiToken.get(),
       isSlackConnected: false
     })
 
+    const connectSlack = () => {
+      const slackApiToken = config.slackApiToken.get()
+      if (!slackApiToken) return
+
+      if (slackConn) slackConn.disconnect()
+      slackConn = SlackConnector(slackApiToken, adapter.sendIncoming)
+
+      // TODO channel list api
+      // TODO select channel api
+      // TODO remember to handle no channel found state
+      slackConn.authenticateP.done(data => {
+        channel = data.channels.filter(c => c.name === channelName)[0]
+        adapter.setSlackConn(slackConn)
+      })
+
+      slackConn.connect()
+    }
+
+    const setConfigAndRestart = newConfigs => {
+      config.setAll(newConfigs)
+      connectSlack()
+    }
+
     setupApi(router, {
       sendText,
-      getStatus
+      getStatus,
+      getConfigs: config.getAll,
+      setConfigs: setConfigAndRestart,
     })
 
-    const config = createConfig(bp)
-    const slackApiToken = config.slackApiToken.get()
-    // TODO check token
-    slackConn = SlackConnector(slackApiToken, adapter.sendIncoming)
-
-    // TODO channel list api
-    // TODO select channel api
-    // TODO remember to handle no channel found state
-    slackConn.authenticateP.done(data => {
-      channel = data.channels.filter(c => c.name === channelName)[0]
-      adapter.setSlackConn(slackConn)
-    })
-
-    slackConn.connect()
+    connectSlack()
   }
 }
