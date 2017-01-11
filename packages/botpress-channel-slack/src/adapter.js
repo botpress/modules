@@ -3,6 +3,7 @@
  */
 export default ({register, sendIncoming}) => {
 
+  // slack connector, check ./slackConnector.js for detail
   let slackConn = null
 
   const outgoingMiddleware = (event, next) => {

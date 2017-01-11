@@ -1,8 +1,8 @@
 export default (router, {
   sendText,
   getStatus,
-  getConfigs,
-  setConfigs,
+  getConfig,
+  setConfig,
 }) => {
   router.post('/sendMessage', (req, res) => {
     sendText(req.body.message)
@@ -13,12 +13,12 @@ export default (router, {
     res.json(getStatus())
   })
 
-  router.get('/configs', (req, res) => {
-    res.json(getConfigs())
+  router.get('/config', (req, res) => {
+    res.json(getConfig())
   })
 
-  router.post('/configs', (req, res) => {
-    setConfigs(req.body)
-    res.json(getConfigs())
+  router.post('/config', (req, res) => {
+    setConfig(req.body)
+    res.json(getConfig())
   })
 }

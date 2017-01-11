@@ -78,8 +78,8 @@ module.exports = {
     setupApi(router, {
       sendText,
       getStatus,
-      getConfigs: config.getAll,
-      setConfigs: setConfigAndRestart,
+      getConfig: config.getAll,
+      setConfig: setConfigAndRestart,
     })
 
     connectSlack()

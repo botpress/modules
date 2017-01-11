@@ -33,8 +33,8 @@ export default class SlackModule extends React.Component {
   mApiGet = (url, body) => this.mApi('get', url, body)
   mApiPost = (url, body) => this.mApi('post', url, body)
 
-  fetchConfigs = () => {
-    this.mApiGet('/configs').then(({data}) => {
+  fetchConfig = () => {
+    this.mApiGet('/config').then(({data}) => {
       this.setState({
         slackApiToken: data.slackApiToken
       })
@@ -44,7 +44,7 @@ export default class SlackModule extends React.Component {
   // ----- component lifecycles -----
 
   componentDidMount() {
-    this.fetchConfigs()
+    this.fetchConfig()
   }
 
   // ----- event handle functions -----
@@ -57,7 +57,7 @@ export default class SlackModule extends React.Component {
   }
 
   handleSaveConfig = () => {
-    this.mApiPost('/configs', {
+    this.mApiPost('/config', {
       slackApiToken: this.state.slackApiToken
     })
     // TODO handle error and response
