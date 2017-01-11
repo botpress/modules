@@ -4,8 +4,8 @@
   "description": "Official API.AI Botpress module",
   "main": "bin/node.bundle.js",
   "botpress": {
-    "menuText": "botpress-api.ai",
-    "menuIcon": "view_module",
+    "menuText": "API.AI",
+    "menuIcon": "record_voice_over",
     "webBundle": "bin/web.bundle.js"
   },
   "scripts": {
