@@ -10,7 +10,6 @@ import {
   FormGroup,
   FormControl,
   Alert,
-  FieldGroup,
   Button
 } from 'react-bootstrap'
 
@@ -47,7 +46,6 @@ export default class ApiModule extends React.Component {
 
     this.renderAccessToken = this.renderAccessToken.bind(this)
     this.renderLanguage = this.renderLanguage.bind(this)
-
     this.handleAccesTokenChange = this.handleAccesTokenChange.bind(this)
     this.handleSaveChanges = this.handleSaveChanges.bind(this)
     this.handleLanguageChange = this.handleLanguageChange.bind(this)
