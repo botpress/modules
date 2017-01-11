@@ -1,3 +1,12 @@
+/**
+ * This is a wrapper for slack rtm client
+ * in charge of
+ *    - connection state management and
+ *    - tranform events from slack and dispatch it to incoming middleware
+ *
+ * TODO event transform should be moved to adapter.js
+ */
+
 import Promise from 'bluebird'
 import { RtmClient, CLIENT_EVENTS, RTM_EVENTS } from '@slack/client'
 
@@ -37,6 +46,7 @@ export default (slackApiToken, sendIncoming) => {
    *   team: 'T0F3U2VU3' }
    */
   rtm.on(RTM_EVENTS.MESSAGE, (message) => {
+    // TODO should move this to adapter
     sendIncoming({
       platform: 'slack',
       type: 'message',
