@@ -66,7 +66,7 @@ const incomingMiddleware = (event, next) => {
       }
     })
     .catch(err => {
-      event.bp.logger.warn('botpress-wit.ai', 'API Error. Could not process incoming text: ', err.message)
+      event.bp.logger.warn('botpress-api.ai', 'API Error. Could not process incoming text: ', err.message)
       next()
     })
   } else {
