@@ -38,43 +38,26 @@ const documentation = {
   default: `
   ### Default
 
-  This mode will inject understanding metadata inside incoming messages through the Wit.ai middleware.
+  This mode will inject understanding metadata inside incoming messages through the API.AI middleware.
 
-  Events will have a \`wit\` property populated with the extracted \`entities\` and the \`context\`.
+  Events will have an \`nlp\` property populated with the extracted metadata from API.AI.
 
   **Tip:** Use this mode if you want to handle the conversation flow yourself and only want to extract entities from incoming text. This is great for programmers.
 
   \`\`\`js
-  bp.hear({'wit.entities.intent[0].value': 'weather'}, (event, next) => {
-    console.log('>> Weather')
-    bp.messenger.sendText(event.user.id, 'Weather intent')
+  bp.hear({'nlp.action': 'smalltalk.person'}, (event, next) => {
+    bp.messenger.sendText(event.user.id, 'My name is James')
   })
   \`\`\`
   `
   ,
   fulfillment: `### Fulfillment
 
-  This mode will run your Wit.ai stories automatically given that you defined the **Actions** in botpress.
+  This mode will check if there's an available response in the \`fulfillment\` property of the API.AI response and respond automatically. No code required.
 
-  For more information about Actions and how they are run, make sure to read [node-wit](https://github.com/wit-ai/node-wit)'s documentation.
+  **Note:** Works only with single-response text. We do not support Cards and quick responses.
 
-  **Tip:** Use this mode if you created a conversation flow on Wit.ai's User Interface and want it to run automatically in your bot. This is great for non-programmers.
-
-  #### Example
-
-  \`\`\`js
-  // Implement your Actions like this
-  bp.wit.actions['getWeather'] = request => {
-    return new Promise((resolve, reject) => {
-      bp.logger.info('Get Weather called', request)
-      // Do something here
-      resolve(request.context)
-    })
-  }
-
-  // You need to call this method once you are done implementing the Actions
-  bp.wit.reinitializeClient()
-  \`\`\`
+  **Tip:** This is great for non-programmers or if all your conversation logic is hosted on API.AI.
   `
 }
 

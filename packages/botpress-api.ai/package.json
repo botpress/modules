@@ -15,6 +15,11 @@
   },
   "author": "Botpress Team",
   "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/botpress/botpress-api.ai"
+  },
+  "homepage": "https://github.com/botpress/botpress-api.ai",
   "devDependencies": {
     "babel-core": "^6.18.2",
     "babel-loader": "^6.2.7",
