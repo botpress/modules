@@ -13,6 +13,7 @@ import {
   Button
 } from 'react-bootstrap'
 
+import Markdown from 'react-markdown'
 import style from './style.scss'
 
 const supportedLanguages = {
@@ -33,6 +34,50 @@ const supportedLanguages = {
   'uk': "Ukrainian"
 }
 
+const documentation = {
+  default: `
+  ### Default
+
+  This mode will inject understanding metadata inside incoming messages through the Wit.ai middleware.
+
+  Events will have a \`wit\` property populated with the extracted \`entities\` and the \`context\`.
+
+  **Tip:** Use this mode if you want to handle the conversation flow yourself and only want to extract entities from incoming text. This is great for programmers.
+
+  \`\`\`js
+  bp.hear({'wit.entities.intent[0].value': 'weather'}, (event, next) => {
+    console.log('>> Weather')
+    bp.messenger.sendText(event.user.id, 'Weather intent')
+  })
+  \`\`\`
+  `
+  ,
+  fulfillment: `### Fulfillment
+
+  This mode will run your Wit.ai stories automatically given that you defined the **Actions** in botpress.
+
+  For more information about Actions and how they are run, make sure to read [node-wit](https://github.com/wit-ai/node-wit)'s documentation.
+
+  **Tip:** Use this mode if you created a conversation flow on Wit.ai's User Interface and want it to run automatically in your bot. This is great for non-programmers.
+
+  #### Example
+
+  \`\`\`js
+  // Implement your Actions like this
+  bp.wit.actions['getWeather'] = request => {
+    return new Promise((resolve, reject) => {
+      bp.logger.info('Get Weather called', request)
+      // Do something here
+      resolve(request.context)
+    })
+  }
+
+  // You need to call this method once you are done implementing the Actions
+  bp.wit.reinitializeClient()
+  \`\`\`
+  `
+}
+
 export default class ApiModule extends React.Component {
 
   constructor(props) {
@@ -45,14 +90,17 @@ export default class ApiModule extends React.Component {
     }
 
     this.renderAccessToken = this.renderAccessToken.bind(this)
+    this.renderRadioButton = this.renderRadioButton.bind(this)
     this.renderLanguage = this.renderLanguage.bind(this)
+
     this.handleAccesTokenChange = this.handleAccesTokenChange.bind(this)
     this.handleSaveChanges = this.handleSaveChanges.bind(this)
+    this.handleRadioChange = this.handleRadioChange.bind(this)
     this.handleLanguageChange = this.handleLanguageChange.bind(this)
   }
 
   getStateHash() {
-    return this.state.accessToken + ' ' + this.state.lang
+    return this.state.accessToken + ' ' + this.state.lang + ' ' + this.state.mode
   }
 
   getAxios() {
@@ -78,6 +126,12 @@ export default class ApiModule extends React.Component {
   handleAccesTokenChange(event) {
     this.setState({
       accessToken: event.target.value
+    })
+  }
+
+  handleRadioChange(event) {
+    this.setState({
+      selectedMode: event.target.value
     })
   }
 
@@ -127,6 +181,36 @@ export default class ApiModule extends React.Component {
     )
   }
 
+  renderRadioButton(label, key, props) {
+    return (
+      <span className={style.radio} key={key}>
+        <label>
+          <input type="radio" value={key}
+            checked={this.state.mode === key}
+            onChange={this.handleRadioChange} />
+
+          <span className={style.radioText}>{label}</span>
+        </label>
+      </span>
+    )
+  }
+
+  renderMode() {
+    return (
+      <Row>
+        <FormGroup>
+          <Col componentClass={ControlLabel} sm={3}>
+            Mode
+          </Col>
+          <Col sm={8}>
+            {this.renderRadioButton('Default', 'default')}
+            {this.renderRadioButton('Fulfillment', 'fulfillment')}
+          </Col>
+        </FormGroup>
+      </Row>
+    )
+  }
+
   renderLanguageOption(value, key) {
     return <option key={key} value={key}>{value}</option>
   }
@@ -146,6 +230,16 @@ export default class ApiModule extends React.Component {
             </FormControl>
           </Col>
         </FormGroup>
+      </Row>
+    )
+  }
+
+  renderExplication() {
+    return (
+      <Row className={style.explication}>
+        <Col sm={12}>
+          <Markdown source={documentation[this.state.selectedMode]} />
+        </Col>
       </Row>
     )
   }
@@ -179,7 +273,11 @@ export default class ApiModule extends React.Component {
               <div className={style.settings}>
                 {this.renderAccessToken()}
                 {this.renderLanguage()}
+                {this.renderMode()}
               </div>
+            </Panel>
+            <Panel header="Documentation">
+              {this.renderExplication()}
             </Panel>
           </Col>
         </Row>
