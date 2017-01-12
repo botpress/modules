@@ -4,7 +4,7 @@ import fs from 'fs'
 import axios from 'axios'
 
 let configFile = null
-
+let config = null
 let service = null
 
 const saveConfig = config => {
@@ -13,7 +13,7 @@ const saveConfig = config => {
 
 const loadConfig = () => {
   if (!fs.existsSync(configFile)) {
-    const config = { accessToken : '', lang: 'en' }
+    const config = { accessToken : '', lang: 'en', mode: 'fulfillment' }
     saveConfig(config, configFile)
   }
 
@@ -24,7 +24,7 @@ const loadConfig = () => {
 }
 
 const setService = () => {
-  const config = loadConfig()
+  config = loadConfig()
   
   const client = axios.create({
     baseURL: 'https://api.api.ai/v1',
@@ -45,8 +45,25 @@ const incomingMiddleware = (event, next) => {
   if (event.type === 'message') {
     service(event.user.id, event.text)
     .then(({data}) => {
-      event.nlp = data.result
-      next()
+      const {result} = data
+      if (config.mode === 'fulfillment' 
+        && result.fulfillment 
+        && result.fulfillment.speech
+        && result.fulfillment.speech.length > 0) {
+        event.bp.middlewares.sendOutgoing({
+          type: 'text',
+          platform: event.platform,
+          text: result.fulfillment.speech,
+          raw: {
+            to: event.user.id,
+            message: result.fulfillment.speech
+          }
+        })
+        return null // swallow the event, don't call next()
+      } else {
+        event.nlp = result
+        next()
+      }
     })
     .catch(err => {
       event.bp.logger.warn('botpress-wit.ai', 'API Error. Could not process incoming text: ', err.message)
@@ -79,8 +96,8 @@ module.exports = {
     })
 
     router.post('/config', (req, res) => {
-      const { accessToken, lang } = req.body
-      saveConfig({ accessToken, lang })
+      const { accessToken, lang, mode } = req.body
+      saveConfig({ accessToken, lang, mode })
       setService()
       res.sendStatus(200)
     })

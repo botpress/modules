@@ -144,7 +144,7 @@ export default class ApiModule extends React.Component {
   handleSaveChanges() {
     this.setState({ loading:true })
 
-    return this.getAxios().post('/api/botpress-wit/config', {
+    return this.getAxios().post('/api/botpress-apiai/config', {
       accessToken: this.state.accessToken,
       lang: this.state.lang
     })
