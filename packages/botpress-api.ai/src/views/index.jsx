@@ -131,7 +131,7 @@ export default class ApiModule extends React.Component {
 
   handleRadioChange(event) {
     this.setState({
-      selectedMode: event.target.value
+      mode: event.target.value
     })
   }
 
@@ -144,7 +144,7 @@ export default class ApiModule extends React.Component {
   handleSaveChanges() {
     this.setState({ loading:true })
 
-    return this.getAxios().post('/api/botpress-apiai/config', {
+    return this.getAxios().post('/api/botpress-wit/config', {
       accessToken: this.state.accessToken,
       lang: this.state.lang
     })
@@ -238,7 +238,7 @@ export default class ApiModule extends React.Component {
     return (
       <Row className={style.explication}>
         <Col sm={12}>
-          <Markdown source={documentation[this.state.selectedMode]} />
+          <Markdown source={documentation[this.state.mode]} />
         </Col>
       </Row>
     )
