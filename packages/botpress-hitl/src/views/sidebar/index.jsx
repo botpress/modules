@@ -33,6 +33,7 @@ export default class Sidebar extends React.Component {
         </div>
         <div className={style.users}>
           <User />
+          <User />              
         </div>
       </div>
     )
