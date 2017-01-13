@@ -22,6 +22,10 @@ import style from './style.scss'
 
 const api = route => '/api/botpress-hitl/' + route
 
+const userConversationData = {
+  name: "Dany Fortin-Simard"
+}
+
 export default class HitlModule extends React.Component {
 
   constructor(props) {
@@ -56,7 +60,7 @@ export default class HitlModule extends React.Component {
             <Col md={9} className={style.column}>
               <Row>
                 <Col md={12}>
-                  <Conversation />
+                  <Conversation data={userConversationData}/>
                 </Col>
               </Row>
               <Row>

@@ -1,20 +1,56 @@
 .sidebar {
-  background-color: blue;
+  background-color: white;
   height: 660px;
+  min-width: 320px;
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
-  border-right: solid 1px #000;
 
   .header {
     height: 60px;
-    border-bottom: solid 1px #000;
+    border-bottom: solid 1px #c1c1c1;
+
+    h3 {
+      display: block;
+      float: left;
+      margin-top: 0;
+      color: #a0a0a0;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 4px 7px 0px 0px;
+    }
+
+    .allPaused {
+      width: 160px;
+      height: 100%;
+      float: left;
+      padding-top: 18px;
+      padding-left: 10px;
+    }
+
+    .showPaused {
+      width: 160px;
+      height: 100%;
+      float: left;
+      padding-top: 18px;
+    }
   }
 
   .users {
     height: 600px;
-    background-color: purple;
     border-bottom-left-radius: 10px;
+    overflow-y: scroll;
+  }
 
-    overflow-y: auto;
+  .toggle {
+    &:global(.react-toggle--checked) {
+
+      :global(.react-toggle-thumb) {
+        border-color: #56C0B2;
+      }
+
+      :global(.react-toggle-track) {
+        background-color: #56C0B2 !important;
+      }
+    }
   }
 }
