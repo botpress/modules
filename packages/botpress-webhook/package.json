@@ -13,6 +13,11 @@
     "watch": "node webpack.js --watch",
     "compile": "node webpack.js --compile"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/botpress/botpress-webhook"
+  },
+  "homepage": "https://github.com/botpress/botpress-webhook",
   "author": "Diego Bardari",
   "license": "AGPL-3.0",
   "devDependencies": {
@@ -39,5 +44,9 @@
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
     "webpack": "^1.13.3"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "eventemitter2": "^2.2.1"
   }
 }
