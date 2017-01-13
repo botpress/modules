@@ -8,7 +8,9 @@ import {
   FormControl,
   ListGroup,
   ListGroupItem,
-  Glyphicon
+  Glyphicon,
+  OverlayTrigger,
+  Tooltip
 } from 'react-bootstrap'
 import Toggle from 'react-toggle'
 
@@ -23,7 +25,11 @@ export default class Message extends React.Component {
   }
 
   renderContent() {
-    return this.props.content.message
+    return (
+      <p>
+        {this.props.content.message}
+      </p>
+    )
   }
 
   renderMessageFromUser() {
@@ -43,10 +49,19 @@ export default class Message extends React.Component {
   }
 
   renderMessage() {
+    const tooltip = (
+      <Tooltip id="tooltip">{this.props.content.date}</Tooltip>
+    )
+
     if(this.props.content.fromUser) {
-      return this.renderMessageFromUser()
+      return <OverlayTrigger placement="right" overlay={tooltip}>
+        {this.renderMessageFromUser()}
+      </OverlayTrigger>
     }
-    return this.renderMessageFromBot()
+    return <OverlayTrigger placement="left" overlay={tooltip}>
+      {this.renderMessageFromBot()}
+    </OverlayTrigger>
+
   }
 
   render() {

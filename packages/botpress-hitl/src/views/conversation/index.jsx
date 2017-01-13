@@ -21,13 +21,15 @@ import Message from '../message'
 const userMessage = {
   type: 'text',
   fromUser: true,
-  message: 'Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla'
+  message: 'Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla',
+  date: '10:27am'
 }
 
 const botMessage = {
   type: 'text',
   fromUser: false,
-  message: 'Bla bla bla'
+  message: 'Bla bla bla',
+  date: '10:32am'
 }
 
 export default class Conversation extends React.Component {
@@ -36,15 +38,31 @@ export default class Conversation extends React.Component {
     super()
   }
 
+  componentDidMount() {
+    var element = this.refs.innerMessages
+  }
+
+
   render() {
     return (
       <div className={style.conversation}>
         <div className={style.header}>
-          Conversation header
+          <h3>
+            {this.props.data.name}
+          </h3>
+          
         </div>
         <div className={style.messages}>
-          <Message content={userMessage}/>
-          <Message content={botMessage}/>
+          <div className={style.innerMessages} id="innerMessages" ref="innerMessages">
+            <Message content={userMessage}/>
+            <Message content={botMessage}/>
+              <Message content={userMessage}/>
+              <Message content={botMessage}/>
+                <Message content={userMessage}/>
+                <Message content={botMessage}/>
+                  <Message content={userMessage}/>
+                  <Message content={botMessage}/>
+          </div>
         </div>
       </div>
     )
