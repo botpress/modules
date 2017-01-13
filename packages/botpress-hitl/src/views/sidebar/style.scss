@@ -27,11 +27,14 @@
       padding-left: 10px;
     }
 
-    .showPaused {
-      width: 160px;
-      height: 100%;
-      float: left;
-      padding-top: 18px;
+    .filter {
+      position: absolute;
+      top: 18px;
+      right: 24px;
+    }
+
+    .filter:hover {
+      cursor: pointer;
     }
   }
 
