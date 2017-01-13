@@ -76,6 +76,20 @@ function getUserSession(event) {
   })
 }
 
+function getSession(sessionId) {
+  return knex('hitl_sessions')
+  .where({ id: sessionId })
+  .select('*')
+  .limit(1)
+  .then(users => {
+    if (!users || users.length === 0) {
+      return null
+    } else {
+      return users[0]
+    }
+  })
+}
+
 function appendMessageToSession(event, sessionId, direction) {
   const message = {
     ts: moment().format('x'),
@@ -143,12 +157,12 @@ function getAllSessions(onlyPaused = false) {
 
 function getSessionData(sessionId) {
   return knex('hitl_sessions')
-  .where({ id: sessionId })
+  .where({ 'session_id': sessionId })
   .join('hitl_messages', 'hitl_messages.session_id', 'hitl_sessions.id')
   .select('*')
   .orderBy('id', 'desc')
   .limit(100)
-  .then(messages => _.order(messages, ['id', 'desc']))
+  .then(messages => _.orderBy(messages, ['id'], ['desc']))
 }
 
 module.exports = k => {
@@ -160,6 +174,7 @@ module.exports = k => {
     setSessionPaused,
     appendMessageToSession,
     getAllSessions,
-    getSessionData
+    getSessionData,
+    getSession
   }
 }

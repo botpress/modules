@@ -72,8 +72,26 @@ module.exports = {
       .then(messages => res.send(messages))
     })
 
-    // post /sessions/:id/typing
-    // post /sessions/:id/message
+    router.post('/sessions/:sessionId/message', (req, res) => {
+      const { message } = req.body
+
+      db.getSession(req.params.sessionId)
+      .then(session => {
+        const event = {
+          type: 'text',
+          platform: session.platform,
+          raw: { to: session.userId, message: message },
+          text: message
+        }
+
+        bp.middlewares.sendOutgoing(event)
+
+        return db.appendMessageToSession(event, session.id, 'out')
+        .then(res.sendStatus(200))
+      })
+    })
+
+    // TODO post /sessions/:id/typing
     
     router.post('/sessions/:sessionId/pause', (req, res) => {
       db.setSessionPaused(true, null, null, 'operator', req.params.sessionId)
