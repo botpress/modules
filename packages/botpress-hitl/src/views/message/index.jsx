@@ -11,10 +11,10 @@ import {
   Glyphicon
 } from 'react-bootstrap'
 import Toggle from 'react-toggle'
-import classnames from 'classnames'
 
 import 'react-toggle/style.css'
 import style from './style.scss'
+
 
 export default class Message extends React.Component {
 
@@ -22,13 +22,41 @@ export default class Message extends React.Component {
     super()
   }
 
-  render() {
+  renderContent() {
+    return this.props.content.message
+  }
 
+  renderMessageFromUser() {
     return (
-      <div className={style.message}>
-        Message box
+      <div className={style.message + ' ' + style.fromUser}>
+        {this.renderContent()}
       </div>
     )
   }
 
+  renderMessageFromBot() {
+    return (
+      <div className={style.message + ' ' + style.fromBot}>
+        {this.renderContent()}
+      </div>
+    )
+  }
+
+  renderMessage() {
+    if(this.props.content.fromUser) {
+      return this.renderMessageFromUser()
+    }
+    return this.renderMessageFromBot()
+  }
+
+  render() {
+    return (
+      // Left side
+      <Row>
+        <Col md={12}>
+          {this.renderMessage()}
+        </Col>
+      </Row>
+    )
+  }
 }
