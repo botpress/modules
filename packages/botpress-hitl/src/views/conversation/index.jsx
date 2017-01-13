@@ -27,8 +27,12 @@ export default class Conversation extends React.Component {
   render() {
     return (
       <div className={style.conversation}>
-        <h2>Conversation box</h2>
-        <Message />
+        <div className={style.header}>
+          Conversation header
+        </div>
+        <div className={style.messages}>
+          <Message />
+        </div>
       </div>
     )
   }

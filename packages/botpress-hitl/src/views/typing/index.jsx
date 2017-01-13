@@ -26,7 +26,7 @@ export default class Typing extends React.Component {
 
     return (
       <div className={style.typing}>
-        <h2>Typing box</h2>
+        Typing box
       </div>
     )
   }

@@ -26,7 +26,7 @@ export default class Message extends React.Component {
 
     return (
       <div className={style.message}>
-        <h2>Message box</h2>
+        Message box
       </div>
     )
   }

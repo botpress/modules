@@ -1,4 +1,13 @@
 .sidebar {
   background-color: blue;
   height: 660px;
+
+  .header {
+    height: 60px;
+  }
+
+  .users {
+    height: 600px;
+    background-color: purple;
+  }
 }

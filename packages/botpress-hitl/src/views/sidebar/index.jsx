@@ -28,8 +28,12 @@ export default class Sidebar extends React.Component {
 
     return (
       <div className={style.sidebar}>
-        <h2>Sidebar box</h2>
-        <User />
+        <div className={style.header}>
+          Header sidebar
+        </div>
+        <div className={style.users}>
+          <User />
+        </div>
       </div>
     )
   }
