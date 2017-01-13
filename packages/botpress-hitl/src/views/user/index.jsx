@@ -33,18 +33,19 @@ export default class User extends React.Component {
   changeSession() {
     console.log("ACTION, session")
   }
-  
+
   render() {
+    console.log(this.props.session)
     return (
       <div className={style.user} onClick={::this.changeSession}>
-        {user.paused ? <i className="material-icons">pause_circle_filled</i> : null}
-        <img src={user.img} />
+        {this.props.session.paused == 1 ? <i className="material-icons">pause_circle_filled</i> : null}
+        <img src={this.props.session.user_image_url} />
         <div className={style.content}>
-          <h3>{user.name}</h3>
-          <h4>{user.lastMessage}</h4>
+          <h3>{this.props.session.full_name}</h3>
+          <h4>{this.props.session.text}</h4>
         </div>
         <div className={style.date}>
-          <h5>{user.lastDate}</h5>
+          <h5>{this.props.session.last_event_on}</h5>
         </div>
       </div>
     )

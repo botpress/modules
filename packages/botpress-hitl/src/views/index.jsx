@@ -37,10 +37,63 @@ export default class HitlModule extends React.Component {
   }
 
   componentDidMount() {
-    this.setState({
-      loading: false
+    this.fetchAllSessions()
+    .then(() => { //TODO: REMOVE THAT
+      this.setState({
+        sessions: [
+            {
+              "id": 2,
+              "platform": "facebook",
+              "userId": "1376093502450904",
+              "full_name": "Dany Fortin-Simard",
+              "user_image_url": "https://scontent.xx.fbcdn.net/v/t1.0-1/12715224_1025291760845415_914386888548333516_n.jpg?oh=1aa06932b855fe0f7b11df7035a3bc6a&oe=5912ECB3",
+              "last_event_on": 1484342951862,
+              "last_heard_on": 1484342951862,
+              "paused": 0,
+              "paused_trigger": null,
+              "count": 1,
+              "type": "message",
+              "text": "Allo",
+              "direction": "in"
+            },
+            {
+              "id": 1,
+              "platform": "facebook",
+              "userId": "1011874175608567",
+              "full_name": "Sylvain Perron",
+              "user_image_url": "https://scontent.xx.fbcdn.net/t31.0-1/12593899_538788466289434_4364893903957008279_o.jpg",
+              "last_event_on": 1484342910630,
+              "last_heard_on": 1484342910630,
+              "paused": 0,
+              "paused_trigger": null,
+              "count": 3,
+              "type": "message",
+              "text": "heyo",
+              "direction": "in"
+            }
+          ]
+      })
     })
   }
+
+  getAxios() {
+    return this.props.bp.axios
+  }
+
+  fetchAllSessions() {
+    this.setState({ loading: true })
+
+    return this.getAxios().get("/api/botpress-hitl/sessions")
+    .then((res) => {
+      console.log(res.data)
+      this.setState({
+        loading: false,
+        sessions: res.data
+      })
+    })
+  }
+
+
   renderLoading() {
     return <h1>Loading...</h1>
   }
@@ -56,7 +109,7 @@ export default class HitlModule extends React.Component {
         <Grid>
           <Row>
             <Col md={3} className={style.column}>
-              <Sidebar />
+              <Sidebar sessions={this.state.sessions}/>
             </Col>
             <Col md={9} className={style.column}>
               <Row>
