@@ -25,7 +25,6 @@ export default class Conversation extends React.Component {
   }
 
   render() {
-
     return (
       <div className={style.conversation}>
         <h2>Conversation box</h2>
@@ -33,5 +32,4 @@ export default class Conversation extends React.Component {
       </div>
     )
   }
-
 }
