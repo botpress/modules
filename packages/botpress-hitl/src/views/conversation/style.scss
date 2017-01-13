@@ -1,4 +1,12 @@
 .conversation {
   background-color: orange;
   height: 560px;
+
+  .header {
+    height: 60px;
+  }
+
+  .messages {
+    height: 500px;
+  }
 }

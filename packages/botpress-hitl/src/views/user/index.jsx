@@ -26,9 +26,8 @@ export default class User extends React.Component {
 
     return (
       <div className={style.user}>
-        <h2>User box</h2>
+        User box
       </div>
     )
   }
-
 }
