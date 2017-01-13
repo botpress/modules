@@ -44,6 +44,7 @@
     "webpack-node-externals": "^1.5.4"
   },
   "dependencies": {
+    "lodash": "^4.17.4",
     "moment": "^2.17.1"
   }
 }

@@ -67,7 +67,11 @@ module.exports = {
       .then(sessions => res.send(sessions))
     })
 
-    // get /sessions/:id
+    router.get('/sessions/:sessionId', (req, res) => {
+      db.getSessionData(req.params.sessionId)
+      .then(messages => res.send(messages))
+    })
+
     // post /sessions/:id/typing
     // post /sessions/:id/message
     
