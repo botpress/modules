@@ -18,6 +18,18 @@ import style from './style.scss'
 
 import Message from '../message'
 
+const userMessage = {
+  type: 'text',
+  fromUser: true,
+  message: 'Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla'
+}
+
+const botMessage = {
+  type: 'text',
+  fromUser: false,
+  message: 'Bla bla bla'
+}
+
 export default class Conversation extends React.Component {
 
   constructor() {
@@ -31,7 +43,8 @@ export default class Conversation extends React.Component {
           Conversation header
         </div>
         <div className={style.messages}>
-          <Message />
+          <Message content={userMessage}/>
+          <Message content={botMessage}/>
         </div>
       </div>
     )
