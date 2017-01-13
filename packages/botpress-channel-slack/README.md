@@ -1,6 +1,10 @@
-# botpress-slack
+# botpress-slack [NOT READY YET]
 
 Official Slack connector for Botpress. This module has been built to accelerate and facilitate development of Slack bots.
+
+## ETA -> End of Feb 2017
+
+Your help would be valuable! Get in touch with us if you're willing to help (Gitter)
 
 ## Contribution
 
