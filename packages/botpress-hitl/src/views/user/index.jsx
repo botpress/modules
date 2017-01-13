@@ -30,10 +30,13 @@ export default class User extends React.Component {
     super()
   }
 
+  changeSession() {
+    console.log("ACTION, session")
+  }
+  
   render() {
-
     return (
-      <div className={style.user}>
+      <div className={style.user} onClick={::this.changeSession}>
         {user.paused ? <i className="material-icons">pause_circle_filled</i> : null}
         <img src={user.img} />
         <div className={style.content}>

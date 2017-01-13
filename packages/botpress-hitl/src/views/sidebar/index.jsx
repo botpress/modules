@@ -8,7 +8,9 @@ import {
   FormControl,
   ListGroup,
   ListGroupItem,
-  Glyphicon
+  Glyphicon,
+  OverlayTrigger,
+  Tooltip
 } from 'react-bootstrap'
 
 import Toggle from 'react-toggle'
@@ -34,17 +36,24 @@ export default class Sidebar extends React.Component {
     this.setState({
       allPaused: !this.state.allPaused
     })
-    console.log("Pause all:", this.state.allPaused)
+    console.log("ACTION, Pause all:", this.state.allPaused)
   }
 
   toggleFilter() {
     this.setState({
       filter: !this.state.filter
     })
-    console.log("Filter:", this.state.allPaused)
+    console.log("ACTION, Filter:", this.state.filter)
   }
 
   render() {
+    const filterTooltip = (
+      <Tooltip id="tooltip">Show only paused conversations</Tooltip>
+    )
+    const filterStyle = {
+      color: this.state.filter ? '#56c0b2' : '#666666'
+    };
+
     return (
       <div className={style.sidebar}>
         <div className={style.header}>
@@ -54,11 +63,10 @@ export default class Sidebar extends React.Component {
               defaultChecked={this.state.allPaused}
               onChange={::this.toggleAllPaused}/>
           </div>
-          <div className={style.showPaused}>
-            <h3>Show paused</h3>
-            <Toggle className={classnames(style.toggle, style.enabled)}
-              defaultChecked={this.state.filter}
-              onChange={::this.toggleFilter}/>
+          <div className={style.filter}>
+            <OverlayTrigger placement="top" overlay={filterTooltip}>
+              <i className="material-icons" style={filterStyle} onClick={::this.toggleFilter}>filter_list</i>
+            </OverlayTrigger>
           </div>
         </div>
         <div className={style.users}>

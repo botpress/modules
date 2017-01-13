@@ -4,6 +4,7 @@
   border-top-right-radius: 10px;
 
   .header {
+    position: relative;
     height: 60px;
     border-bottom: solid 1px #c1c1c1;
 
@@ -29,5 +30,22 @@
     overflow-x: hidden;
     position: absolute;
     bottom: 0;
+  }
+
+  .toggle {
+    position: absolute;
+    right: 10px;
+    top: 18px;
+
+    &:global(.react-toggle--checked) {
+
+      :global(.react-toggle-thumb) {
+        border-color: #56C0B2;
+      }
+
+      :global(.react-toggle-track) {
+        background-color: #56C0B2 !important;
+      }
+    }
   }
 }

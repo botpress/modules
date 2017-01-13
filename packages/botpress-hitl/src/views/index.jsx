@@ -23,7 +23,8 @@ import style from './style.scss'
 const api = route => '/api/botpress-hitl/' + route
 
 const userConversationData = {
-  name: "Dany Fortin-Simard"
+  name: "Dany Fortin-Simard",
+  paused: true
 }
 
 export default class HitlModule extends React.Component {
