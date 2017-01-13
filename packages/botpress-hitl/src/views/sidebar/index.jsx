@@ -46,6 +46,10 @@ export default class Sidebar extends React.Component {
     console.log("ACTION, Filter:", this.state.filter)
   }
 
+  renderUser(value) {
+    return <User key={value.id} session={value}></User>
+  }
+
   render() {
     const filterTooltip = (
       <Tooltip id="tooltip">Show only paused conversations</Tooltip>
@@ -70,13 +74,7 @@ export default class Sidebar extends React.Component {
           </div>
         </div>
         <div className={style.users}>
-          <User />
-          <User />
-          <User />
-          <User />
-          <User />
-          <User />   <User />
-          <User />
+          {this.props.sessions.map(this.renderUser)}
         </div>
       </div>
     )
