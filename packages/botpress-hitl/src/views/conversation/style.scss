@@ -1,9 +1,11 @@
 .conversation {
   background-color: orange;
   height: 560px;
+  border-top-right-radius: 10px;
 
   .header {
     height: 60px;
+    border-bottom: solid 1px #000;
   }
 
   .messages {
