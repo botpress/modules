@@ -74,7 +74,7 @@ export default class Sidebar extends React.Component {
           </div>
         </div>
         <div className={style.users}>
-          {this.props.sessions.map(this.renderUser)}
+          {this.props.sessions.sessions && this.props.sessions.sessions.map(this.renderUser)}
         </div>
       </div>
     )
