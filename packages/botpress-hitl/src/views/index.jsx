@@ -49,7 +49,7 @@ export default class HitlModule extends React.Component {
               "user_image_url": "https://scontent.xx.fbcdn.net/v/t1.0-1/12715224_1025291760845415_914386888548333516_n.jpg?oh=1aa06932b855fe0f7b11df7035a3bc6a&oe=5912ECB3",
               "last_event_on": 1484342951862,
               "last_heard_on": 1484342951862,
-              "paused": 0,
+              "paused": 1,
               "paused_trigger": null,
               "count": 1,
               "type": "message",

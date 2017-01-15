@@ -12,6 +12,7 @@ import {
 } from 'react-bootstrap'
 import Toggle from 'react-toggle'
 import classnames from 'classnames'
+import moment from 'moment'
 
 import 'react-toggle/style.css'
 import style from './style.scss'
@@ -28,24 +29,42 @@ export default class User extends React.Component {
 
   constructor() {
     super()
+
+    this.state = {
+      displayImg: 'block'
+    }
   }
 
   changeSession() {
     console.log("ACTION, session")
   }
 
+  onErrorLoadingImage() {
+    this.setState({
+      displayImg: 'none'
+    })
+  }
+
   render() {
-    console.log(this.props.session)
+    const imgStyle = {
+      display: this.state.displayImg,
+      backgroundColor: 'blue'
+    }
+    
+    const dateFormatted = moment(this.props.session.last_event_on, 'x').format('LT')
+
     return (
       <div className={style.user} onClick={::this.changeSession}>
         {this.props.session.paused == 1 ? <i className="material-icons">pause_circle_filled</i> : null}
-        <img src={this.props.session.user_image_url} />
+        <div className={style.imgContainer}>
+          <img src={this.props.session.user_image_url} onError={::this.onErrorLoadingImage} style={imgStyle}/>
+        </div>
         <div className={style.content}>
           <h3>{this.props.session.full_name}</h3>
           <h4>{this.props.session.text}</h4>
         </div>
         <div className={style.date}>
-          <h5>{this.props.session.last_event_on}</h5>
+          <h5>{dateFormatted}</h5>
         </div>
       </div>
     )

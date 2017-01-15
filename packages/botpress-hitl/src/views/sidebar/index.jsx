@@ -62,7 +62,7 @@ export default class Sidebar extends React.Component {
       <div className={style.sidebar}>
         <div className={style.header}>
           <div className={style.allPaused}>
-            <h3>Pause all</h3>
+            <h3>Pause bot</h3>
             <Toggle className={classnames(style.toggle, style.enabled)}
               defaultChecked={this.state.allPaused}
               onChange={::this.toggleAllPaused}/>
