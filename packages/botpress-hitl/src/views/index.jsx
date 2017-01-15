@@ -2,17 +2,8 @@ import React from 'react'
 import {
   Grid,
   Row,
-  Col,
-  ListGroup,
-  ButtonToolbar,
-  ButtonGroup,
-  Button,
-  Badge,
-  OverlayTrigger,
-  Tooltip
+  Col
 } from 'react-bootstrap'
-
-import classnames from 'classnames'
 
 import Sidebar from './sidebar'
 import Conversation from './conversation'

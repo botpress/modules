@@ -1,20 +1,9 @@
 import React from 'react'
 import {
-  Panel,
-  Grid,
-  Row,
-  Col,
-  Button,
-  FormControl,
-  ListGroup,
-  ListGroupItem,
-  Glyphicon
+  Col
 } from 'react-bootstrap'
-import Toggle from 'react-toggle'
-import classnames from 'classnames'
 import moment from 'moment'
 
-import 'react-toggle/style.css'
 import style from './style.scss'
 
 const user = {
@@ -50,7 +39,7 @@ export default class User extends React.Component {
       display: this.state.displayImg,
       backgroundColor: 'blue'
     }
-    
+
     const dateFormatted = moment(this.props.session.last_event_on, 'x').format('LT')
 
     return (

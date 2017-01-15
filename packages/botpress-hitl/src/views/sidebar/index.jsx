@@ -1,14 +1,6 @@
 import React from 'react'
 import {
-  Panel,
-  Grid,
-  Row,
   Col,
-  Button,
-  FormControl,
-  ListGroup,
-  ListGroupItem,
-  Glyphicon,
   OverlayTrigger,
   Tooltip
 } from 'react-bootstrap'
