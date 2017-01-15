@@ -27,7 +27,8 @@
 
   .content {
     float: left;
-    width: 180;
+    min-width: 180px;
+    width: 60%;
 
     h3 {
       margin-top: 0px;
@@ -35,6 +36,7 @@
       padding-top: 20px;
       font-size: 16px;
       font-weight: 500;
+      max-width: 180px;
     }
 
     h4 {
@@ -51,7 +53,8 @@
 
   .date {
     width: 60px;
-    float: left;
+    position: absolute;
+    right: 0px;
 
     h5 {
       color: #a3a3a3;

@@ -48,7 +48,16 @@ export default class Conversation extends React.Component {
     console.log("ACTION, pause: ", this.props.data.props)
   }
 
+
   render() {
+    const dynamicHeightStyleMessageDiv = {
+      height: screen.height - 240
+    }
+
+    const dynamicHeightStyleInnerMessageDiv = {
+      maxHeight: screen.height - 240
+    }
+
     return (
       <div className={style.conversation}>
         <div className={style.header}>
@@ -59,8 +68,11 @@ export default class Conversation extends React.Component {
             defaultChecked={this.props.data.paused}
             onChange={::this.togglePaused}/>
         </div>
-        <div className={style.messages}>
-          <div className={style.innerMessages} id="innerMessages" ref="innerMessages">
+        <div className={style.messages} style={dynamicHeightStyleMessageDiv}>
+          <div className={style.innerMessages}
+            id="innerMessages"
+            ref="innerMessages"
+            style={dynamicHeightStyleInnerMessageDiv}>
             <Message content={userMessage}/>
             <Message content={botMessage}/>
               <Message content={userMessage}/>

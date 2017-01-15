@@ -1,6 +1,5 @@
 .conversation {
   background-color: white;
-  height: 560px;
   border-top-right-radius: 10px;
 
   .header {
@@ -19,13 +18,11 @@
   }
 
   .messages {
-    height: 500px;
     position: relative;
   }
 
   .innerMessages {
     width: 100%;
-    max-height: 500px;
     overflow-y: auto;
     overflow-x: hidden;
     position: absolute;
