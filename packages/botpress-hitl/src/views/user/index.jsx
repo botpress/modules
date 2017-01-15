@@ -6,14 +6,6 @@ import moment from 'moment'
 
 import style from './style.scss'
 
-const user = {
-  name: "Dany Fortin-Simard",
-  img: 'https://scontent-lga3-1.xx.fbcdn.net/v/t1.0-9/12715224_1025291760845415_914386888548333516_n.jpg?oh=9e4777351bdf48b3d93461f0ae8fe9e9&oe=58E17959',
-  lastMessage: "Bla bla bla bla bla bla bla bla bla bla bla bla",
-  lastDate: "10:26am",
-  paused: true
-}
-
 export default class User extends React.Component {
 
   constructor() {
@@ -24,10 +16,6 @@ export default class User extends React.Component {
     }
   }
 
-  changeSession() {
-    console.log("ACTION, session")
-  }
-
   onErrorLoadingImage() {
     this.setState({
       displayImg: 'none'
@@ -36,14 +24,14 @@ export default class User extends React.Component {
 
   render() {
     const imgStyle = {
-      display: this.state.displayImg,
-      backgroundColor: 'blue'
+      display: this.state.displayImg
     }
 
-    const dateFormatted = moment(this.props.session.last_event_on, 'x').format('LT')
+    let dateFormatted = moment(this.props.session.last_event_on, 'x').fromNow()
+    dateFormatted = dateFormatted.replace('minutes', 'mins').replace('seconds', 'secs')
 
     return (
-      <div className={style.user} onClick={::this.changeSession}>
+      <div className={style.user} onClick={this.props.setSession}>
         {this.props.session.paused == 1 ? <i className="material-icons">pause_circle_filled</i> : null}
         <div className={style.imgContainer}>
           <img src={this.props.session.user_image_url} onError={::this.onErrorLoadingImage} style={imgStyle}/>
