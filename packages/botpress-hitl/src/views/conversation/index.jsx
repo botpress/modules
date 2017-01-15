@@ -7,26 +7,14 @@ import style from './style.scss'
 
 import Message from '../message'
 
-const userMessage = {
-  type: 'text',
-  fromUser: true,
-  message: 'Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla Bla bla bla',
-  date: '10:27am'
-}
-
-const botMessage = {
-  type: 'text',
-  fromUser: false,
-  message: 'Bla bla bla',
-  date: '10:32am'
-}
-
 export default class Conversation extends React.Component {
   constructor() {
     super()
+
+    this.state = { loading: true, messages: null }
   }
 
-  componentDidMount() {
+  scrollToBottom() {
     const messageScrollDiv = this.refs.innerMessages
     messageScrollDiv.scrollTop = messageScrollDiv.scrollHeight
   }
@@ -36,24 +24,47 @@ export default class Conversation extends React.Component {
     console.log("ACTION, pause: ", this.props.data.props)
   }
 
+  getAxios() {
+    return this.props.bp.axios
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!this.props.data || nextProps.data.id !== this.props.data.id) {
+      this.fetchSessionMessages(nextProps.data.id)
+    }
+  }
+
+  fetchSessionMessages(sessionId) {
+    this.setState({ loading: true })
+
+    return this.getAxios().get('/api/botpress-hitl/sessions/' + sessionId)
+    .then(({ data }) => {
+      this.setState({
+        loading: false,
+        messages: data
+      })
+
+      setTimeout(::this.scrollToBottom, 50)
+    })
+  }
 
   render() {
     const dynamicHeightStyleMessageDiv = {
-      height: screen.height - 240
+      height: innerHeight - 260
     }
 
     const dynamicHeightStyleInnerMessageDiv = {
-      maxHeight: screen.height - 240
+      maxHeight: innerHeight - 260
     }
 
     return (
       <div className={style.conversation}>
         <div className={style.header}>
           <h3>
-            {this.props.data.name}
+            {this.props.data && this.props.data.full_name}
           </h3>
           <Toggle className={classnames(style.toggle, style.enabled)}
-            defaultChecked={this.props.data.paused}
+            defaultChecked={this.props.data && !!this.props.data.paused}
             onChange={::this.togglePaused}/>
         </div>
         <div className={style.messages} style={dynamicHeightStyleMessageDiv}>
@@ -61,14 +72,9 @@ export default class Conversation extends React.Component {
             id="innerMessages"
             ref="innerMessages"
             style={dynamicHeightStyleInnerMessageDiv}>
-            <Message content={userMessage}/>
-            <Message content={botMessage}/>
-              <Message content={userMessage}/>
-              <Message content={botMessage}/>
-                <Message content={userMessage}/>
-                <Message content={botMessage}/>
-                  <Message content={userMessage}/>
-                  <Message content={botMessage}/>
+            {this.state.messages && this.state.messages.map((m, i) => {
+              return <Message key={i} content={m}/>
+            })}
           </div>
         </div>
       </div>

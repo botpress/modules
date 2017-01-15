@@ -162,7 +162,7 @@ function getSessionData(sessionId) {
   .select('*')
   .orderBy('id', 'desc')
   .limit(100)
-  .then(messages => _.orderBy(messages, ['id'], ['desc']))
+  .then(messages => _.orderBy(messages, ['ts'], ['asc']))
 }
 
 module.exports = k => {

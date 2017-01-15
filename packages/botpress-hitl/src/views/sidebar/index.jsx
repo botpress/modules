@@ -39,7 +39,7 @@ export default class Sidebar extends React.Component {
   }
 
   renderUser(value) {
-    return <User key={value.id} session={value}></User>
+    return <User key={value.id} session={value} setSession={() => this.props.setSession(value.id)}></User>
   }
 
   render() {
@@ -51,7 +51,7 @@ export default class Sidebar extends React.Component {
     };
 
     const dynamicHeightUsersDiv = {
-      height: screen.height - 140
+      height: innerHeight - 160
     }
 
     return (
@@ -70,7 +70,7 @@ export default class Sidebar extends React.Component {
           </div>
         </div>
         <div className={style.users} style={dynamicHeightUsersDiv}>
-          {this.props.sessions.sessions.map(this.renderUser)}
+          {this.props.sessions.sessions.map(::this.renderUser)}
         </div>
       </div>
     )

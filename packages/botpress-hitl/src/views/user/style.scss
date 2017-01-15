@@ -36,7 +36,7 @@
       padding-top: 20px;
       font-size: 16px;
       font-weight: 500;
-      max-width: 180px;
+      max-width: 160px;
     }
 
     h4 {
@@ -52,15 +52,16 @@
   }
 
   .date {
-    width: 60px;
+    width: 80px;
     position: absolute;
-    right: 0px;
+    right: 10px;
+    text-align: right;
 
     h5 {
       color: #a3a3a3;
       margin-top: 0px;
-      padding-top: 21px;
-      font-size: 14px;
+      padding-top: 22px;
+      font-size: 12px;
     }
   }
 }
