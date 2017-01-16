@@ -87,6 +87,9 @@ module.exports = {
         bp.middlewares.sendOutgoing(event)
 
         return db.appendMessageToSession(event, session.id, 'out')
+        .then(message => {
+          event.bp.events.emit('hitl.message', message)
+        })
         .then(res.sendStatus(200))
       })
     })
