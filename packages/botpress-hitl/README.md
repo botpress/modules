@@ -89,7 +89,7 @@ A basic implementation example that shows how easy it is to implement a help req
 
 ## Contribution
 
-Botpress Team would really appreciate to have some help from the community to work on this important module. By helping us, you will contribute to the core and by the way, you will become one of our **Botpress Leaders**!
+Botpress Team would really like to have some help from the community to work on this important module. By helping us, you will contribute to the core and by the way, you will become one of our **Botpress Leaders**!
 
 ## Community
 
