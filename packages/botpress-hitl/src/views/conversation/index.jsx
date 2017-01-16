@@ -94,7 +94,7 @@ export default class Conversation extends React.Component {
           <OverlayTrigger placement="left" overlay={pausedTooltip}>
             <div className={style.toggleDiv}>
               <Toggle className={classnames(style.toggle, style.enabled)}
-                checked={this.props.data && !!this.props.data.paused}
+                checked={this.props.data && !this.props.data.paused}
                 onChange={::this.togglePaused}/>
             </div>
           </OverlayTrigger>

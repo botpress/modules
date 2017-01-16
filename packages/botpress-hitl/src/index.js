@@ -118,7 +118,7 @@ module.exports = {
     const router = bp.getRouter('botpress-hitl')
 
     router.get('/sessions', (req, res) => {
-      db.getAllSessions(!!req.query.onlyPaused)
+      db.getAllSessions(req.query.onlyPaused === "true")
       .then(sessions => res.send(sessions))
     })
 
