@@ -80,6 +80,8 @@ A basic implementation example that shows how easy it is to implement a help req
   }
 ```
 
+**Note**: This is the only code you need to add to your bot in your `index.js` file.
+
 ## Roadmap
 
 - Add pause bot in the UI
