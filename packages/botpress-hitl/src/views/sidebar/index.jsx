@@ -45,6 +45,15 @@ export default class Sidebar extends React.Component {
     return null
   }
 
+  renderUsers() {
+    const sessions = this.props.sessions.sessions
+
+    if(sessions.length === 0) {
+      return <p className={style.empty}>There's no conversation...</p>
+    }
+    return sessions.map(::this.renderUser)
+  }
+
   render() {
     const filterTooltip = (
       <Tooltip id="tooltip">Show only paused conversations</Tooltip>
@@ -67,7 +76,7 @@ export default class Sidebar extends React.Component {
           </div>
         </div>
         <div className={style.users} style={dynamicHeightUsersDiv}>
-          {this.props.sessions.sessions.map(::this.renderUser)}
+          {::this.renderUsers()}
         </div>
       </div>
     )
