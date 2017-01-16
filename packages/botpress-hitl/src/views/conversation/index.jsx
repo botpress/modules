@@ -37,7 +37,9 @@ export default class Conversation extends React.Component {
 
   togglePaused() {
     this.props.data.props = !this.props.data.props
-    console.log("ACTION, pause: ", this.props.data.props)
+    const sessionId = this.props.data.id
+    const action = !!this.props.data.paused ? 'unpause' : 'pause'
+    this.getAxios().post(`/api/botpress-hitl/sessions/${sessionId}/${action}`)
   }
 
   getAxios() {
