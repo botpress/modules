@@ -4,8 +4,6 @@ import DB from './db'
 // TODO: If messages count > X, delete some
 // TODO: Load / Save config
 
-
-
 const config = {
   sessionExpiry: '3 days',
   paused: false
@@ -39,16 +37,43 @@ const incomingMiddleware = (event, next) => {
   })
 }
 
+const outgoingMiddleware = (event, next) => {
+  if (!db) { return next() }
+
+  return db.getUserSession(event)
+  .then(session => {
+
+    if (session.is_new_session) {
+      event.bp.events.emit('hitl.session', session)
+    }
+
+    return db.appendMessageToSession(event, session.id, 'out')
+    .then(message => {
+      event.bp.events.emit('hitl.message', message)
+      next()
+    })
+  })
+}
+
 module.exports = {
   init: function(bp) {
 
     bp.middlewares.register({
-      name: 'hitl.captureMessages',
+      name: 'hitl.captureInMessages',
       type: 'incoming',
       order: 2,
       handler: incomingMiddleware,
       module: 'botpress-hitl',
       description: 'Captures incoming messages and if the session if paused, swallow the event.'
+    })
+
+    bp.middlewares.register({
+      name: 'hitl.captureOutMessages',
+      type: 'outgoing',
+      order: 1,
+      handler: outgoingMiddleware,
+      module: 'botpress-hitl',
+      description: 'Captures outgoing messages to show inside HITL.'
     })
 
     bp.db.get()
@@ -87,12 +112,6 @@ module.exports = {
         }
 
         bp.middlewares.sendOutgoing(event)
-
-        return db.appendMessageToSession(event, session.id, 'out')
-        .then(message => {
-          event.bp.events.emit('hitl.message', message)
-        })
-        .then(res.sendStatus(200))
       })
     })
 
