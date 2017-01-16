@@ -21,11 +21,26 @@ export default class HitlModule extends React.Component {
     super(props)
     this.state = {
       loading: true,
-      currentSession: null
+      currentSession: null,
+      sessions: null
     }
+
+    this.updateSession = ::this.updateSession
+    this.refreshSessions = ::this.refreshSessions
   }
 
   componentDidMount() {
+    this.props.bp.events.on('hitl.message', this.updateSession)
+    this.props.bp.events.on('hitl.session', this.refreshSessions)
+    this.refreshSessions()
+  }
+
+  componentWillUnmount() {
+    this.props.bp.events.off('hitl.message', this.updateSession)
+    this.props.bp.events.off('hitl.session', this.refreshSessions)
+  }
+
+  refreshSessions(session) {
     this.fetchAllSessions()
     .then(() => {
       if (!this.state.currentSession) {
@@ -33,6 +48,33 @@ export default class HitlModule extends React.Component {
         this.setSession(firstSession.id)
       }
     })
+  }
+
+  updateSession(message) {
+    if (!this.state.sessions) {
+      return
+    }
+
+    const session = _.find(this.state.sessions.sessions, { id: message.session_id })
+
+    if (!session) {
+      return
+    }
+
+    const newSession = Object.assign({}, session, { 
+      text: message.text,
+      direction: message.direction,
+      type: message.type,
+      last_event_on: parseInt(message.ts),
+      last_heard_on: message.direction === 'in' ? parseInt(message.ts) : session.last_heard_on
+    })
+
+    const newSessions = {
+      total: this.state.sessions.total,
+      sessions: [newSession, ..._.without(this.state.sessions.sessions, session)]
+    }
+
+    this.setState({ sessions:  newSessions })
   }
 
   getAxios() {

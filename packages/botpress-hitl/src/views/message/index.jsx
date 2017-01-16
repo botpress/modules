@@ -93,7 +93,6 @@ export default class Message extends React.Component {
   }
 
   render() {
-
     console.log(this.props.content)
     const renderedTypes = [
       "message",
@@ -105,8 +104,6 @@ export default class Message extends React.Component {
     if (!_.includes(renderedTypes, this.props.content.type)) {
       return null
     }
-
-
     return (
       <Row>
         <Col md={12}>

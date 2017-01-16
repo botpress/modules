@@ -12,11 +12,27 @@ export default class Conversation extends React.Component {
     super()
 
     this.state = { loading: true, messages: null }
+    this.appendMessage = ::this.appendMessage
   }
 
   scrollToBottom() {
     const messageScrollDiv = this.refs.innerMessages
     messageScrollDiv.scrollTop = messageScrollDiv.scrollHeight
+  }
+
+  componentDidMount() {
+    this.props.bp.events.on('hitl.message', this.appendMessage)
+  }
+
+  componentWillUnmount() {
+    this.props.bp.events.off('hitl.message', this.appendMessage)
+  }
+
+  appendMessage(message) {
+    if (this.state.messages && this.props.data.id === message.session_id) {
+      this.setState({ messages: [...this.state.messages, message] })
+      setTimeout(::this.scrollToBottom, 50)
+    }
   }
 
   togglePaused() {
