@@ -20,7 +20,7 @@ The HITL module should now be available in your bot UI, and the APIs exposed.
 
 ### Viewing conversations
 
-By using this module, you can look to all your conversations at the same place. You don't have to
+By using this module, you can look to all your conversations at the same place. You don't have to use external connectors interface to follow your conversations.
 
 ### Filtering by status
 
