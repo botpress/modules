@@ -122,12 +122,17 @@ function setSessionPaused(paused, platform, userId, trigger, sessionId = null) {
     return knex('hitl_sessions')
     .where({ id: sessionId })
     .update({ paused: paused ? 1 : 0, paused_trigger: trigger })
-    .then()
+    .then(() => parseInt(sessionId))
   } else {
     return knex('hitl_sessions')
     .where({ userId, platform })
     .update({ paused: paused ? 1 : 0, paused_trigger: trigger })
-    .then()
+    .then(() => {
+      return knex('hitl_sessions')
+      .where({ userId, platform })
+      .select('id')
+    })
+    .then(sessions => parseInt(sessions[0].id))
   }
 }
 

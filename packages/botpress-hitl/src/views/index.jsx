@@ -25,19 +25,22 @@ export default class HitlModule extends React.Component {
       sessions: null
     }
 
+    this.updateSessionMessage = ::this.updateSessionMessage
     this.updateSession = ::this.updateSession
     this.refreshSessions = ::this.refreshSessions
   }
 
   componentDidMount() {
-    this.props.bp.events.on('hitl.message', this.updateSession)
+    this.props.bp.events.on('hitl.message', this.updateSessionMessage)
     this.props.bp.events.on('hitl.session', this.refreshSessions)
+    this.props.bp.events.on('hitl.session.changed', this.updateSession)
     this.refreshSessions()
   }
 
   componentWillUnmount() {
-    this.props.bp.events.off('hitl.message', this.updateSession)
+    this.props.bp.events.off('hitl.message', this.updateSessionMessage)
     this.props.bp.events.off('hitl.session', this.refreshSessions)
+    this.props.bp.events.off('hitl.session.changed', this.updateSession)
   }
 
   refreshSessions(session) {
@@ -50,7 +53,26 @@ export default class HitlModule extends React.Component {
     })
   }
 
-  updateSession(message) {
+  updateSession(changes) {
+    if (!this.state.sessions) {
+      return
+    }
+
+    const sessions = this.state.sessions.sessions.map(session => {
+      return Object.assign({}, session, session.id === changes.id ? changes : {})
+    })
+
+    this.setState({ sessions: {
+      total: this.state.sessions.total,
+      sessions: sessions
+    }})
+
+    if (this.state.currentSession) {
+      this.setSession(this.state.currentSession.id)
+    }
+  }
+
+  updateSessionMessage(message) {
     if (!this.state.sessions) {
       return
     }
