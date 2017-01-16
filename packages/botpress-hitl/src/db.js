@@ -136,10 +136,10 @@ function setSessionPaused(paused, platform, userId, trigger, sessionId = null) {
   }
 }
 
-function getAllSessions(onlyPaused = false) {
+function getAllSessions(onlyPaused) {
   let condition = ''
 
-  if (onlyPaused) {
+  if (onlyPaused === true) {
     condition = 'where hitl_sessions.paused = 1'
   }
 

@@ -32,15 +32,17 @@ export default class Sidebar extends React.Component {
   }
 
   toggleFilter() {
-    this.setState({
-      filter: !this.state.filter
-    })
-    console.log("ACTION, Filter:", this.state.filter)
+    this.props.toggleOnlyPaused()
   }
 
   renderUser(value) {
     const isCurrent = value.id === this.props.currentSession
-    return <User className={isCurrent ? style.current : ''} key={value.id} session={value} setSession={() => this.props.setSession(value.id)}></User>
+
+    if (isCurrent || !this.props.filter || (this.props.filter && !!value.paused)) {
+      return <User className={isCurrent ? style.current : ''} key={value.id} session={value} setSession={() => this.props.setSession(value.id)}></User>
+    }
+
+    return null
   }
 
   render() {
@@ -48,7 +50,7 @@ export default class Sidebar extends React.Component {
       <Tooltip id="tooltip">Show only paused conversations</Tooltip>
     )
     const filterStyle = {
-      color: this.state.filter ? '#56c0b2' : '#666666'
+      color: this.props.filter ? '#56c0b2' : '#666666'
     };
 
     const dynamicHeightUsersDiv = {
@@ -58,15 +60,9 @@ export default class Sidebar extends React.Component {
     return (
       <div className={style.sidebar}>
         <div className={style.header}>
-          <div className={style.allPaused}>
-            <h3>Pause bot</h3>
-            <Toggle className={classnames(style.toggle, style.enabled)}
-              defaultChecked={this.state.allPaused}
-              onChange={::this.toggleAllPaused}/>
-          </div>
           <div className={style.filter}>
             <OverlayTrigger placement="top" overlay={filterTooltip}>
-              <i className="material-icons" style={filterStyle} onClick={::this.toggleFilter}>filter_list</i>
+              <i className="material-icons" style={filterStyle} onClick={::this.toggleFilter}>bookmark</i>
             </OverlayTrigger>
           </div>
         </div>
