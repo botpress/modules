@@ -130,6 +130,8 @@ module.exports = {
         }
 
         bp.middlewares.sendOutgoing(event)
+
+        res.sendStatus(200)
       })
     })
 
