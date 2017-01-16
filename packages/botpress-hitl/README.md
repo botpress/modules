@@ -22,11 +22,11 @@ The HITL module should now be available in your bot UI, and the APIs exposed.
 
 By using this module, you can look to all your conversations at the same place. You don't have to use external connectors interface to follow your conversations.
 
-### Filtering by status
+#### Filtering by status
 
 You can filter conversations based on their status (paused/active) by using filtering button in the UI.
 
-### Pausing/resuming conversations
+#### Pausing/resuming conversations
 
 You can pause or resume any conversations from the UI.
 
@@ -50,8 +50,8 @@ A basic implementation example that shows how easy it is to implement a request 
 
 ## Roadmap
 
-- Add pause bot itn the UI
--
+- Add pause bot in the UI
+- Implement other types of message to view them in UI (template, buttons, etc.)
 
 ## Contribution
 
