@@ -72,11 +72,11 @@ export default class Conversation extends React.Component {
 
   render() {
     const dynamicHeightStyleMessageDiv = {
-      height: innerHeight - 260
+      height: innerHeight - 210
     }
 
     const dynamicHeightStyleInnerMessageDiv = {
-      maxHeight: innerHeight - 260
+      maxHeight: innerHeight - 210
     }
 
     const pausedTooltip = <Tooltip id="pausedTooltip">Pause this conversation</Tooltip>

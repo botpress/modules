@@ -6,7 +6,7 @@
 
   .header {
     height: 60px;
-    border-bottom: solid 1px #c1c1c1;
+    border-bottom: solid 1px #eaeaea;
 
     h3 {
       display: block;
@@ -39,7 +39,8 @@
 
   .users {
     border-bottom-left-radius: 5px;
-    overflow-y: scroll;
+    overflow-y: auto;
+    border-right: 1px solid #eaeaea;
     background-color: white;
   }
 
