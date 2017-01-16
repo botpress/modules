@@ -63,8 +63,9 @@ function createUserSession(event) {
 }
 
 function getUserSession(event) {
+  const userId = (event.user && event.user.id) || event.raw.to
   return knex('hitl_sessions')
-  .where({ platform: event.platform, userId: event.user.id })
+  .where({ platform: event.platform, userId: userId })
   .select('*')
   .limit(1)
   .then(users => {
