@@ -8,6 +8,8 @@ import {
 
 import style from './style.scss'
 import moment from 'moment'
+import _ from 'lodash'
+import ReactAudioPlayer from 'react-audio-player'
 
 export default class Message extends React.Component {
 
@@ -15,12 +17,44 @@ export default class Message extends React.Component {
     super()
   }
 
-  renderContent() {
+  renderText() {
     return (
       <p>
         {this.props.content.text}
       </p>
     )
+  }
+
+  renderImage() {
+    return <img src={this.props.content.text}/>
+  }
+
+  renderVideo() {
+    return <video controls>
+      <source src={this.props.content.text} type="video/mp4" />
+    </video>
+  }
+
+  renderAudio() {
+    return <ReactAudioPlayer className={style.audio} src={this.props.content.text} />
+  }
+
+  renderContent() {
+    const type = this.props.content.type
+
+    if (type === "message") {
+      return this.renderText()
+    }
+    else if (type === "image") {
+      return this.renderImage()
+    }
+    else if (type === "video") {
+      return this.renderVideo()
+    }
+    else if (type === "audio") {
+      return this.renderAudio()
+    }
+    return null;
   }
 
   renderMessageFromUser() {
@@ -40,7 +74,6 @@ export default class Message extends React.Component {
   }
 
   renderMessage() {
-
     const date = moment(this.props.content.ts, 'x').format('DD MMM YYYY [at] LT')
 
     const tooltip = (
@@ -60,9 +93,21 @@ export default class Message extends React.Component {
   }
 
   render() {
+
     console.log(this.props.content)
+    const renderedTypes = [
+      "message",
+      "image",
+      "video",
+      "audio"
+    ]
+
+    if (!_.includes(renderedTypes, this.props.content.type)) {
+      return null
+    }
+
+
     return (
-      // Left side
       <Row>
         <Col md={12}>
           {this.renderMessage()}
