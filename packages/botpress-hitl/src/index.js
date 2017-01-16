@@ -1,16 +1,27 @@
 import DB from './db'
 import _ from 'lodash'
+import path from 'path'
+import fs from 'fs'
 
 // TODO: Cleanup old sessions
 // TODO: If messages count > X, delete some
-// TODO: Load / Save config
-
-const config = {
-  sessionExpiry: '3 days',
-  paused: false
-}
 
 let db = null
+let configFile = null
+let config = { }
+
+const saveConfig = config => {
+  fs.writeFileSync(configFile, JSON.stringify(config))
+}
+
+const loadConfig = () => {
+  if (!fs.existsSync(configFile)) {
+    const config = { sessionExpiry: '3 days', paused: false }
+    saveConfig(config, configFile)
+  }
+
+  return Object.assign(JSON.parse(fs.readFileSync(configFile, 'utf-8')))
+}
 
 const incomingMiddleware = (event, next) => {
   if (!db) { return next() }
@@ -62,6 +73,8 @@ const outgoingMiddleware = (event, next) => {
 
 module.exports = {
   init: function(bp) {
+    configFile = path.join(bp.projectLocation, bp.botfile.modulesConfigDir, 'botpress-hitl.json')
+    config = loadConfig()
 
     bp.middlewares.register({
       name: 'hitl.captureInMessages',
@@ -75,7 +88,7 @@ module.exports = {
     bp.middlewares.register({
       name: 'hitl.captureOutMessages',
       type: 'outgoing',
-      order: 1,
+      order: 50,
       handler: outgoingMiddleware,
       module: 'botpress-hitl',
       description: 'Captures outgoing messages to show inside HITL.'
