@@ -33,7 +33,7 @@ export default class Conversation extends React.Component {
   }
 
   appendMessage(message) {
-    if (this.state.messages && this.props.data.id === message.session_id) {
+    if (this.state.messages && this.props.data && this.props.data.id === message.session_id) {
       this.setState({ messages: [...this.state.messages, message] })
       setTimeout(::this.scrollToBottom, 50)
     }
@@ -70,44 +70,58 @@ export default class Conversation extends React.Component {
     })
   }
 
+  renderHeader() {
+    const pausedTooltip = <Tooltip id="pausedTooltip">Pause this conversation</Tooltip>
+
+    return (
+      <div>
+        <h3>
+          {this.props.data && this.props.data.full_name}
+          {this.props.data && !!this.props.data.paused
+            ? <span className={style.pausedWarning}>Paused</span>
+            : null}
+        </h3>
+        <OverlayTrigger placement="left" overlay={pausedTooltip}>
+          <div className={style.toggleDiv}>
+            <Toggle className={classnames(style.toggle, style.enabled)}
+              checked={this.props.data && !this.props.data.paused}
+              onChange={::this.togglePaused}/>
+          </div>
+        </OverlayTrigger>
+      </div>
+    )
+  }
+
+  renderMessages() {
+    const dynamicHeightStyleInnerMessageDiv = {
+      maxHeight: innerHeight - 210
+    }
+
+    return (
+      <div className={style.innerMessages}
+        id="innerMessages"
+        ref="innerMessages"
+        style={dynamicHeightStyleInnerMessageDiv}>
+        {this.state.messages && this.state.messages.map((m, i) => {
+          return <Message key={i} content={m}/>
+        })}
+      </div>
+    )
+  }
+
+
   render() {
     const dynamicHeightStyleMessageDiv = {
       height: innerHeight - 210
     }
 
-    const dynamicHeightStyleInnerMessageDiv = {
-      maxHeight: innerHeight - 210
-    }
-
-    const pausedTooltip = <Tooltip id="pausedTooltip">Pause this conversation</Tooltip>
-
     return (
       <div className={style.conversation}>
         <div className={style.header}>
-          <h3>
-            {this.props.data && this.props.data.full_name}
-            {this.props.data && !!this.props.data.paused
-              ? <span className={style.pausedWarning}>Paused</span>
-              : null}
-
-          </h3>
-          <OverlayTrigger placement="left" overlay={pausedTooltip}>
-            <div className={style.toggleDiv}>
-              <Toggle className={classnames(style.toggle, style.enabled)}
-                checked={this.props.data && !this.props.data.paused}
-                onChange={::this.togglePaused}/>
-            </div>
-          </OverlayTrigger>
+          {this.props.data ? ::this.renderHeader() : null}
         </div>
         <div className={style.messages} style={dynamicHeightStyleMessageDiv}>
-          <div className={style.innerMessages}
-            id="innerMessages"
-            ref="innerMessages"
-            style={dynamicHeightStyleInnerMessageDiv}>
-            {this.state.messages && this.state.messages.map((m, i) => {
-              return <Message key={i} content={m}/>
-            })}
-          </div>
+          {this.props.data ? ::this.renderMessages() : null}
         </div>
       </div>
     )
