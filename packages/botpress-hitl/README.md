@@ -6,9 +6,11 @@ Official HITL (Human In The Loop) module for Botpress. This module has been buil
 
 <img src='/assets/hitl-screenshot.png' height='300px'>
 
-## Get started
+## Installation
 
-```
+Installing modules on Botpress is simple. By using CLI, users only need to type this command in their terminal to add messenger module to their bot.
+
+```js
 botpress install hitl
 ```
 
@@ -53,14 +55,6 @@ A basic implementation example that shows how easy it is to implement a request 
 ## Contribution
 
 Botpress Team would really appreciate to have some help from the community to work on this important module. By helping us, you will contribute to the core and by the way, you will become one of our **Botpress Leaders**!
-
-## Installation
-
-Installing modules on Botpress is simple. By using CLI, users only need to type this command in their terminal to add messenger module to their bot.
-
-```js
-botpress install hitl // Not publish yet on NPM
-```
 
 ## Community
 
