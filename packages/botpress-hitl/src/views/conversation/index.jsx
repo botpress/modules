@@ -21,7 +21,9 @@ export default class Conversation extends React.Component {
 
   scrollToBottom() {
     const messageScrollDiv = this.refs.innerMessages
-    messageScrollDiv.scrollTop = messageScrollDiv.scrollHeight
+    if (messageScrollDiv) {
+      messageScrollDiv.scrollTop = messageScrollDiv.scrollHeight
+    }
   }
 
   componentDidMount() {
@@ -51,8 +53,13 @@ export default class Conversation extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!this.props.data || nextProps.data.id !== this.props.data.id) {
-      this.fetchSessionMessages(nextProps.data.id)
+    let newData = this.props.data
+    if (nextProps.data) {
+      newData = nextProps.data
+    }
+
+    if (newData && newData.id){
+      this.fetchSessionMessages(newData.id)
     }
   }
 
