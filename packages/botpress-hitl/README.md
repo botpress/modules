@@ -30,10 +30,6 @@ You can filter conversations based on their status (paused/active) by using filt
 
 You can pause or resume any conversations from the UI.
 
-## Roadmap
-
-- Add pause bot to UI
-
 ## API
 
 ### `POST /api/botpress-hitl/sessions/{$id}/pause`
@@ -51,6 +47,11 @@ A basic implementation example that shows how easy it is to implement a request 
 ```js
 
 ```
+
+## Roadmap
+
+- Add pause bot itn the UI
+-
 
 ## Contribution
 
