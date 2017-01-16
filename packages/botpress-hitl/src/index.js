@@ -101,8 +101,18 @@ module.exports = {
   ready: function(bp) {
 
     bp.hitl = {
-      pause: (platform, userId) => db.setSessionPaused(true, platform, userId, 'code'),
-      unpause: (platform, userId) => db.setSessionPaused(false, platform, userId, 'code')
+      pause: (platform, userId) => {
+        db.setSessionPaused(true, platform, userId, 'code')
+        .then(sessionId => {
+          bp.events.emit('hitl.session.changed', { id: sessionId, paused: 1 })
+        })
+      },
+      unpause: (platform, userId) => {
+        db.setSessionPaused(false, platform, userId, 'code')
+        .then(sessionId => {
+          bp.events.emit('hitl.session.changed', { id: sessionId, paused: 0 })
+        })
+      }
     }
 
     const router = bp.getRouter('botpress-hitl')
@@ -139,11 +149,17 @@ module.exports = {
     
     router.post('/sessions/:sessionId/pause', (req, res) => {
       db.setSessionPaused(true, null, null, 'operator', req.params.sessionId)
+      .then(sessionId => {
+        bp.events.emit('hitl.session.changed', { id: sessionId, paused: 1 })
+      })
       .then(res.sendStatus(200))
     })
 
     router.post('/sessions/:sessionId/unpause', (req, res) => {
       db.setSessionPaused(false, null, null, 'operator', req.params.sessionId)
+      .then(sessionId => {
+        bp.events.emit('hitl.session.changed', { id: sessionId, paused: 0 })
+      })
       .then(res.sendStatus(200))
     })
   }

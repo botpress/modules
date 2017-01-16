@@ -82,7 +82,7 @@ export default class Conversation extends React.Component {
             {this.props.data && this.props.data.full_name}
           </h3>
           <Toggle className={classnames(style.toggle, style.enabled)}
-            defaultChecked={this.props.data && !!this.props.data.paused}
+            checked={this.props.data && !!this.props.data.paused}
             onChange={::this.togglePaused}/>
         </div>
         <div className={style.messages} style={dynamicHeightStyleMessageDiv}>
