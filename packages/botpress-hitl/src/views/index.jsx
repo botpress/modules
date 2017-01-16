@@ -113,12 +113,13 @@ export default class HitlModule extends React.Component {
       return this.renderLoading()
     }
 
+    const currentSessionId = this.state.currentSession && this.state.currentSession.id
     return (
       <div className={style.mainContainer}>
         <Grid>
           <Row>
             <Col md={3} className={style.column}>
-              <Sidebar sessions={this.state.sessions} setSession={::this.setSession}/>
+              <Sidebar sessions={this.state.sessions} setSession={::this.setSession} currentSession={currentSessionId}/>
             </Col>
             <Col md={9} className={style.column}>
               <Row>

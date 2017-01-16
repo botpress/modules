@@ -39,7 +39,8 @@ export default class Sidebar extends React.Component {
   }
 
   renderUser(value) {
-    return <User key={value.id} session={value} setSession={() => this.props.setSession(value.id)}></User>
+    const isCurrent = value.id === this.props.currentSession
+    return <User className={isCurrent ? style.current : ''} key={value.id} session={value} setSession={() => this.props.setSession(value.id)}></User>
   }
 
   render() {

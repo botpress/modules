@@ -1,8 +1,8 @@
 .sidebar {
   background-color: white;
   min-width: 320px;
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
 
   .header {
     height: 60px;
@@ -38,9 +38,14 @@
   }
 
   .users {
-    border-bottom-left-radius: 10px;
+    border-bottom-left-radius: 5px;
     overflow-y: scroll;
     background-color: white;
+  }
+
+  .current {
+    background-color: #fefefe;
+    border-left: 5px solid #cccccc;
   }
 
   .toggle {

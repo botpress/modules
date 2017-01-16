@@ -3,6 +3,7 @@ import {
   Col
 } from 'react-bootstrap'
 import moment from 'moment'
+import classnames from 'classnames'
 
 import style from './style.scss'
 
@@ -31,7 +32,7 @@ export default class User extends React.Component {
     dateFormatted = dateFormatted.replace('minutes', 'mins').replace('seconds', 'secs')
 
     return (
-      <div className={style.user} onClick={this.props.setSession}>
+      <div className={classnames(style.user, this.props.className)} onClick={this.props.setSession}>
         {this.props.session.paused == 1 ? <i className="material-icons">pause_circle_filled</i> : null}
         <div className={style.imgContainer}>
           <img src={this.props.session.user_image_url} onError={::this.onErrorLoadingImage} style={imgStyle}/>
