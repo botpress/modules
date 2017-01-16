@@ -42,10 +42,42 @@ Resume a conversation for a specific user.
 
 ## Example
 
-A basic implementation example that shows how easy it is to implement a request for help in Messenger.
+A basic implementation example that shows how easy it is to implement a help request in Messenger.
 
 ```js
+  const _ = require('lodash')
 
+  module.exports = function(bp) {
+    bp.middlewares.load()
+
+    bp.hear(/HITL_START/, (event, next) => {
+      bp.messenger.sendTemplate(event.user.id, {
+        template_type: 'button',
+        text: 'Bot paused, a human will get in touch very soon.',
+        buttons: [{
+          type: 'postback',
+          title: 'Cancel request',
+          payload: 'HITL_STOP'
+        }]
+      })
+
+      bp.notifications.send({
+        message: event.user.first_name + ' wants to talk to a human',
+        level: 'info',
+        url: '/modules/botpress-hitl'
+      })
+      bp.hitl.pause(event.platform, event.user.id)
+    })
+
+    bp.hear(/HITL_STOP/, (event, next) => {
+      bp.messenger.sendText(event.user.id, 'Human in the loop disabled. Bot resumed.')
+      bp.hitl.unpause(event.platform, event.user.id)
+    })
+
+    bp.hear({ type: 'message', text: /.+/i }, (event, next) => {
+      bp.messenger.sendText(event.user.id, 'You said: ' + event.text)
+    })
+  }
 ```
 
 ## Roadmap
