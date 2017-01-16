@@ -42,7 +42,7 @@ export default class Message extends React.Component {
   renderContent() {
     const type = this.props.content.type
 
-    if (type === "message") {
+    if (type === "message" || type === "text") {
       return this.renderText()
     }
     else if (type === "image") {
@@ -95,6 +95,7 @@ export default class Message extends React.Component {
   render() {
     console.log(this.props.content)
     const renderedTypes = [
+      "text",
       "message",
       "image",
       "video",

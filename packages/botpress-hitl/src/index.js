@@ -4,6 +4,8 @@ import DB from './db'
 // TODO: If messages count > X, delete some
 // TODO: Load / Save config
 
+
+
 const config = {
   sessionExpiry: '3 days',
   paused: false
