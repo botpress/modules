@@ -160,9 +160,9 @@ function getSessionData(sessionId) {
   return knex('hitl_sessions')
   .where({ 'session_id': sessionId })
   .join('hitl_messages', 'hitl_messages.session_id', 'hitl_sessions.id')
-  .select('*')
-  .orderBy('id', 'desc')
+  .orderBy('hitl_messages.id', 'desc')
   .limit(100)
+  .select('*')
   .then(messages => _.orderBy(messages, ['ts'], ['asc']))
 }
 
