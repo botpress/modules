@@ -1,8 +1,8 @@
 .typing {
   background-color: red;
-  height: 100px;
+  height: 50px;
   border-bottom-right-radius: 10px;
-  border-top: solid 1px #ededed;
+  border-top: solid 1px #ececec;
 
   h2 {
     margin: 0;
@@ -16,6 +16,7 @@
     width: 100%;
     height: 100%;
     border: none;
+    overflow-y: hidden;
   }
 
   textarea:focus {
