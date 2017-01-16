@@ -49,6 +49,12 @@
     border-left: 5px solid #cccccc;
   }
 
+  .empty {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 15px;
+  }
+
   .toggle {
     &:global(.react-toggle--checked) {
 
