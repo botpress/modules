@@ -105,8 +105,6 @@ export default class HitlModule extends React.Component {
   }
 
   fetchAllSessions() {
-    this.setState({ loading: true })
-
     return this.getAxios().get('/api/botpress-hitl/sessions?onlyPaused=' + this.state.onlyPaused)
     .then((res) => {
       this.setState({
@@ -148,7 +146,7 @@ export default class HitlModule extends React.Component {
       <div className={style.mainContainer}>
         <Grid>
           <Row>
-            <Col md={3} className={style.column}>
+            <Col sm={3} className={style.column} lgOffset={1}>
               <Sidebar 
                 sessions={this.state.sessions} 
                 setSession={::this.setSession} 
@@ -156,14 +154,14 @@ export default class HitlModule extends React.Component {
                 filter={this.state.onlyPaused}
                 toggleOnlyPaused={::this.toggleOnlyPaused} />
             </Col>
-            <Col md={9} className={style.column}>
+            <Col sm={9} className={style.column} lg={7}>
               <Row>
-                <Col md={12}>
+                <Col sm={12}>
                   <Conversation bp={this.props.bp} data={this.state.currentSession}/>
                 </Col>
               </Row>
               <Row>
-                <Col md={12}>
+                <Col sm={12}>
                   <Typing sendMessage={::this.sendMessage}/>
                 </Col>
               </Row>

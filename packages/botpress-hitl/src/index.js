@@ -42,7 +42,7 @@ const incomingMiddleware = (event, next) => {
 
       event.bp.events.emit('hitl.message', message)
 
-      if (!!session.paused || config.paused) {
+      if ((!!session.paused || config.paused) && _.includes(['text', 'message'], event.type)) {
         event.bp.logger.debug('[hitl] Session paused, message swallowed:', event.text)
         // the session or bot is paused, swallow the message
         return
@@ -104,12 +104,14 @@ module.exports = {
       pause: (platform, userId) => {
         db.setSessionPaused(true, platform, userId, 'code')
         .then(sessionId => {
+          bp.events.emit('hitl.session', { id: sessionId })
           bp.events.emit('hitl.session.changed', { id: sessionId, paused: 1 })
         })
       },
       unpause: (platform, userId) => {
         db.setSessionPaused(false, platform, userId, 'code')
         .then(sessionId => {
+          bp.events.emit('hitl.session', { id: sessionId })
           bp.events.emit('hitl.session.changed', { id: sessionId, paused: 0 })
         })
       }
@@ -150,6 +152,7 @@ module.exports = {
     router.post('/sessions/:sessionId/pause', (req, res) => {
       db.setSessionPaused(true, null, null, 'operator', req.params.sessionId)
       .then(sessionId => {
+        bp.events.emit('hitl.session', { id: sessionId })
         bp.events.emit('hitl.session.changed', { id: sessionId, paused: 1 })
       })
       .then(res.sendStatus(200))
@@ -158,6 +161,7 @@ module.exports = {
     router.post('/sessions/:sessionId/unpause', (req, res) => {
       db.setSessionPaused(false, null, null, 'operator', req.params.sessionId)
       .then(sessionId => {
+        bp.events.emit('hitl.session', { id: sessionId })
         bp.events.emit('hitl.session.changed', { id: sessionId, paused: 0 })
       })
       .then(res.sendStatus(200))
