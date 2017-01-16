@@ -18,11 +18,7 @@ export default class Message extends React.Component {
   }
 
   renderText() {
-    return (
-      <p>
-        {this.props.content.text}
-      </p>
-    )
+    return <p>{this.props.content.text}</p>
   }
 
   renderImage() {
