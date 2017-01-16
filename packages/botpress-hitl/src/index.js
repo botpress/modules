@@ -1,4 +1,5 @@
 import DB from './db'
+import _ from 'lodash'
 
 // TODO: Cleanup old sessions
 // TODO: If messages count > X, delete some
@@ -13,6 +14,10 @@ let db = null
 
 const incomingMiddleware = (event, next) => {
   if (!db) { return next() }
+
+  if (_.includes(['delivery', 'read'], event.type)) {
+    return next()
+  }
 
   return db.getUserSession(event)
   .then(session => {

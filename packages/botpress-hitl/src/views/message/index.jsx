@@ -89,7 +89,6 @@ export default class Message extends React.Component {
   }
 
   render() {
-    console.log(this.props.content)
     const renderedTypes = [
       "text",
       "message",
