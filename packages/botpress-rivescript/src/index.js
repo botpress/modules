@@ -8,6 +8,7 @@ import calls from './calls'
 import deliveries from './deliveries'
 
 var rs = null
+var utf8 = false
 
 const validateRiveName = (name) => /[A-Z0-9_-]+/i.test(name)
 
@@ -47,6 +48,15 @@ module.exports = {
       handler: incomingMiddleware,
       description: 'Processes incoming messages by the RiveScript engine and sends responses'
     })
+
+    bp.rivescript = {
+      setUtf8: value => {
+        utf8 = value
+        if (rs) {
+          reloadRiveScript()
+        }
+      }
+    }
   },
   ready: function(bp) {
 
@@ -81,8 +91,11 @@ module.exports = {
 
     const reloadRiveScript = () => {
       saveMemory()
-
-      rs = new RiveScript()
+      const isUtf8 = /true|1/i.test(process.env.RIVESCRIPT_UTF8) || utf8
+      if (isUtf8) {
+        bp.logger.debug('[botpress-rivescript]', 'UTF8 mode enabled')
+      }
+      rs = new RiveScript({ utf8: isUtf8 })
 
       rs.loadDirectory(riveDirectory, (batchNumber) => {
         rs.sortReplies()

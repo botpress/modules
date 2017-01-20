@@ -69,6 +69,15 @@ The platform is injected in the user variables as the `platform` name.
 - JS: bp.messenger.sendText(event.user.id, 'Buy?', { quick_replies: ['Yes', 'No'] })
 ```
 
+### UTF-8 Support
+
+You can enable UTF-8 input parsing by either one of these methods:
+
+- Set the `RIVESCRIPT_UTF8=true` environement variable
+- Call `bp.rivescript.setUtf8(true)` in your bot
+
+Read more about RiveScript and its [UTF8 support here](https://github.com/aichaos/rivescript-js#utf-8-support)
+
 ## API
 
 ### `GET /api/botpress-rivescript/scripts`
