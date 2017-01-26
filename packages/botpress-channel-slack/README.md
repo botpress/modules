@@ -4,7 +4,7 @@ Official Slack connector for Botpress. This module has been built to accelerate 
 
 ## ETA -> End of Feb 2017
 
-Your help would be valuable! Get in touch with us if you're willing to help (Gitter)
+Your help would be valuable! Get in touch with us if you're willing to help (Slack)
 
 ## Contribution
 
@@ -20,7 +20,9 @@ botpress install slack // Not publish yet on NPM
 
 ## Community
 
-There's a [public chatroom](https://gitter.im/botpress/core) where you are welcome to join and ask any question and even help others.
+There's a [Slack community](https://slack.botpress.io) where you are welcome to join us, ask any question and even help others.
+
+Get an invite and join us now! 👉[https://slack.botpress.io](https://slack.botpress.io)
 
 ## License
 
