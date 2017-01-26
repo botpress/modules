@@ -24,7 +24,9 @@ The terminal module should now be available in your bot UI
 
 Pull requests are welcomed! We believe that it takes all of us to create something big and impactful.
 
-We have a [Public Chatroom](https://gitter.im/botpress/core), everybody is invited to come and share ideas, issues or simply get in touch.
+There's a [Slack community](https://slack.botpress.io) where you are welcome to join us, ask any question and even help others.
+
+Get an invite and join us now! 👉[https://slack.botpress.io](https://slack.botpress.io)
 
 ## License
 
