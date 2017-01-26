@@ -31,6 +31,12 @@ And an incoming message is sent to be heard:
 }
 ```
 
+## Community
+
+There's a [Slack community](https://slack.botpress.io) where you are welcome to join us, ask any question and even help others.
+
+Get an invite and join us now! 👉[https://slack.botpress.io](https://slack.botpress.io)
+
 ## License
 
 botpress-webhook is licensed under [AGPL-3.0](/LICENSE)
