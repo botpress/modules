@@ -46,7 +46,8 @@ const reinitializeClient = bp => () => {
 const initializeClient = (bp, config) => {
   let witConfig = {
     accessToken: config.accessToken,
-    logger: bp.logger
+    logger: bp.logger,
+    apiVersion: '20160526'
   }
 
   if (config.selectedMode === 'stories') {
