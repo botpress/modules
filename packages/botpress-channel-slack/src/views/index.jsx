@@ -7,26 +7,37 @@ import {
   Col,
   Button,
   ControlLabel,
-  // Panel,
-  // Checkbox,
-  // Glyphicon,
-  // ListGroup,
-  // ListGroupItem,
-  // InputGroup,
-  // Alert
+  Link,
+  Checkbox
 } from 'react-bootstrap'
+
+import _ from 'lodash'
 
 import style from './style.scss'
 
 export default class SlackModule extends React.Component {
 
-  state = {
-    message: '',
-    slackApiToken: ''
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      loading: true,
+      clientID: '',
+      clientSecret: '',
+      hostname: '',
+      scope: '',
+      verificationToken: '',
+      apiToken: null,
+      hashState: null
+    }
   }
 
-  // TODO handle error
-  // TODO add eslint about missing class method
+  componentDidMount() {
+    this.fetchConfig()
+    .then(() => {
+      this.authenticate()
+    })
+  }
 
   getAxios = () => this.props.bp.axios
   mApi = (method, url, body) => this.getAxios()[method]('/api/botpress-slack' + url, body)
@@ -34,22 +45,106 @@ export default class SlackModule extends React.Component {
   mApiPost = (url, body) => this.mApi('post', url, body)
 
   fetchConfig = () => {
-    this.mApiGet('/config').then(({data}) => {
+    return this.mApiGet('/config').then(({data}) => {
       this.setState({
-        slackApiToken: data.slackApiToken
+        clientID: data.clientID,
+        clientSecret: data.clientSecret,
+        hostname: data.hostname,
+        scope: data.scope,
+        apiToken: data.apiToken,
+        verificationToken: data.verificationToken,
+        loading: false
+      })
+
+      setImmediate(() => {
+        this.setState({
+          hashState: this.getHashState()
+        })
       })
     })
   }
 
-  // ----- component lifecycles -----
-
-  componentDidMount() {
-    this.fetchConfig()
+  getHashState = () => {
+    const values = _.omit(this.state, ['loading', 'hashState'])
+    return _.join(_.toArray(values), '_')
   }
 
-  // ----- event handle functions -----
+  getRedictURI = () => {
+    return this.state.hostname + "/modules/botpress-slack"
+  }
+
+  getOAuthLink = () => {
+    return "https://slack.com/oauth/pick" +
+      "?client_id=" + this.state.clientID +
+      "&scope=" + this.state.scope +
+      "&redirect_uri=" + this.getRedictURI()
+  }
+
+  getOAuthAccessLink = (code) => {
+    return "https://slack.com/api/oauth.access" +
+      "?client_id=" + this.state.clientID +
+      "&client_secret=" + this.state.clientSecret +
+      "&code=" + code +
+      "&redirect_uri=" + this.getRedictURI()
+  }
+
+  getOAuthTestLink = () => {
+    return "https://slack.com/api/auth.test" + 
+      "?token=" + this.state.apiToken
+  }
+
+  getParameterByName = (name) => {
+    const url = window.location.href
+    name = name.replace(/[\[\]]/g, "\\$&")
+    let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+      results = regex.exec(url)
+    if (!results) return null
+    if (!results[2]) return ''
+    return decodeURIComponent(results[2].replace(/\+/g, " "))
+  }
+
+  isAuthenticate = () => {
+    if (!this.state.apiToken) return false
+
+    return this.getAxios().get(this.getOAuthTestLink())
+    .then(({data}) => {
+      if (data.ok) return true
+
+      throw new Error("An error occured while testing of your API Token...")
+    })
+    .catch((err) => {
+      console.log(err)
+      this.setState({ apiToken: null })
+      return false
+    })
+  }
+
+  authenticate = () => {
+    const code = this.getParameterByName('code')
+
+    if(!code || this.state.apiToken) return
+
+    this.getAxios().get(this.getOAuthAccessLink(code))
+    .then(({data}) => {
+      if (!data.ok) {
+        throw new Error("You encountered an error during authentification, the code doesn't seems to be valid...")
+      }
+
+      this.setState({
+        apiToken: data.access_token
+      })
+
+      setImmediate(() => {
+        this.handleSaveConfig()
+      })
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+  }
+
   handleChange = event => {
-    var { name, value } = event.target
+    const { name, value } = event.target
 
     this.setState({
       [name]: value
@@ -58,19 +153,19 @@ export default class SlackModule extends React.Component {
 
   handleSaveConfig = () => {
     this.mApiPost('/config', {
-      slackApiToken: this.state.slackApiToken
+      clientID: this.state.clientID,
+      clientSecret: this.state.clientSecret,
+      hostname: this.state.hostname,
+      apiToken: this.state.apiToken,
+      verificationToken: this.state.verificationToken,
+      scope: this.state.scope
     })
-    // TODO handle error and response
-  }
-
-  handleSendTestMessage = () => {
-    const { message } = this.state
-
-    // TODO handle error
-    this.mApiPost('/sendMessage', { message })
-      .then(() => {
-        this.setState({ message: '' })
-      })
+    .then(({data}) => {
+      this.fetchConfig()
+    })
+    .catch(err => {
+      console.log(err)
+    })
   }
 
   // ----- render functions -----
@@ -78,6 +173,7 @@ export default class SlackModule extends React.Component {
   renderHeader = title => (
     <div className={style.header}>
       <h4>{title}</h4>
+      {this.renderSaveButton()}
     </div>
   )
 
@@ -104,14 +200,16 @@ export default class SlackModule extends React.Component {
     type: 'text', ...props
   })
 
-  renderTextAreaInput = (label, name, props = {}) => this.renderInput(label, name, {
-    componentClass: 'textarea',
-    rows: 3,
-    ...props
-  })
+  renderTextAreaInput = (label, name, props = {}) => {
+    return this.renderInput(label, name, {
+      componentClass: 'textarea',
+      rows: 2,
+      ...props
+    })
+  }
 
   withNoLabel = (element) => (
-    <FormGroup>
+    <FormGroup >
       <Col smOffset={3} sm={7}>
         {element}
       </Col>
@@ -119,43 +217,86 @@ export default class SlackModule extends React.Component {
   )
 
   renderBtn = (label, handler) => (
-    <Button className={style.formButton} onClick={handler}>
-      {label}
-    </Button>
+    <Button onClick={handler}>{label}</Button>
   )
 
-  renderConfigSection = () => (
-    <div className={style.section}>
-      {this.renderHeader('Config')}
-      {this.renderTextAreaInput('Slack Token', 'slackApiToken', {
-        placeholder: 'paste slack api token here'
-      })}
-
-      {this.withNoLabel(
-        this.renderBtn('Save', this.handleSaveConfig)
-      )}
-    </div>
+  renderLinkButton = (label, link, handler) => (
+    <a href={link}>
+      <Button className={style.formButton} onClick={handler}>
+        {label}
+      </Button>
+    </a>
   )
 
-  renderTestSection = () => (
-    <div className={style.section}>
-      {this.renderHeader('Test Area')}
-      {this.renderTextAreaInput('Message', 'message', {
-        placeholder: 'type test message here'
-      })}
+  renderAuthentificationButton = () => { 
+    if (this.isAuthenticate()) {
+      return this.withNoLabel(this.renderLinkButton('Reset', this.getOAuthLink(), this.handleSaveConfig))
+    }
 
-      {this.withNoLabel(
-        <Button className={style.formButton} onClick={this.handleSendTestMessage}>
-          Send
-        </Button>
-      )}
-    </div>
-  )
+    return this.withNoLabel(this.renderLinkButton('Authenticate', this.getOAuthLink(), this.handleSaveConfig))
+  }
+
+  renderApiToken = () => {
+    return this.renderTextInput('API token', 'apiToken', {
+      disabled: true
+    })
+  }
+
+  renderSaveButton = () => {
+    let opacity = 0
+    if (this.state.hashState && this.state.hashState !== this.getHashState()) {
+      opacity = 1
+    }
+
+    return <Button
+        className={style.formButton}
+        style={{opacity: opacity}}
+        onClick={this.handleSaveConfig}>
+          Save
+      </Button>
+  }
+
+
+  renderConfigSection = () => {
+    return (
+      <div className={style.section}>
+        {this.renderHeader('Configuration')}
+    
+        {this.renderTextInput('Client ID', 'clientID', {
+          placeholder: 'Paste your client id here...'
+        })}
+    
+        {this.renderTextInput('Client Secret', 'clientSecret', {
+          placeholder: 'Paste your client secret here...'
+        })}
+    
+        {this.renderTextInput('Verification Token', 'verificationToken', {
+          placeholder: 'Paste your verification token here...'
+        })}      
+
+        {this.renderTextInput('Hostname', 'hostname', {
+          placeholder: 'e.g. https://a9f849c4.ngrok.io',
+        })}
+
+        {this.renderTextInput('Scope', 'scope', {
+          placeholder: 'e.g. chat:write:bot,chat:write:user,dnd:read'
+        })}
+    
+        {this.isAuthenticate() ? this.renderApiToken() : null }
+        
+        {this.renderAuthentificationButton()}
+      </div>
+    )
+  }
+
 
   render() {
-    return <Form horizontal>
-      {this.renderConfigSection()}
-      {this.renderTestSection()}
-    </Form>
+    if (this.state.loading) return null
+
+    return <Col md={10} mdOffset={1}>
+        <Form horizontal>
+          {this.renderConfigSection()}
+        </Form>
+      </Col>
   }
 }

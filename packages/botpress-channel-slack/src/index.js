@@ -1,87 +1,114 @@
-import setupApi from './api'
-import createSendFuncs from './sendFuncs'
 import createConfig from './config'
-import createAdapter from './adapter'
+import outgoing from './outgoing'
+import actions from './actions'
 
-// TODO refactor rename it for better naming consistency
-import SlackConnector from './slackConnector'
+import _ from 'lodash'
+import axios from 'axios'
+import Promise from 'bluebird'
 
-// TODO remove this
-import { createTestIncomingMiddleware } from './testHelper'
+import Slack from './slack'
 
 let adapter = null
-let slackConn = null
+let connection = null
+let channels = null
+let slack = null
+const outgoingPending = outgoing.pending
 
-const channelName = 'slack-module-test'
-let channel = null
-const getChannel = () => channel
+const outgoingMiddleware = (event, next) => {
+  if (event.platform !== 'slack') {
+    return next()
+  }
 
-// TODO
-// 2. aggregate SlackConnector creation -- done
-// 3. configurable slack api token
-//    - status management
-//      - no token
-//      - connection failed
-//    - update config api -> restart slack rtm if token changed
+  if (!outgoing[event.type]) {
+    return next('Unsupported event type: ' + event.type)
+  }
+
+  const setValue = method => (...args) => {
+    if (event.__id && outgoingPending[event.__id]) {
+      outgoingPending[event.__id][method].apply(null, args)
+      delete outgoingPending[event.__id]
+    }
+  }
+
+  outgoing[event.type](event, next, slack)
+  .then(setValue('resolve'), setValue('reject'))
+}
 
 module.exports = {
   init(bp) {
-    bp.slack = createSendFuncs(bp.middlewares.sendOutgoing)
-    adapter = createAdapter(bp.middlewares)
+    bp.middlewares.register({
+      name: 'slack.sendMessages',
+      type: 'outgoing',
+      order: 100,
+      handler: outgoingMiddleware,
+      module: 'botpress-slack',
+      description: 'Sends out messages that targets platform = slack.' +
+      ' This middleware should be placed at the end as it swallows events once sent.'
+    })
 
-    // TODO this is test only
-    bp.middlewares.register(
-      createTestIncomingMiddleware(getChannel)
-    )
+    bp.slack = {}
+    _.forIn(actions, (action, name) => {
+      bp.slack[name] = actions[name]
+      let sendName = name.replace(/^create/, 'send')
+      bp.slack[sendName] = Promise.method(function() {
+
+        var msg = action.apply(this, arguments)
+        msg.__id = new Date().toISOString() + Math.random()
+        const resolver = { event: msg }
+
+        const promise = new Promise(function(resolve, reject) {
+          resolver.resolve = resolve
+          resolver.reject = reject
+        })
+
+        outgoingPending[msg.__id] = resolver
+
+        bp.middlewares.sendOutgoing(msg)
+
+        return promise
+      })
+    })
   },
 
   ready(bp) {
     const config = createConfig(bp)
 
-    const router = bp.getRouter('botpress-slack')
+    slack = new Slack(bp, config)
 
-    // TODO handle channel == null
-    const sendText = message => {
-      const channel = getChannel()
-      if (!channel) return
-      bp.slack.sendText(message, channel.id)
+    const router = bp.getRouter('botpress-slack', { 'auth': req => !/\/action-endpoint/i.test(req.originalUrl) })
+
+    const sendText = (message, channelId) => {
+      slack.sendText(message, channelId)
     }
 
     const getStatus = () => ({
-      hasSlackApiToken: !!config.slackApiToken.get(),
-      isSlackConnected: false
+      hasApiToken: !!config.apiToken.get(),
+      isSlackConnected: slack.isConnected()
     })
-
-    const connectSlack = () => {
-      const slackApiToken = config.slackApiToken.get()
-      if (!slackApiToken) return
-
-      if (slackConn) slackConn.disconnect()
-      slackConn = SlackConnector(slackApiToken, adapter.sendIncoming)
-
-      // TODO channel list api
-      // TODO select channel api
-      // TODO remember to handle no channel found state
-      slackConn.authenticateP.done(data => {
-        channel = data.channels.filter(c => c.name === channelName)[0]
-        adapter.setSlackConn(slackConn)
-      })
-
-      slackConn.connect()
-    }
 
     const setConfigAndRestart = newConfigs => {
       config.setAll(newConfigs)
-      connectSlack()
+      slack.connect(bp)
     }
 
-    setupApi(router, {
-      sendText,
-      getStatus,
-      getConfig: config.getAll,
-      setConfig: setConfigAndRestart,
+    slack.connect(bp)
+
+    router.post('/sendMessage', (req, res) => {
+      sendText(req.body.message)
+      res.status(200).end()
     })
 
-    connectSlack()
+    router.get('/status', (req, res) => {
+      res.json(getStatus())
+    })
+
+    router.get('/config', (req, res) => {
+      res.json(config.getAll())
+    })
+
+    router.post('/config', (req, res) => {
+      setConfigAndRestart(req.body)
+      res.json(config.getAll())
+    })
   }
 }

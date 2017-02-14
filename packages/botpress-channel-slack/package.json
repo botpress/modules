@@ -5,13 +5,21 @@
   "main": "bin/node.bundle.js",
   "botpress": {
     "menuText": "Slack",
-    "menuIcon": "view_module",
+    "menuIcon": "chat_bubble_outline",
     "webBundle": "bin/web.bundle.js"
   },
+  "keywords": [
+    "slack",
+    "botpress"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "node webpack.js --watch",
     "compile": "node webpack.js --compile"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/botpress/botpress-slack"
   },
   "author": "Botpress",
   "license": "AGPL-3.0",
@@ -43,6 +51,7 @@
   },
   "dependencies": {
     "@slack/client": "^3.7.0",
+    "axios": "^0.15.3",
     "bluebird": "^3.4.7",
     "lodash": "^4.17.3"
   }
