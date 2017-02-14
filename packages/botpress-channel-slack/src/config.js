@@ -7,18 +7,29 @@ import createStorage from './storage'
  * import createConfig from './config'
  *
  * const config = createConfig(bp)
- * const token = config.slackApiToken.get()
+ * const token = config.apiToken.get()
  *
  * // set token
- * config.slackApiToken.set(NEW_TOKEN)
+ * config.apiToken.set(NEW_TOKEN)
  */
+
 export default bp => {
   const configKeys = [
-    'slackApiToken'
+    'apiToken',
+    'clientID',
+    'clientSecret',
+    'hostname',
+    'verificationToken',
+    'scope'
   ]
 
   const configDefaults = {
-    slackApiToken: process.env.BOTPRESS_SLACK_TOKEN
+    apiToken: null,
+    clientID: '',
+    clientSecret: '',
+    hostname: '',
+    verificationToken: '',
+    scope: ''
   }
 
   const configStorage = createStorage(bp, configDefaults)
