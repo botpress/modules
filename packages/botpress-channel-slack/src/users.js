@@ -46,9 +46,9 @@ module.exports = function(bp, slack) {
       }
 
       return slack.getUserProfile(userId)
-      .then((profile) => {
-        profile.id = userId
-        userProfiles[userId] = profile
+      .then((user) => {
+        user.id = userId
+        userProfiles[userId] = user
 
         if (new Date() - cacheTs >= 10000) {
           saveUserProfiles(userProfiles)
@@ -56,15 +56,15 @@ module.exports = function(bp, slack) {
         }
 
         return bp.db.saveUser({
-          id: profile.id,
+          id: user.id,
           platform: 'slack',
-          gender: 'unknown', //TODO: To review and set
-          timezone: null, //TODO: To review and set
-          locale: null, //TODO: To review and set
-          picture_url: profile.img_512,
-          first_name: profile.first_name,
-          last_name: profile.last_name
-        }).return(profile)
+          gender: 'unknown',
+          timezone: user.tz_offset / 3600,
+          locale: 'en',
+          picture_url: user.profile.img_512,
+          first_name: user.profile.first_name,
+          last_name: user.profile.last_name
+        }).return(user)
       })
     })
   }

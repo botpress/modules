@@ -21,18 +21,6 @@ const handleText = (event, next, slack) => {
   return handlePromise(next, slack.sendText(channelId, text, options))
 }
 
-const handleAttachments = (event, next, slack) => {
-  if (event.platform !== 'slack' || event.type !== 'attachments') {
-    return next()
-  }
-
-  const channelId = event.raw.channelId
-  const attachments = event.raw.attachments
-  const options = event.raw.options
-
-  return handlePromise(next, slack.sendAttachments(channelId, attachments, options))
-}
-
 const handleUpdateText = (event, next, slack) => {
   if (event.platform !== 'slack' || event.type !== 'update_text') {
     return next()
@@ -44,6 +32,18 @@ const handleUpdateText = (event, next, slack) => {
   const ts = event.raw.ts
   
   return handlePromise(next, slack.sendUpdateText(ts, channelId, text, options))
+}
+
+const handleAttachments = (event, next, slack) => {
+  if (event.platform !== 'slack' || event.type !== 'attachments') {
+    return next()
+  }
+
+  const channelId = event.raw.channelId
+  const attachments = event.raw.attachments
+  const options = event.raw.options
+
+  return handlePromise(next, slack.sendAttachments(channelId, attachments, options))
 }
 
 const handleUpdateAttachments = (event, next, slack) => {
@@ -59,10 +59,47 @@ const handleUpdateAttachments = (event, next, slack) => {
   return handlePromise(next, slack.sendUpdateAttachments(ts, channelId, attachments, options))
 }
 
+const handleDeleteTextOrAttachments = (event, next, slack) => {
+  if (event.platform !== 'slack' || event.type !== 'delete_text_or_attachments') {
+    return next()
+  }
+
+  const channelId = event.raw.channelId
+  const options = event.raw.options
+  const ts = event.raw.ts
+
+  return handlePromise(next, slack.sendDeleteTextOrAttachments(ts, channelId, options))
+}
+
+const handleReaction = (event, next, slack) => {
+  if (event.platform !== 'slack' || event.type !== 'reaction') {
+    return next()
+  }
+
+  const name = event.raw.name
+  const options = event.raw.options
+
+  return handlePromise(next, slack.sendReaction(name, options))
+}
+
+const handleRemoveReaction = (event, next, slack) => {
+  if (event.platform !== 'slack' || event.type !== 'remove_reaction') {
+    return next()
+  }
+
+  const name = event.raw.name
+  const options = event.raw.options
+
+  return handlePromise(next, slack.sendRemoveReaction(name, options))
+}
+
 module.exports = {
   'text': handleText,
   'attachments': handleAttachments,
+  'reaction': handleReaction,
   'update_text': handleUpdateText,
   'update_attachments': handleUpdateAttachments,
+  'delete_text_or_attachments': handleDeleteTextOrAttachments,
+  'remove_reaction': handleRemoveReaction,
   pending: {}
 }
