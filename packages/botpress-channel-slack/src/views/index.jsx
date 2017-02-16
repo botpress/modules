@@ -27,6 +27,7 @@ export default class SlackModule extends React.Component {
       hostname: '',
       scope: '',
       verificationToken: '',
+      botToken: null,
       apiToken: null,
       hashState: null
     }
@@ -36,6 +37,10 @@ export default class SlackModule extends React.Component {
     this.fetchConfig()
     .then(() => {
       this.authenticate()
+    })
+
+    this.mApiGet('/user?id=U41H4NB9N').then(({data}) => {
+      console.log(data)
     })
   }
 
@@ -52,6 +57,7 @@ export default class SlackModule extends React.Component {
         hostname: data.hostname,
         scope: data.scope,
         apiToken: data.apiToken,
+        botToken: data.botToken,
         verificationToken: data.verificationToken,
         loading: false
       })
@@ -114,7 +120,10 @@ export default class SlackModule extends React.Component {
     })
     .catch((err) => {
       console.log(err)
-      this.setState({ apiToken: null })
+      this.setState({ 
+        apiToken: null,
+        botToken: null
+      })
       return false
     })
   }
@@ -131,7 +140,8 @@ export default class SlackModule extends React.Component {
       }
 
       this.setState({
-        apiToken: data.access_token
+        apiToken: data.access_token,
+        botToken: data.bot.bot_access_token
       })
 
       setImmediate(() => {
@@ -157,6 +167,7 @@ export default class SlackModule extends React.Component {
       clientSecret: this.state.clientSecret,
       hostname: this.state.hostname,
       apiToken: this.state.apiToken,
+      botToken: this.state.botToken,
       verificationToken: this.state.verificationToken,
       scope: this.state.scope
     })
@@ -167,6 +178,18 @@ export default class SlackModule extends React.Component {
       console.log(err)
     })
   }
+
+handleReset = () => {
+  this.setState({
+    apiToken: null,
+    botToken: null
+  })
+
+  setImmediate(() => {
+    this.setState({ hashState: this.getHashState()})
+    this.handleSaveConfig()
+  })
+}
 
   // ----- render functions -----
 
@@ -217,7 +240,7 @@ export default class SlackModule extends React.Component {
   )
 
   renderBtn = (label, handler) => (
-    <Button onClick={handler}>{label}</Button>
+    <Button className={style.formButton} onClick={handler}>{label}</Button>
   )
 
   renderLinkButton = (label, link, handler) => (
@@ -230,16 +253,10 @@ export default class SlackModule extends React.Component {
 
   renderAuthentificationButton = () => { 
     if (this.isAuthenticate()) {
-      return this.withNoLabel(this.renderLinkButton('Reset', this.getOAuthLink(), this.handleSaveConfig))
+      return this.withNoLabel(this.renderBtn('Disconnect', this.handleReset))
     }
 
-    return this.withNoLabel(this.renderLinkButton('Authenticate', this.getOAuthLink(), this.handleSaveConfig))
-  }
-
-  renderApiToken = () => {
-    return this.renderTextInput('API token', 'apiToken', {
-      disabled: true
-    })
+    return this.withNoLabel(this.renderLinkButton('Authenticate & Connect', this.getOAuthLink(), this.handleSaveConfig))
   }
 
   renderSaveButton = () => {
@@ -256,12 +273,27 @@ export default class SlackModule extends React.Component {
       </Button>
   }
 
+  renderTokenInfo = () => {
+    return <div>
+      {this.renderTextInput('API token', 'apiToken', {
+        disabled: true
+      })}
+
+      {this.renderTextInput('Bot token', 'botToken', {
+        disabled: true
+      })}
+    </div>
+  }
 
   renderConfigSection = () => {
     return (
       <div className={style.section}>
         {this.renderHeader('Configuration')}
     
+        {this.renderTextInput('Hostname', 'hostname', {
+          placeholder: 'e.g. https://a9f849c4.ngrok.io',
+        })}
+
         {this.renderTextInput('Client ID', 'clientID', {
           placeholder: 'Paste your client id here...'
         })}
@@ -274,15 +306,11 @@ export default class SlackModule extends React.Component {
           placeholder: 'Paste your verification token here...'
         })}      
 
-        {this.renderTextInput('Hostname', 'hostname', {
-          placeholder: 'e.g. https://a9f849c4.ngrok.io',
-        })}
-
         {this.renderTextInput('Scope', 'scope', {
           placeholder: 'e.g. chat:write:bot,chat:write:user,dnd:read'
         })}
     
-        {this.isAuthenticate() ? this.renderApiToken() : null }
+        {this.isAuthenticate() ? this.renderTokenInfo() : null }
         
         {this.renderAuthentificationButton()}
       </div>

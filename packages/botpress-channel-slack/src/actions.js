@@ -51,6 +51,18 @@ const createAttachments = (channelId, attachments, options = {}) => {
   }
 }
 
+const createReaction = (name, options = {}) => {
+  return {
+    platform: 'slack',
+    type: 'reaction',
+    text: 'App sent a reaction',
+    raw: {
+      name: name,
+      options: options
+    }
+  }
+}
+
 const createUpdateText = (ts, channelId, text, options = {}) => {
   validateChannelId(channelId)
   validateText(text)
@@ -82,11 +94,41 @@ const createUpdateAttachments = (ts, channelId, attachments, options = {}) => {
       options: options
     }
   }
-} 
+}
+
+const createDeleteTextOrAttachments = (ts, channelId, options = {}) => {
+  validateChannelId(channelId)
+
+  return {
+    platform: 'slack',
+    type: 'delete_text_or_attachments',
+    text: "App deleted a text or an attachments",
+    raw: {
+      channelId: channelId,
+      ts: ts,
+      options: options
+    }
+  }
+}
+
+const createRemoveReaction = (name, options = {}) => {
+  return {
+    platform: 'slack',
+    type: 'remove_reaction',
+    text: 'App remove a reaction',
+    raw: {
+      name: name,
+      options: options
+    }
+  }
+}
 
 module.exports = {
   createText,
   createAttachments,
+  createReaction,
   createUpdateText,
-  createUpdateAttachments
+  createUpdateAttachments,
+  createDeleteTextOrAttachments,
+  createRemoveReaction
 }

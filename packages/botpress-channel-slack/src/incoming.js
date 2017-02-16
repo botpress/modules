@@ -1,6 +1,7 @@
 import { RTM_EVENTS } from '@slack/client'
 
 import LRU from 'lru-cache'
+import _ from 'lodash'
 import Users from './users'
 
 const OTHER_RTM_EVENTS = [
@@ -89,6 +90,10 @@ module.exports = (bp, slack) => {
     if (event.bot_id || event.subtype) {
       return true
     }
+    if (event.user === slack.getBotId()) {
+      return true
+    }
+
     return false
   }
 
@@ -117,34 +122,46 @@ module.exports = (bp, slack) => {
     return users.getOrFetchUserProfile(userId)
   }
 
-  const formatRaw = (raw) => {
-    raw.channel = { id: raw.channel }
-    raw.user = { id: raw.user }
-    raw.team = { id: raw.team }
+  const extractBasics = (event) => {
+    return {
+      platform: 'slack',
+      channel: { id: event.channel },
+      ts: event.ts,
+      direct: isDirect(event.channel),
+      raw: event
+    }
+  }
 
-    return raw
+  const isDirect = (channelId) => {
+    return !_.some(slack.getChannels(), { id: channelId })
   }
 
   const router = bp.getRouter('botpress-slack', { 'auth': req => !/\/action-endpoint/i.test(req.originalUrl) })
 
   router.post('/action-endpoint', (req, res) => {
-    const request = JSON.parse(req.body.payload)
+
+    const payload = JSON.parse(req.body.payload)
+
     if (!slack.isConnected()) {
       throw new Error("You are not connected and authenticated")
     }
 
-    if (request.token !== slack.config.verificationToken.get()) {
+    if (payload.token !== slack.config.verificationToken.get()) {
       throw new Error("Verification token are not matching")
     }
 
-    preprocessEvent(request)
-    .then(profile => {
+    preprocessEvent(payload)
+    .then(user => {
       bp.middlewares.sendIncoming({
         platform: 'slack',
         type: 'button',
-        user: profile,
-        text: 'button',
-        raw: request
+        text: user.profile.real_name + " clicked on a button",
+        user: user,
+        channel: payload.channel,
+        button: payload.actions[0],
+        ts: payload.message_ts,
+        direct: isDirect(payload.channel.id),
+        raw: payload
       })
     })
     
@@ -153,37 +170,40 @@ module.exports = (bp, slack) => {
 
 
   slack.rtm.on(RTM_EVENTS['MESSAGE'], function handleRtmMessage(message) {
+
     if (isFromBot(message)) return
 
     preprocessEvent(message)
-    .then(profile => {
-      const raw = formatRaw(message)
+    .then(user => {
 
       bp.middlewares.sendIncoming({
-        platform: 'slack',
-        type: message.type,
-        user: profile,
+        type: 'message',
         text: message.text,
-        raw: raw
+        user: user,
+        ...extractBasics(message)
       })
 
-      let mentionnedUsers = []
       let match = []
       while(match = mentionRegex.exec(message.text)) {
-        mentionnedUsers.push(match[1])
-      }
-
-      if (mentionnedUsers.length > 0) {
-        raw.mentionnedUsers = mentionnedUsers
-        bp.middlewares.sendIncoming({
-          platform: 'slack',
-          type: 'users_mentioned',
-          user: profile,
-          text: "Users have been mentioned",
-          raw: raw
-        })
-      }
-      
+        const mentionedId = match[1]
+        if (mentionedId === slack.getBotId()) {
+          bp.middlewares.sendIncoming({
+            type: 'bot_mentioned',
+            text: "Bot has been mentioned",
+            user: user,
+            mentionedId: mentionedId,
+            ...extractBasics(message)
+          })
+        } else {
+          bp.middlewares.sendIncoming({
+            type: 'user_mentioned',
+            text: "User has been mentioned",
+            user: user,
+            mentionedId: mentionedId,
+            ...extractBasics(message)
+          })
+        }
+      }   
     })
   })
 
@@ -192,43 +212,47 @@ module.exports = (bp, slack) => {
     if (isFromBot(reaction)) return
 
     preprocessEvent(reaction)
-    .then(profile => {
+    .then(user => {
       bp.middlewares.sendIncoming({
-        platform: 'slack',
         type: 'reaction',
-        user: profile,
-        text: profile.real_name + " reacted using " +reaction.reaction,
-        raw: formatRaw(reaction)
+        user: user,
+        text: user.profile.real_name + " reacted using " + reaction.reaction,
+        reaction: reaction.reaction,
+        ...extractBasics(reaction),
+        ts: reaction.event_ts
       })
     })
   })
 
   slack.rtm.on(RTM_EVENTS['USER_TYPING'], function handleRtmTypingAdded(typing) {
+    
     if (isFromBot(typing)) return
 
     preprocessEvent(typing)
-    .then(profile => {
+    .then(user => {
       bp.middlewares.sendIncoming({
-        platform: 'slack',
         type: 'typing',
-        user: profile, 
-        text: profile.real_name + " is typing",
-        raw: formatRaw(typing)
+        user: user,
+        text: user.profile.real_name + " is typing",
+        ...extractBasics(typing)
       })
     })
   })
 
   slack.rtm.on(RTM_EVENTS['FILE_SHARED'], function handleRtmTypingAdded(file) {
-    if (isFromBot(file)) return
 
-    preprocessEvent(file)
-    .then(profile => {
+    if (isFromBot(file)) return
+    
+    users.getOrFetchUserProfile(file.user_id)
+    .then(user => {
       bp.middlewares.sendIncoming({
         platform: 'slack',
         type: 'file',
-        user: profile,
-        text: profile.real_name + " shared a file",
-        raw: formatRaw(file)
+        user: user,
+        text: user.profile.real_name + " shared a file",
+        file: file.file,
+        ts: file.event_ts,
+        raw: file
       })
     })
   })
@@ -236,7 +260,7 @@ module.exports = (bp, slack) => {
 
   OTHER_RTM_EVENTS.map((rtmEvent) => {
     slack.rtm.on(RTM_EVENTS[rtmEvent], function handleOtherRTMevent(event) {
-      
+
       bp.middlewares.sendIncoming({
         platform: 'slack',
         type: event.type,

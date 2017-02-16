@@ -16,6 +16,7 @@ import createStorage from './storage'
 export default bp => {
   const configKeys = [
     'apiToken',
+    'botToken',
     'clientID',
     'clientSecret',
     'hostname',
@@ -25,11 +26,12 @@ export default bp => {
 
   const configDefaults = {
     apiToken: null,
+    botToken: null,
     clientID: '',
     clientSecret: '',
     hostname: '',
     verificationToken: '',
-    scope: ''
+    scope: 'admin,bot,chat:write:bot,commands,identify,incoming-webhook'
   }
 
   const configStorage = createStorage(bp, configDefaults)

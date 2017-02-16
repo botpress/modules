@@ -77,13 +77,8 @@ module.exports = {
 
     const router = bp.getRouter('botpress-slack', { 'auth': req => !/\/action-endpoint/i.test(req.originalUrl) })
 
-    const sendText = (message, channelId) => {
-      slack.sendText(message, channelId)
-    }
-
     const getStatus = () => ({
-      hasApiToken: !!config.apiToken.get(),
-      isSlackConnected: slack.isConnected()
+      connected: slack.isConnected()
     })
 
     const setConfigAndRestart = newConfigs => {
@@ -93,15 +88,6 @@ module.exports = {
 
     slack.connect(bp)
 
-    router.post('/sendMessage', (req, res) => {
-      sendText(req.body.message)
-      res.status(200).end()
-    })
-
-    router.get('/status', (req, res) => {
-      res.json(getStatus())
-    })
-
     router.get('/config', (req, res) => {
       res.json(config.getAll())
     })
@@ -109,6 +95,33 @@ module.exports = {
     router.post('/config', (req, res) => {
       setConfigAndRestart(req.body)
       res.json(config.getAll())
+    })
+
+    router.get('/status', (req, res) => {
+      res.json(getStatus())
+    })
+
+    router.get('/user', (req, res) => {
+      slack.getUserProfile(req.query.id)
+      .then(user => {
+        res.json(user)
+      })
+    })
+
+    router.get('/users', (req, res) => {
+      res.json(slack.getUsers())
+    })
+
+    router.get('/channels', (req, res) => {
+      res.json(slack.getChannels())
+    })
+
+    router.get('/team', (req, res) => {
+      res.json(slack.getTeam())
+    })
+
+    router.get('/data', (req, res) => {
+      res.json(slack.getData())
     })
   }
 }
