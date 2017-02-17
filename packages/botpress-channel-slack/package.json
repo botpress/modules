@@ -1,6 +1,6 @@
 {
   "name": "botpress-slack",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Official Slack connector for botpress",
   "main": "bin/node.bundle.js",
   "botpress": {
@@ -53,6 +53,7 @@
     "@slack/client": "^3.7.0",
     "axios": "^0.15.3",
     "bluebird": "^3.4.7",
-    "lodash": "^4.17.3"
+    "lodash": "^4.17.3",
+    "lru-cache": "^4.0.2"
   }
 }
