@@ -3,29 +3,10 @@ import fs from 'fs'
 
 import axios from 'axios'
 
-let configFile = null
 let config = null
 let service = null
 
-const saveConfig = config => {
-  fs.writeFileSync(configFile, JSON.stringify(config))
-}
-
-const loadConfig = () => {
-  if (!fs.existsSync(configFile)) {
-    const config = { accessToken : '', lang: 'en', mode: 'fulfillment' }
-    saveConfig(config, configFile)
-  }
-
-  const overrides = {}
-  if (process.env.APIAI_TOKEN) overrides.accessToken = process.env.APIAI_TOKEN
-
-  return Object.assign(JSON.parse(fs.readFileSync(configFile, 'utf-8')), overrides)
-}
-
 const setService = () => {
-  config = loadConfig()
-  
   const client = axios.create({
     baseURL: 'https://api.api.ai/v1',
     timeout: 5000,
@@ -76,8 +57,16 @@ const incomingMiddleware = (event, next) => {
 }
 
 module.exports = {
-  init: function(bp) {
-    configFile = path.join(bp.projectLocation, bp.botfile.modulesConfigDir, 'botpress-apiai.json')
+
+  config: {
+    accessToken: { type: 'string', env: 'APIAI_TOKEN' },
+    lang: { type: 'string', default: 'en' },
+    mode: { type: 'choice', validation: ['fulfillment', 'default'], default: 'default' }
+  },
+
+  init: async function(bp, configurator) {
+    config = await configurator.loadAll()
+
     setService()
 
     bp.middlewares.register({
@@ -89,16 +78,18 @@ module.exports = {
       description: 'Process natural language in the form of text. Structured data with an action and parameters for that action is injected in the incoming message event.'
     })
   },
-  ready: function(bp) {
+
+  ready: async function(bp, configurator) {
     const router = bp.getRouter('botpress-apiai')
 
-    router.get('/config', (req, res) => {
-      res.send(loadConfig())
+    router.get('/config', async (req, res) => {
+      res.send(await configurator.loadAll())
     })
 
-    router.post('/config', (req, res) => {
+    router.post('/config', async (req, res) => {
       const { accessToken, lang, mode } = req.body
-      saveConfig({ accessToken, lang, mode })
+      await configurator.saveAll({ accessToken, lang, mode })
+      config = await configurator.loadAll()
       setService()
       res.sendStatus(200)
     })
