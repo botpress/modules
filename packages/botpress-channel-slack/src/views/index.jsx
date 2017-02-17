@@ -38,10 +38,6 @@ export default class SlackModule extends React.Component {
     .then(() => {
       this.authenticate()
     })
-
-    this.mApiGet('/user?id=U41H4NB9N').then(({data}) => {
-      console.log(data)
-    })
   }
 
   getAxios = () => this.props.bp.axios
