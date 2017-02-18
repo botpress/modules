@@ -24,7 +24,7 @@ Settings can also be set programmatically by providing the settings in the `${mo
 
 #### 1. Setup Hostname
 
-You need to manually enter your hostname. If you are developping locally, we suggest using [ngrok](#ngrok) to deploy your chatbot ([learn more about ngrok]((https://ngrok.com))
+You need to manually enter your hostname. If you are developping locally, we suggest using [ngrok](https://ngrok.com/) to deploy your chatbot ([learn more about ngrok](https://ngrok.com)
 
 #### 2. Create a [**Slack app**](https://api.slack.com/apps?new_app=1)
   
