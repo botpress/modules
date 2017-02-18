@@ -171,7 +171,6 @@ class Slack {
     this.rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, (rtmStartData) => {
       bp.logger.info('slack connector is authenticated')
       this.data = rtmStartData
-      console.log(rtmStartData)
     })
 
     this.rtm.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, () => {
