@@ -115,8 +115,7 @@ You can listen to incoming event easily with Botpress by using `bp` built-in `he
 
 ```js
 bp.hear({ platform: 'slack', type: 'message', text: 'Hello' }, (event, next) => {
-      bp.slack.sendText(event.channel.id, 'Welcome on Botpress!!!')
-   }
+	bp.slack.sendText(event.channel.id, 'Welcome on Botpress!!!')
 })
 ```
 
