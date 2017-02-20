@@ -1,6 +1,6 @@
 {
   "name": "botpress-rivescript",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Simple scripting language for chatbots with a friendly, easy to learn syntax",
   "main": "bin/node.bundle.js",
   "homepage": "https://github.com/botpress/botpress-rivescript",
