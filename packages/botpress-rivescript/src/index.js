@@ -32,6 +32,49 @@ const incomingMiddleware = (event, next) => {
       })
       event.bp.messenger.sendText(event.user.id, reply)
     })
+  } else if(event.platform === "irc") {
+
+    if(event.type !== "message" &&  event.type !== "pm") {
+      return next()
+    }
+    const sendTo = (event.type === "message") ? event.channel : event.user
+    const txt = event.text
+
+    rs.setUservar(event.user, "platform", event.platform)
+    rs.setUservars(event.user, event.user)
+    rs.replyAsync(event.user, txt)
+    .then(reply => {
+      deliveries.forEach(delivery => {
+        if(delivery && delivery.test.test(reply)) {
+          delivery.handler(delivery.test.exec(reply), rs, event.bp, event)
+          next()
+          return
+        }
+      })
+      event.bp.irc.sendMessage(sendTo, reply)
+    })
+
+  } else if (event.platform === "discord") {
+    if(event.type !== "message") {
+      return next()
+    }
+    if(!event.bp.discord.isPrivate(event.raw)) {
+      return next()
+    }
+    rs.setUservar(event.user.id, "platform", event.platform)
+    rs.setUservars(event.user.id, event.author)
+    rs.replyAsync(event.user.id, event.text)
+    .then(reply => {
+      deliveries.forEach(delivery => {
+        if(delivery && delivery.test.test(reply)) {
+          delivery.handler(delivery.test.exec(reply), rs, event.bp, event)
+          next()
+          return
+        }
+      })
+      event.bp.discord.sendText(event.channel.id, reply)
+    })
+
   } else {
     throw new Error('Unsupported platform: ', event.platform)
   }
