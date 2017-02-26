@@ -12,71 +12,54 @@ var utf8 = false
 
 const validateRiveName = (name) => /[A-Z0-9_-]+/i.test(name)
 
+const handleMessage = (event, id, user, platform, sendTo, text, sendText) => {
+  const options = {}
+  rs.setUservar(id, 'platform', platform)
+  rs.setUservars(id, user)
+  rs.replyAsync(id, text)
+  .then(reply => {
+    deliveries.forEach(delivery => {
+      if(delivery && delivery.test.test(reply)) {
+        const send = (reply, options) => {
+          sendText(sendTo, reply, options)
+        }
+        try {
+          delivery.handler(delivery.test.exec(reply), rs, event.bp, event, send)
+        } catch(err) {
+          event.bp.logger.error(err)
+          throw err
+        }
+        next()
+        return
+      }
+    })
+    sendText(sendTo, reply, options)
+  })
+}
+
 const incomingMiddleware = (event, next) => {
-  if (event.platform === 'facebook') {
-
-    if (event.type !== 'message') {
+  const { user, channel, platform, bp, text, type, raw, author } = event
+  if (platform === 'facebook') {
+    if (type !== 'message') {
       return next()
     }
-
-    rs.setUservar(event.user.id, 'platform', event.platform)
-    rs.setUservars(event.user.id, event.user)
-    rs.replyAsync(event.user.id, event.text)
-    .then(reply => {
-      deliveries.forEach(delivery => {
-        if(delivery && delivery.test.test(reply)) {
-          delivery.handler(delivery.test.exec(reply), rs, event.bp, event)
-          next()
-          return
-        }
-      })
-      event.bp.messenger.sendText(event.user.id, reply)
-    })
-  } else if(event.platform === "irc") {
-
-    if(event.type !== "message" &&  event.type !== "pm") {
+    handleMessage(event, user.id, user, platform, user.id, text, bp.messenger.sendText)
+  } else if(platform === "irc") {
+    if(type !== "pm") {
       return next()
     }
-    const sendTo = (event.type === "message") ? event.channel : event.user
-    const txt = event.text
-
-    rs.setUservar(event.user, "platform", event.platform)
-    rs.setUservars(event.user, event.user)
-    rs.replyAsync(event.user, txt)
-    .then(reply => {
-      deliveries.forEach(delivery => {
-        if(delivery && delivery.test.test(reply)) {
-          delivery.handler(delivery.test.exec(reply), rs, event.bp, event)
-          next()
-          return
-        }
-      })
-      event.bp.irc.sendMessage(sendTo, reply)
-    })
-
-  } else if (event.platform === "discord") {
-    if(event.type !== "message") {
+    const sendTo = (type === "message") ? channel : user
+    handleMessage(event, user, user, platform, sendTo, text, bp.irc.sendMessage)
+  } else if (platform === "discord") {
+    if(type !== "message") {
       return next()
     }
-    if(!event.bp.discord.isPrivate(event.raw)) {
+    if(!bp.discord.isPrivate(raw) || bp.discord.isSelf(user.id)) {
       return next()
     }
-    rs.setUservar(event.user.id, "platform", event.platform)
-    rs.setUservars(event.user.id, event.author)
-    rs.replyAsync(event.user.id, event.text)
-    .then(reply => {
-      deliveries.forEach(delivery => {
-        if(delivery && delivery.test.test(reply)) {
-          delivery.handler(delivery.test.exec(reply), rs, event.bp, event)
-          next()
-          return
-        }
-      })
-      event.bp.discord.sendText(event.channel.id, reply)
-    })
-
+    handleMessage(event, user.id, author, platform, channel.id, text, bp.discord.sendText)
   } else {
-    throw new Error('Unsupported platform: ', event.platform)
+    throw new Error('Unsupported platform: ', platform)
   }
   next()
 }

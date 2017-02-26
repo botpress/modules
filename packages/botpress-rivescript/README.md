@@ -60,7 +60,7 @@ The platform is injected in the user variables as the `platform` name.
 
 ```
 + execute
-- JS: console.log(rs, bp, event) // all available
+- JS: console.log(rs, bp, event, send) // all available
 
 + log
 - JS: bp.logger.info('Hello from RiveScript')
@@ -69,6 +69,21 @@ The platform is injected in the user variables as the `platform` name.
 - JS: bp.messenger.sendText(event.user.id, 'Buy?', { quick_replies: ['Yes', 'No'] })
 ```
 
+To execute your own script, you can register it to `bp` then use it directly in rivescript
+
+In your index.js
+```js
+bp.hello = (bp, send) => {
+  bp.logger.info('Will send from a custom script !')
+  send('This is a reply !', { quick_replies: ['Yes', 'No'] })
+}
+```
+
+In your rivescript
+```
++custom
+- JS: bp.hello(bp, send)
+```
 ### UTF-8 Support
 
 You can enable UTF-8 input parsing by either one of these methods:
