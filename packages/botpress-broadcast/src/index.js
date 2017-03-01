@@ -1,3 +1,5 @@
+import checkVersion from 'botpress-version-manager'
+
 import deamon from './deamon'
 import DB from './db'
 import moment from 'moment'
@@ -6,6 +8,7 @@ let db = null
 
 module.exports = {
   init: function(bp) {
+    checkVersion(bp, __dirname)
     deamon(bp)
     bp.db.get()
     .then(knex => {
