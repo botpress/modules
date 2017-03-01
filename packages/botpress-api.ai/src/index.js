@@ -1,3 +1,4 @@
+import checkVersion from 'botpress-version-manager'
 import path from 'path'
 import fs from 'fs'
 
@@ -65,6 +66,8 @@ module.exports = {
   },
 
   init: async function(bp, configurator) {
+    checkVersion(bp, __dirname)
+    
     config = await configurator.loadAll()
 
     setService()

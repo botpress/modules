@@ -8,6 +8,17 @@
     "menuIcon": "record_voice_over",
     "webBundle": "bin/web.bundle.js"
   },
+  "keywords": [
+    "botpress",
+    "nlp",
+    "api.ai"
+  ],
+  "version-manager": {
+    "warn": "Can't migrate existing database, please see https://gist.github.com/slvnperron/9a3027f4d798c7d6b6b6a9b9b6bdfa7b",
+    "botpress-check": ">= 0.1 < 1",
+    "botpress-update": "^0.x",
+    "module-downgrade": "~1.0.x"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "node webpack.js --watch",
@@ -48,6 +59,7 @@
     "webpack-node-externals": "^1.5.4"
   },
   "dependencies": {
-    "axios": "^0.15.3"
+    "axios": "^0.15.3",
+    "botpress-version-manager": "^1.0.2"
   }
 }
