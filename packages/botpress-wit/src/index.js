@@ -1,26 +1,11 @@
+import checkVersion from 'botpress-version-manager'
+
 import path from 'path'
 import fs from 'fs'
 
 import Wit from './wit'
 
 let wit = null
-let configFile = null
-
-const saveConfig = (config) => {
-  fs.writeFileSync(configFile, JSON.stringify(config))
-}
-
-const loadConfig = () => {
-  if (!fs.existsSync(configFile)) {
-    const config = { accessToken : '', selectedMode: 'understanding' }
-    saveConfig(config, configFile)
-  }
-
-  const overrides = {}
-  if (process.env.WIT_TOKEN) overrides.accessToken = process.env.WIT_TOKEN
-
-  return Object.assign(JSON.parse(fs.readFileSync(configFile, 'utf-8')), overrides)
-}
 
 const incomingMiddleware = (event, next) => {
   if (event.type === 'message') {
@@ -53,10 +38,21 @@ const incomingMiddleware = (event, next) => {
 }
 
 module.exports = {
-  init: function(bp) {
-    wit = Wit(bp)
 
-    configFile = path.join(bp.projectLocation, bp.botfile.modulesConfigDir, 'botpress-wit.json')
+  config: {
+    accessToken: { type: 'string', required: true, env: 'WIT_TOKEN', default: '<YOUR TOKEN HERE>' },
+    selectedMode: {
+      type: 'choice',
+      validation: ['understanding', 'stories'],
+      required: true,
+      default: 'understanding'
+    }
+  },
+
+  init: function(bp, config) {
+    checkVersion(bp, __dirname)
+    
+    wit = Wit(bp)
 
     bp.middlewares.register({
       name: 'wit.incoming',
@@ -67,22 +63,26 @@ module.exports = {
       description: 'Understands entities from incoming message and suggests or executes actions.'
     })
 
-    wit.setConfiguration(loadConfig())
+    config.loadAll()
+    .then(c => wit.setConfiguration(c))
   },
 
-  ready: function(bp) {
+  ready: function(bp, config) {
 
     const router = bp.getRouter('botpress-wit')
 
     router.get('/config', (req, res) => {
-      res.send(loadConfig())
+      config.loadAll()
+      .then(c => res.send(c))
     })
 
     router.post('/config', (req, res) => {
       const { accessToken, selectedMode } = req.body
-      saveConfig({ accessToken, selectedMode })
-      wit.setConfiguration(loadConfig())
-      res.sendStatus(200)
+
+      config.saveAll({ accessToken, selectedMode })
+      .then(() => config.loadAll())
+      .then(c => wit.setConfiguration(c))
+      .then(() => res.sendStatus(200))
     })
   }
 }
