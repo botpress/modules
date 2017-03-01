@@ -1,6 +1,6 @@
 {
   "name": "botpress-slack",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Official Slack connector for botpress",
   "main": "bin/node.bundle.js",
   "botpress": {
