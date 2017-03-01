@@ -1,6 +1,6 @@
 {
   "name": "botpress-analytics",
-  "version": "1.0.7",
+  "version": "2.0.6",
   "description": "Provides high level analytics about your bot usage.",
   "main": "bin/node.bundle.js",
   "homepage": "https://github.com/botpress/botpress-analytics",
@@ -10,7 +10,16 @@
     "menuIcon": "timeline",
     "webBundle": "bin/web.bundle.js"
   },
-  "keywords": ["analytics", "botpress"],
+  "keywords": [
+    "analytics",
+    "botpress"
+  ],
+  "version-manager": {
+    "warn": "Can't migrate existing database, please see https://gist.github.com/slvnperron/9a3027f4d798c7d6b6b6a9b9b6bdfa7b",
+    "botpress-check": ">= 0.1 < 1",
+    "botpress-update": "^0.x",
+    "module-downgrade": "~1.0.x"
+  },
   "scripts": {
     "seed": "node seed.js",
     "watch": "node webpack.js --watch",
@@ -21,6 +30,7 @@
   "license": "AGPL-3.0",
   "dependencies": {
     "bluebird": "^3.4.6",
+    "botpress-version-manager": "^1.0.2",
     "eventemitter2": "^2.1.3",
     "lodash": "^4.16.6",
     "moment": "^2.15.2"

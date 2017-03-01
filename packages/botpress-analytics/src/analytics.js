@@ -36,9 +36,7 @@ class Analytics {
     setInterval(() => {
       this.stats.getLastRun()
       .then(ts => {
-        const run = moment(new Date(ts))
-        const then = moment(new Date()).subtract(30, 'min')
-        const elasped = moment.duration(then.diff(run)).asMinutes()
+        const elasped = moment.duration(moment().diff(ts)).asMinutes()
         if(!ts || elasped >= this.getUpdateFrequency()) {
           this.updateData()
         }
@@ -47,7 +45,11 @@ class Analytics {
   }
 
   getDBSize() {
-    return fs.statSync(this.bp.db.location)['size'] / 1000000.0 // in megabytes
+    if (this.bp.db.location !== 'postgres') {
+      return fs.statSync(this.bp.db.location)['size'] / 1000000.0 // in megabytes  
+    } else {
+      return 1
+    }
   }
 
   getAnalyticsMetadata() {
