@@ -1,6 +1,7 @@
 import Promise from 'bluebird'
 import moment from 'moment'
 import _ from 'lodash'
+import { DatabaseHelpers as helpers } from 'botpress'
 
 var knex = null
 
@@ -9,7 +10,7 @@ function initialize() {
     throw new Error('you must initialize the database before')
   }
 
-  return knex.schema.createTableIfNotExists('hitl_sessions', function (table) {
+  return helpers(knex).createTableIfNotExists('hitl_sessions', function (table) {
     table.increments('id').primary()
     table.string('platform')
     table.string('userId')
@@ -21,7 +22,7 @@ function initialize() {
     table.string('paused_trigger')
   })
   .then(function() {
-    return knex.schema.createTableIfNotExists('hitl_messages', function (table) {
+    return helpers(knex).createTableIfNotExists('hitl_messages', function (table) {
       table.increments('id').primary()
       table.integer('session_id').references('hitl_sessions.id').onDelete('CASCADE')
       table.string('type')
@@ -35,7 +36,7 @@ function initialize() {
 
 function createUserSession(event) {
   let profileUrl = null
-  let full_name = event.user.id
+  let full_name = '#' + Math.random().toString().substr(2)
 
   if (event.platform === 'facebook') {
     profileUrl = event.user.profile_pic
@@ -46,8 +47,8 @@ function createUserSession(event) {
     platform: event.platform,
     userId: event.user.id,
     user_image_url: profileUrl,
-    last_event_on: moment().format('x'),
-    last_heard_on: moment().format('x'),
+    last_event_on: helpers(knex).date.now().sql,
+    last_heard_on: helpers(knex).date.now().sql,
     paused: 0,
     full_name: full_name,
     paused_trigger: null
@@ -93,7 +94,7 @@ function getSession(sessionId) {
 
 function appendMessageToSession(event, sessionId, direction) {
   const message = {
-    ts: moment().format('x'),
+    ts: helpers(knex).date.now().sql,
     session_id: sessionId,
     type: event.type,
     text: event.text,
@@ -101,14 +102,14 @@ function appendMessageToSession(event, sessionId, direction) {
     direction: direction
   }
 
-  const update = { last_event_on: moment().format('x') }
+  const update = { last_event_on: helpers(knex).date.now() }
 
   if (direction === 'in') {
-    update.last_heard_on = moment().format('x')
+    update.last_heard_on = helpers(knex).date.now()
   }
 
   return knex('hitl_messages')
-  .insert(message)
+  .insert(_.cloneDeep(message))
   .then(() => {
     return knex('hitl_sessions')
     .where({ id: sessionId })
@@ -140,25 +141,24 @@ function getAllSessions(onlyPaused) {
   let condition = ''
 
   if (onlyPaused === true) {
-    condition = 'where hitl_sessions.paused = 1'
+    condition = 'hitl_sessions.paused = ' + helpers(knex).bool.true()
   }
 
-  return knex('hitl_sessions')
-  .select(knex.raw('count(*) as count'))
-  .then(results => {
-    return knex.raw(`
-      select hitl_sessions.*, count(*) as count, hitl_messages.type, hitl_messages.text, hitl_messages.direction
-      from hitl_messages
-      join hitl_sessions on hitl_sessions.id = hitl_messages.session_id
-      ${condition}
-      group by hitl_sessions.id
-      order by hitl_messages.id desc
-      limit 100`)
-    .then(sessions => ({
-      total: results[0].count,
-      sessions: sessions
-    }))
+  return knex.select('*').from(function() {
+    this.select([knex.raw('max(id) as mId'), 'session_id', knex.raw('count(*) as count')])
+    .from('hitl_messages')
+    .groupBy('session_id')
+    .as('q1')
   })
+  .join('hitl_messages', knex.raw('q1.mId'), 'hitl_messages.id')
+  .join('hitl_sessions', knex.raw('q1.session_id'), 'hitl_sessions.id')
+  .whereRaw(condition)
+  .orderBy('hitl_sessions.last_event_on', 'desc')
+  .limit(100)
+  .then(results => ({
+    total: 0,
+    sessions: results
+  }))
 }
 
 function getSessionData(sessionId) {
@@ -168,7 +168,7 @@ function getSessionData(sessionId) {
   .orderBy('hitl_messages.id', 'desc')
   .limit(100)
   .select('*')
-  .then(messages => _.orderBy(messages, ['ts'], ['asc']))
+  .then(messages => _.orderBy(messages, ['id'], ['asc']))
 }
 
 module.exports = k => {

@@ -1,3 +1,4 @@
+import checkVersion from 'botpress-version-manager'
 import DB from './db'
 import _ from 'lodash'
 import path from 'path'
@@ -7,21 +8,7 @@ import fs from 'fs'
 // TODO: If messages count > X, delete some
 
 let db = null
-let configFile = null
-let config = { }
-
-const saveConfig = config => {
-  fs.writeFileSync(configFile, JSON.stringify(config))
-}
-
-const loadConfig = () => {
-  if (!fs.existsSync(configFile)) {
-    const config = { sessionExpiry: '3 days', paused: false }
-    saveConfig(config, configFile)
-  }
-
-  return Object.assign(JSON.parse(fs.readFileSync(configFile, 'utf-8')))
-}
+let config = null
 
 const incomingMiddleware = (event, next) => {
   if (!db) { return next() }
@@ -32,16 +19,13 @@ const incomingMiddleware = (event, next) => {
 
   return db.getUserSession(event)
   .then(session => {
-
     if (session.is_new_session) {
       event.bp.events.emit('hitl.session', session)
     }
 
     return db.appendMessageToSession(event, session.id, 'in')
     .then(message => {
-
       event.bp.events.emit('hitl.message', message)
-
       if ((!!session.paused || config.paused) && _.includes(['text', 'message'], event.type)) {
         event.bp.logger.debug('[hitl] Session paused, message swallowed:', event.text)
         // the session or bot is paused, swallow the message
@@ -72,9 +56,17 @@ const outgoingMiddleware = (event, next) => {
 }
 
 module.exports = {
-  init: function(bp) {
-    configFile = path.join(bp.projectLocation, bp.botfile.modulesConfigDir, 'botpress-hitl.json')
-    config = loadConfig()
+
+  config: {
+    sessionExpiry: { type: 'string', default: '3 days' },
+    paused: { type: 'bool', default: false, env: 'BOTPRESS_HITL_PAUSED' }
+  },
+
+  init: async (bp, configurator) => {
+    
+    checkVersion(bp, __dirname)
+
+    config = await configurator.loadAll()
 
     bp.middlewares.register({
       name: 'hitl.captureInMessages',
@@ -98,6 +90,7 @@ module.exports = {
     .then(knex => db = DB(knex))
     .then(() => db.initialize())
   },
+
   ready: function(bp) {
 
     bp.hitl = {
