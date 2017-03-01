@@ -1,12 +1,23 @@
 {
   "name": "botpress-hitl",
-  "version": "0.0.1",
+  "version": "1.0.4",
   "description": "Official HITL (Human In The Loop) module for Botpress",
   "main": "bin/node.bundle.js",
   "botpress": {
     "menuText": "HITL",
     "menuIcon": "feedback",
     "webBundle": "bin/web.bundle.js"
+  },
+  "keywords": [
+    "hitl",
+    "human in the loop",
+    "botpress"
+  ],
+  "version-manager": {
+    "warn": "",
+    "botpress-check": ">= 0.1 < 1",
+    "botpress-update": "^0.x",
+    "module-downgrade": "~0.0.x"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -50,8 +61,9 @@
     "webpack-node-externals": "^1.5.4"
   },
   "dependencies": {
-    "lodash": "^4.17.4",
     "bluebird": "^3.4.7",
+    "botpress-version-manager": "^1.0.2",
+    "lodash": "^4.17.4",
     "moment": "^2.17.1"
   }
 }

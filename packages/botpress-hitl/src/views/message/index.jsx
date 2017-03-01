@@ -70,7 +70,7 @@ export default class Message extends React.Component {
   }
 
   renderMessage() {
-    const date = moment(this.props.content.ts, 'x').format('DD MMM YYYY [at] LT')
+    const date = moment(this.props.content.ts).format('DD MMM YYYY [at] LT')
 
     const tooltip = (
       <Tooltip id="tooltip">{date}</Tooltip>
