@@ -1,16 +1,13 @@
-import createConfig from './config'
+import checkVersion from 'botpress-version-manager'
+
 import outgoing from './outgoing'
 import actions from './actions'
 
 import _ from 'lodash'
-import axios from 'axios'
 import Promise from 'bluebird'
 
 import Slack from './slack'
 
-let adapter = null
-let connection = null
-let channels = null
 let slack = null
 const outgoingPending = outgoing.pending
 
@@ -35,7 +32,21 @@ const outgoingMiddleware = (event, next) => {
 }
 
 module.exports = {
+
+  config: {
+    apiToken: { type: 'string', default: '', env: 'SLACK_API_TOKEN' },
+    botToken: { type: 'string', default: '', env: 'SLACK_BOT_TOKEN' },
+    clientID: { type: 'string', default: '', env: 'SLACK_CLIENT_ID' },
+    clientSecret: { type: 'string', default: '', env: 'SLACK_CLIENT_SECRET' },
+    hostname: { type: 'string', default: '', env: 'SLACK_HOST' },
+    verificationToken: { type: 'string', default: '', env: 'SLACK_VERIFICATION_TOKEN' },
+    scope: { type: 'string', default: 'admin,bot,chat:write:bot,commands,identify,incoming-webhook', env: 'SLACK_SCOPE' }
+  },
+
   init(bp) {
+    
+    checkVersion(bp, __dirname)
+
     bp.middlewares.register({
       name: 'slack.sendMessages',
       type: 'outgoing',
@@ -70,8 +81,9 @@ module.exports = {
     })
   },
 
-  ready(bp) {
-    const config = createConfig(bp)
+  ready: async function(bp, configurator) {
+
+    const config = await configurator.loadAll()
 
     slack = new Slack(bp, config)
 
@@ -81,20 +93,21 @@ module.exports = {
       connected: slack.isConnected()
     })
 
-    const setConfigAndRestart = newConfigs => {
-      config.setAll(newConfigs)
+    const setConfigAndRestart = async newConfigs => {
+      await configurator.saveAll(newConfigs)
+      slack.setConfig(newConfigs)
       slack.connect(bp)
     }
 
     slack.connect(bp)
 
-    router.get('/config', (req, res) => {
-      res.json(config.getAll())
+    router.get('/config', async (req, res) => {
+      res.json(await configurator.loadAll())
     })
 
-    router.post('/config', (req, res) => {
+    router.post('/config', async (req, res) => {
       setConfigAndRestart(req.body)
-      res.json(config.getAll())
+      res.json(await configurator.load())
     })
 
     router.get('/status', (req, res) => {
