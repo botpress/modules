@@ -13,6 +13,9 @@ var nodeConfig = {
   },
   externals: [nodeExternals()],
   target: 'node',
+  node: {
+    __dirname: false
+  },
   resolve: {
     extensions: ['', '.js']
   },
