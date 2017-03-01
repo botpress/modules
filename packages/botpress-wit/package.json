@@ -1,6 +1,6 @@
 {
   "name": "botpress-wit",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "This module integrates Wit.ai inside Botpress for NLP",
   "main": "bin/node.bundle.js",
   "botpress": {
