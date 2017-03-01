@@ -12,9 +12,9 @@ module.exports = (bp) => {
       return Promise.resolve(null)
     }
 
-    const nextOccurence = util.getNextOccurence(task.schedule_type, task.schedule)
+    const nextOccurence = util.getNextOccurence(task.schedule_type, task.schedule).toDate()
 
-    return db(bp).scheduleNext(task.id, nextOccurence.format('x'))
+    return db(bp).scheduleNext(task.id, nextOccurence)
   }
 
   const run = () => {
@@ -24,7 +24,7 @@ module.exports = (bp) => {
         let fromDate = null
         return reschedule(expired)
         .then(() => {
-          db(bp).updateTask(expired.id, expired.scheduledOn, 'executing', null, null)
+          db(bp).updateTask(expired.taskId, 'executing', null, null)
         })
         .then(() => {
           if (expired.enabled) {
@@ -34,7 +34,7 @@ module.exports = (bp) => {
             bp.events.emit('scheduler.started', expired)
             return fn(bp, expired)
           } else {
-            bp.logger.debug('[scheduler] Skipped task ' + expired.id + '. Reason=disabled')
+            bp.logger.debug('[scheduler] Skipped task ' + expired.taskId + '. Reason=disabled')
           }
         })
         .then(result => {
@@ -56,9 +56,9 @@ module.exports = (bp) => {
           .then(logs => {
             const flattenLogs = (logs && logs.file && logs.file.map(x => x.message) || []).join('\n')
             if (expired.enabled) {
-              return db(bp).updateTask(expired.id, expired.scheduledOn, 'done', flattenLogs, returned)
+              return db(bp).updateTask(expired.taskId, 'done', flattenLogs, returned)
             } else {
-              return db(bp).updateTask(expired.id, expired.scheduledOn, 'skipped', null, null)
+              return db(bp).updateTask(expired.taskId, 'skipped', null, null)
             }
           })
           .then(() => {
@@ -69,10 +69,10 @@ module.exports = (bp) => {
         .catch(err => {
           bp.logger.error('[scheduler]', err.message, err.stack)
           bp.notifications.send({
-            message: 'An error occured while running task: ' + expired.id + '. Please check the logs for more info.',
+            message: 'An error occured while running task: ' + expired.taskId + '. Please check the logs for more info.',
             level: 'error'
           })
-          return db(bp).updateTask(expired.id, expired.scheduledOn, 'error', null, null)
+          return db(bp).updateTask(expired.taskId, 'error', null, null)
         })
       })
     })

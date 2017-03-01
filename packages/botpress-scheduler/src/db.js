@@ -1,5 +1,5 @@
-import moment from 'moment'
 import _ from 'lodash'
+import { DatabaseHelpers as helpers } from 'botpress'
 
 const Validate = require('validate-arguments')
 
@@ -19,9 +19,9 @@ module.exports = bp => {
       return bp.db.get()
       .then(knex => update(knex, id, options))
     },
-    updateTask: (id, time, status, logs, returned) => {
+    updateTask: (taskId, status, logs, returned) => {
       return bp.db.get()
-      .then(knex => updateTask(knex, id, time, status, logs, returned))
+      .then(knex => updateTask(knex, taskId, status, logs, returned))
     },
     delete: (id) => {
       return bp.db.get()
@@ -55,7 +55,7 @@ module.exports = bp => {
 }
 
 function initialize(knex) {
-  return knex.schema.createTableIfNotExists('scheduler_schedules', function (table) {
+  return helpers(knex).createTableIfNotExists('scheduler_schedules', function (table) {
     table.string('id').primary()
     table.boolean('enabled')
     table.string('schedule_type')
@@ -65,10 +65,10 @@ function initialize(knex) {
     table.string('action')
   })
   .then(function() {
-    return knex.schema.createTableIfNotExists('scheduler_tasks', function (table) {
-      table.string('scheduleId').references('scheduler_schedules.id')
+    return helpers(knex).createTableIfNotExists('scheduler_tasks', function (table) {
+      table.increments('id')
+      table.string('scheduleId').references('scheduler_schedules.id').onDelete('CASCADE')
       table.timestamp('scheduledOn')
-      table.primary(['scheduleId', 'scheduledOn'])
       table.string('status')
       table.string('logs')
       table.timestamp('finishedOn')
@@ -83,16 +83,16 @@ function create(knex, id, options) {
   options.schedule_human =
     util.getHumanExpression(options.schedule_type, options.schedule)
 
-  const firstOccurence = util.getNextOccurence(options.schedule_type, options.schedule)
+  const firstOccurence = util.getNextOccurence(options.schedule_type, options.schedule).toDate()
 
   return knex('scheduler_schedules').insert({
     id: id,
-    created_on: moment().format('x'),
+    created_on: helpers(knex).date.now(),
     ...options
   })
   .then(() => {
     if (options.enabled) {
-      return scheduleNext(knex, id, firstOccurence.format('x'))
+      return scheduleNext(knex, id, firstOccurence)
     }
   })
 }
@@ -106,15 +106,15 @@ function update(knex, id, options) {
   .then()
 }
 
-function updateTask(knex, id, time, status, logs, returned) {
+function updateTask(knex, taskId, status, logs, returned) {
   const options = { status, logs, returned }
 
-  if (status === 'done' || status === 'error' || status === 'skipped') {
-    options.finishedOn = moment().format('x')
+  if (_.includes(['done', 'error', 'skipped'], status)) {
+    options.finishedOn = helpers(knex).date.now()
   }
 
   return knex('scheduler_tasks')
-  .where({ scheduleId: id, scheduledOn: time })
+  .where({ id: taskId })
   .update(options)
   .then()
 }
@@ -134,7 +134,6 @@ function remove(knex, id) {
 }
 
 function listUpcoming(knex) {
-  const now = moment().format('x')
   return knex('scheduler_tasks')
   .where({ status: 'pending' })
   .join('scheduler_schedules', 'scheduler_tasks.scheduleId', 'scheduler_schedules.id')
@@ -142,20 +141,23 @@ function listUpcoming(knex) {
 }
 
 function listPrevious(knex) {
-  const now = moment().format('x')
+  const dt = helpers(knex).date
+
   return knex('scheduler_tasks')
-  .where(knex.raw("julianday('now') >= julianday(scheduledOn/1000, 'unixepoch')"))
+  .whereRaw(dt.isBefore('scheduledOn', dt.now()))
   .andWhere('status', '!=', 'pending')
   .join('scheduler_schedules', 'scheduler_tasks.scheduleId', 'scheduler_schedules.id')
   .then()
 }
 
 function listExpired(knex) {
-  const now = moment().format('x')
+  const dt = helpers(knex).date
+
   return knex('scheduler_tasks')
-  .where(knex.raw("julianday('now') >= julianday(scheduledOn/1000, 'unixepoch')"))
+  .whereRaw(dt.isBefore('scheduledOn', dt.now()))
   .andWhere('status', '=', 'pending')
   .join('scheduler_schedules', 'scheduler_tasks.scheduleId', 'scheduler_schedules.id')
+  .select(['scheduler_tasks.id as taskId', '*'])
   .then()
 }
 
@@ -167,7 +169,8 @@ function deleteScheduled(knex, id) {
 }
 
 function scheduleNext(knex, id, time) {
-  const ts = time.format ? time.format('x') : time
+  const ts = helpers(knex).date.format(time)
+
   return knex('scheduler_tasks')
   .insert({ 
     scheduleId: id,

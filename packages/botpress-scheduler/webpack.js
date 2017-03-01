@@ -8,10 +8,14 @@ var nodeConfig = {
   output: {
     path: './bin',
     filename: 'node.bundle.js',
-    libraryTarget: 'commonjs2'
+    libraryTarget: 'commonjs2',
+    publicPath: __dirname
   },
-  externals: [nodeExternals()],
+  externals: [nodeExternals(), 'botpress'],
   target: 'node',
+  node: {
+    __dirname: false
+  },
   resolve: {
     extensions: ['', '.js']
   },
@@ -20,7 +24,11 @@ var nodeConfig = {
       test: /\.js$/,
       loader: 'babel-loader',
       exclude: /node_modules/,
-      babelrc: true
+      babelrc: true,
+      query: {
+        presets: ['latest', 'stage-0'],
+        plugins: ['transform-object-rest-spread', 'transform-async-to-generator']
+      }
     }, {
       test: /\.json$/,
       loader: 'json-loader'
