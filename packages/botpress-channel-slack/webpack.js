@@ -8,10 +8,14 @@ var nodeConfig = {
   output: {
     path: './bin',
     filename: 'node.bundle.js',
-    libraryTarget: 'commonjs2'
+    libraryTarget: 'commonjs2',
+    publicPath: __dirname
   },
   externals: [nodeExternals()],
   target: 'node',
+  node: {
+    __dirname: false
+  },
   resolve: {
     extensions: ['', '.js']
   },
@@ -22,7 +26,7 @@ var nodeConfig = {
       exclude: /node_modules/,
       query: {
         presets: ['latest', 'stage-0'],
-        plugins: ['transform-object-rest-spread']
+        plugins: ['transform-object-rest-spread', 'transform-async-to-generator']
       }
     }, {
       test: /\.json$/,

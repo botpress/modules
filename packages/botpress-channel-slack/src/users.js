@@ -1,5 +1,3 @@
-'use strict'
-
 /**
  *
  * User info helper.
@@ -8,7 +6,7 @@
  *
  *   - getOrFetchUserProfile: given `userId` return a promise of user data (with cache)
  *
- * Data users' profiles will be cached in `${bp.dataLocation}/botpress-messenger.profiles.json`
+ * Data users' profiles will be cached in `${bp.dataLocation}/botpress-slack.profiles.json`
  *
  */
 

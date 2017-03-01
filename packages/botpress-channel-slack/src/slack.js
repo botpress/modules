@@ -1,4 +1,4 @@
-import { RtmClient, CLIENT_EVENTS, RTM_EVENTS, WebClient } from '@slack/client'
+import { RtmClient, CLIENT_EVENTS, WebClient } from '@slack/client'
 import incoming from './incoming'
 
 import axios from 'axios'
@@ -17,44 +17,47 @@ class Slack {
     this.connected = false
   }
 
+  setConfig(config) {
+    this.config = config
+  }
 
   validateConnection() {
-    if(!this.connected) {
-      throw new Error("You are not connected...")
+    if (!this.connected) {
+      throw new Error('You are not connected...')
     }
   }
 
   validateText(text) {
     const type = typeof(text)
     if ( type !== 'string') {
-      throw new Error("Text format is not valid (actual: " + type + ", required: string)")
-    }  
+      throw new Error('Text format is not valid (actual: ' + type + ', required: string)')
+    }
   }
 
   validateChannelId(channelId) {
     const type = typeof(channelId)
     if ( type !== 'string') {
-      throw new Error("Channel id format is not valid (actual: " + type + ", required: string)")
-    }  
+      throw new Error('Channel id format is not valid (actual: ' + type + ', required: string)')
+    }
   }
 
   validateAttachments(attachments) {
     const type = typeof(attachments)
     if ( type !== 'object') {
-      throw new Error("Attachments format is not valid (actual: " + type + ", required: object)")
-    }  
+      throw new Error('Attachments format is not valid (actual: ' + type + ', required: object)')
+    }
   }
 
   validateOptions(options) {
     const type = typeof(options)
     if ( type !== 'object') {
-      throw new Error("Options format is not valid (actual: " + type + ", required: object)")
-    }  
+      throw new Error('Options format is not valid (actual: ' + type + ', required: object)')
+    }
   }
 
   validateBeforeReaction (options) {
     if (!(options.file || options.file_comment || options.channel || options.timestamp)) {
-      throw new Error("You need to set at least a destination options (file, file_comment, channel, timestamp)...")
+      throw new Error('You need to set at least a destination options (file, file_comment, channel, timestamp)...')
     }
   }
 
@@ -145,13 +148,13 @@ class Slack {
 
     if (user !== 'undefined') return Promise.resolve(user)
 
-    const url = "https://slack.com/api/users.list" +
-      "?token=" + this.config.apiToken.get()
+    const url = 'https://slack.com/api/users.list' +
+      '?token=' + this.config.apiToken
 
     return axios.get(url)
     .then(({data}) => {
       if (!data.ok) {
-        throw new Error("Error getting user profile:" + userId )
+        throw new Error('Error getting user profile:' + userId )
       }
 
       this.data.users = data.members
@@ -187,8 +190,8 @@ class Slack {
   }
 
   getRTMToken() {
-    const botToken = this.config.botToken.get()
-    return botToken ? botToken : this.config.apiToken.get()
+    const botToken = this.config.botToken
+    return botToken ? botToken : this.config.apiToken
   }
 
   getBotId() {
@@ -211,14 +214,10 @@ class Slack {
     return this.data && this.data.users
   }
 
-  getData() {
-    return this.data
-  }
-
   connect(bp) {
     const rtmToken = this.getRTMToken()
 
-    if(!rtmToken) return
+    if (!rtmToken) return
 
     this.connectRTM(bp, rtmToken)
     this.connectWebclient(rtmToken)

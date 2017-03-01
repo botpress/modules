@@ -5,70 +5,70 @@ import _ from 'lodash'
 import Users from './users'
 
 const OTHER_RTM_EVENTS = [
-  "ACCOUNTS_CHANGED",
-  "BOT_ADDED",
-  "BOT_CHANGED",
-  "CHANNEL_ARCHIVE",
-  "CHANNEL_CREATED",
-  "CHANNEL_DELETED",
-  "CHANNEL_HISTORY_CHANGED",
-  "CHANNEL_JOINED",
-  "CHANNEL_LEFT",
-  "CHANNEL_MARKED",
-  "CHANNEL_RENAME",
-  "CHANNEL_UNARCHIVE",
-  "COMMANDS_CHANGED",
-  "DND_UPDATED",
-  "DND_UPDATED_USER",
-  "EMAIL_DOMAIN_CHANGED",
-  "EMOJI_CHANGED",
-  "FILE_CHANGE",
-  "FILE_COMMENT_ADDED",
-  "FILE_COMMENT_DELETED",
-  "FILE_COMMENT_EDITED",
-  "FILE_CREATED",
-  "FILE_DELETED",
-  "FILE_PUBLIC",
-  "FILE_UNSHARED",
-  "GOODBYE",
-  "GROUP_ARCHIVE",
-  "GROUP_CLOSE",
-  "GROUP_HISTORY_CHANGED",
-  "GROUP_JOINED",
-  "GROUP_LEFT",
-  "GROUP_MARKED",
-  "GROUP_OPEN",
-  "GROUP_RENAME",
-  "GROUP_UNARCHIVE",
-  "HELLO",
-  "IM_CLOSE",
-  "IM_CREATED",
-  "IM_HISTORY_CHANGED",
-  "IM_MARKED",
-  "IM_OPEN",
-  "MANUAL_PRESENCE_CHANGE",
-  "PIN_ADDED",
-  "PIN_REMOVED",
-  "PREF_CHANGE",
-  "PRESENCE_CHANGE",
-  "REACTION_REMOVED",
-  "RECONNECT_URL",
-  "STAR_ADDED",
-  "STAR_REMOVED",
-  "SUBTEAM_CREATED",
-  "SUBTEAM_SELF_ADDED",
-  "SUBTEAM_SELF_REMOVED",
-  "SUBTEAM_UPDATED",
-  "TEAM_DOMAIN_CHANGE",
-  "TEAM_JOIN",
-  "TEAM_MIGRATION_STARTED",
-  "TEAM_PLAN_CHANGE",
-  "TEAM_PREF_CHANGE",
-  "TEAM_PROFILE_CHANGE",
-  "TEAM_PROFILE_DELETE",
-  "TEAM_PROFILE_REORDER",
-  "TEAM_RENAME",
-  "USER_CHANGE"
+  'ACCOUNTS_CHANGED',
+  'BOT_ADDED',
+  'BOT_CHANGED',
+  'CHANNEL_ARCHIVE',
+  'CHANNEL_CREATED',
+  'CHANNEL_DELETED',
+  'CHANNEL_HISTORY_CHANGED',
+  'CHANNEL_JOINED',
+  'CHANNEL_LEFT',
+  'CHANNEL_MARKED',
+  'CHANNEL_RENAME',
+  'CHANNEL_UNARCHIVE',
+  'COMMANDS_CHANGED',
+  'DND_UPDATED',
+  'DND_UPDATED_USER',
+  'EMAIL_DOMAIN_CHANGED',
+  'EMOJI_CHANGED',
+  'FILE_CHANGE',
+  'FILE_COMMENT_ADDED',
+  'FILE_COMMENT_DELETED',
+  'FILE_COMMENT_EDITED',
+  'FILE_CREATED',
+  'FILE_DELETED',
+  'FILE_PUBLIC',
+  'FILE_UNSHARED',
+  'GOODBYE',
+  'GROUP_ARCHIVE',
+  'GROUP_CLOSE',
+  'GROUP_HISTORY_CHANGED',
+  'GROUP_JOINED',
+  'GROUP_LEFT',
+  'GROUP_MARKED',
+  'GROUP_OPEN',
+  'GROUP_RENAME',
+  'GROUP_UNARCHIVE',
+  'HELLO',
+  'IM_CLOSE',
+  'IM_CREATED',
+  'IM_HISTORY_CHANGED',
+  'IM_MARKED',
+  'IM_OPEN',
+  'MANUAL_PRESENCE_CHANGE',
+  'PIN_ADDED',
+  'PIN_REMOVED',
+  'PREF_CHANGE',
+  'PRESENCE_CHANGE',
+  'REACTION_REMOVED',
+  'RECONNECT_URL',
+  'STAR_ADDED',
+  'STAR_REMOVED',
+  'SUBTEAM_CREATED',
+  'SUBTEAM_SELF_ADDED',
+  'SUBTEAM_SELF_REMOVED',
+  'SUBTEAM_UPDATED',
+  'TEAM_DOMAIN_CHANGE',
+  'TEAM_JOIN',
+  'TEAM_MIGRATION_STARTED',
+  'TEAM_PLAN_CHANGE',
+  'TEAM_PREF_CHANGE',
+  'TEAM_PROFILE_CHANGE',
+  'TEAM_PROFILE_DELETE',
+  'TEAM_PROFILE_REORDER',
+  'TEAM_RENAME',
+  'USER_CHANG'
 ]
 
 const mentionRegex = new RegExp(/<@(\w+)>/gi)
@@ -100,13 +100,9 @@ module.exports = (bp, slack) => {
   const preprocessEvent = payload => {
 
     let userId = payload.user
-    let channelId = payload.channel
-    let ts = payload.ts
 
     if (isButtonAction(payload)) {
       userId = payload.user.id
-      channelId = payload.channel.id
-      ts = payload.message_ts
     }
 
     const mid = `${payload.channel}_${payload.user}_${payload.ts}`
@@ -143,11 +139,11 @@ module.exports = (bp, slack) => {
     const payload = JSON.parse(req.body.payload)
 
     if (!slack.isConnected()) {
-      throw new Error("You are not connected and authenticated")
+      throw new Error('You are not connected and authenticated')
     }
 
     if (payload.token !== slack.config.verificationToken.get()) {
-      throw new Error("Verification token are not matching")
+      throw new Error('Verification token are not matching')
     }
 
     preprocessEvent(payload)
@@ -155,7 +151,7 @@ module.exports = (bp, slack) => {
       bp.middlewares.sendIncoming({
         platform: 'slack',
         type: 'button',
-        text: user.profile.real_name + " clicked on a button",
+        text: user.profile.real_name + ' clicked on a button',
         user: user,
         channel: payload.channel,
         button: payload.actions[0],
@@ -184,12 +180,12 @@ module.exports = (bp, slack) => {
       })
 
       let match = []
-      while(match = mentionRegex.exec(message.text)) {
+      while (match = mentionRegex.exec(message.text)) {
         const mentionedId = match[1]
         if (mentionedId === slack.getBotId()) {
           bp.middlewares.sendIncoming({
             type: 'bot_mentioned',
-            text: "Bot has been mentioned",
+            text: 'Bot has been mentioned',
             user: user,
             mentionedId: mentionedId,
             ...extractBasics(message)
@@ -197,7 +193,7 @@ module.exports = (bp, slack) => {
         } else {
           bp.middlewares.sendIncoming({
             type: 'user_mentioned',
-            text: "User has been mentioned",
+            text: 'User has been mentioned',
             user: user,
             mentionedId: mentionedId,
             ...extractBasics(message)
@@ -216,7 +212,7 @@ module.exports = (bp, slack) => {
       bp.middlewares.sendIncoming({
         type: 'reaction',
         user: user,
-        text: user.profile.real_name + " reacted using " + reaction.reaction,
+        text: user.profile.real_name + ' reacted using ' + reaction.reaction,
         reaction: reaction.reaction,
         ...extractBasics(reaction),
         ts: reaction.event_ts
@@ -233,7 +229,7 @@ module.exports = (bp, slack) => {
       bp.middlewares.sendIncoming({
         type: 'typing',
         user: user,
-        text: user.profile.real_name + " is typing",
+        text: user.profile.real_name + ' is typing',
         ...extractBasics(typing)
       })
     })
@@ -249,7 +245,7 @@ module.exports = (bp, slack) => {
         platform: 'slack',
         type: 'file',
         user: user,
-        text: user.profile.real_name + " shared a file",
+        text: user.profile.real_name + ' shared a file',
         file: file.file,
         ts: file.event_ts,
         raw: file
@@ -264,7 +260,7 @@ module.exports = (bp, slack) => {
       bp.middlewares.sendIncoming({
         platform: 'slack',
         type: event.type,
-        text: "An another type of event occured",
+        text: 'An another type of event occured',
         raw: event
       })  
     })

@@ -1,7 +1,3 @@
-'use strict'
-
-const _ = require('lodash')
-
 const validateChannelId = (channelId) => {
   if (!/\w+/.test(channelId)) {
     throw new Error('Invalid channel id')
@@ -86,7 +82,7 @@ const createUpdateAttachments = (ts, channelId, attachments, options = {}) => {
   return {
     platform: 'slack',
     type: 'update_attachments',
-    text: "App updated an attachments",
+    text: 'App updated an attachments',
     raw: {
       channelId: channelId,
       attachments: attachments,
@@ -102,7 +98,7 @@ const createDeleteTextOrAttachments = (ts, channelId, options = {}) => {
   return {
     platform: 'slack',
     type: 'delete_text_or_attachments',
-    text: "App deleted a text or an attachments",
+    text: 'App deleted a text or an attachments',
     raw: {
       channelId: channelId,
       ts: ts,
