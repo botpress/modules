@@ -1,3 +1,5 @@
+const checkVersion = require('botpress-version-manager')
+
 const Analytics = require('./analytics')
 const DB = require('./db')
 const _ = require('lodash')
@@ -38,6 +40,7 @@ const outgoingMiddleware = (event, next) => {
 
 module.exports = {
   init: function(bp) {
+    checkVersion(bp, __dirname)
 
     bp.middlewares.register({
       name: 'analytics.incoming',

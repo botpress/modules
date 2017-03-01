@@ -280,7 +280,7 @@ export default class AnalyticsModule extends React.Component {
 
   renderRetentionData(value, i){
     if(value === null) {
-      return <td key={i}>&nbsp;</td>
+      return <td key={i} className={style.noData}>&nbsp;</td>
     }
 
     if(i === 0){

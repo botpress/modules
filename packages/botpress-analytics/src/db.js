@@ -1,5 +1,6 @@
-const Promise = require('bluebird')
-const moment = require('moment')
+import Promise from 'bluebird'
+import moment from 'moment'
+import { DatabaseHelpers as helpers } from 'botpress'
 
 let knex = null
 let bp = null
@@ -9,7 +10,7 @@ function initializeDb() {
     throw new Error('you must initialize the database before')
   }
 
-  return knex.schema.createTableIfNotExists('analytics_interactions', function (table) {
+  return helpers(knex).createTableIfNotExists('analytics_interactions', function (table) {
     table.increments('id').primary()
     table.timestamp('ts')
     table.string('type')
@@ -18,7 +19,7 @@ function initializeDb() {
     table.enu('direction', ['in', 'out'])
   })
   .then(function() {
-    return knex.schema.createTableIfNotExists('analytics_runs', function(table) {
+    return helpers(knex).createTableIfNotExists('analytics_runs', function(table) {
       table.increments('id').primary()
       table.timestamp('ts')
     })
@@ -29,7 +30,7 @@ function initializeDb() {
 function saveFacebookOut(event) {
   const userId = 'facebook:' + event.raw.to
   const interactionRow = {
-    ts: moment(new Date()).format('x'),
+    ts: helpers(knex).date.now(),
     type: event.type,
     text: event.text,
     user: userId,
@@ -42,7 +43,7 @@ function saveFacebookOut(event) {
 
 function saveInteractionIn(event) {
   const interactionRow = {
-    ts: moment(new Date()).format('x'),
+    ts: helpers(knex).date.now(),
     type: event.type,
     text: event.text,
     user: event.platform + ':' + event.user.id,
