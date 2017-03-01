@@ -1,6 +1,6 @@
 {
   "name": "botpress-broadcast",
-  "version": "1.0.10",
+  "version": "2.0.0",
   "description": "Broadcast messages to all (or a subset) of your users",
   "main": "bin/node.bundle.js",
   "homepage": "https://github.com/botpress/botpress-broadcast",
@@ -13,6 +13,12 @@
     "botpress",
     "broadcast"
   ],
+  "version-manager": {
+    "warn": "",
+    "botpress-check": ">= 0.1 < 1",
+    "botpress-update": "^0.x",
+    "module-downgrade": "~1.0.x"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "node webpack.js --watch",
@@ -53,6 +59,7 @@
   "dependencies": {
     "bluebird": "^3.4.6",
     "bluebird-retry": "^0.8.0",
+    "botpress-version-manager": "^1.0.2",
     "dateformat": "^1.0.12",
     "lodash": "^4.17.2",
     "moment": "^2.16.0"
