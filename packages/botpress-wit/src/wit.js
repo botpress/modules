@@ -40,7 +40,9 @@ const setConfiguration = bp => config => {
 }
 
 const reinitializeClient = bp => () => {
-  initializeClient(bp, latestConfig)
+  if (latestConfig) {
+    initializeClient(bp, latestConfig)
+  }
 }
 
 const initializeClient = (bp, config) => {
