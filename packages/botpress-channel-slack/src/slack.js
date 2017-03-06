@@ -206,13 +206,12 @@ class Slack {
     const url = 'https://slack.com/api/channels.list' + '?token=' + this.config.apiToken;
     return axios.get(url).then(({data}) => {
 
-        if (!data.ok) {
-          throw new Error('Error getting channels:' + data);
-        }
+      if (!data.ok) {
+        throw new Error('Error getting channels:' + data);
+      }
 
-        return data.channels;
-      })
-    }
+      return data.channels;
+    })
   }
 
   getTeam() {
