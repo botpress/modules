@@ -27,8 +27,8 @@ export default class SlackModule extends React.Component {
       hostname: '',
       scope: '',
       verificationToken: '',
-      botToken: null,
-      apiToken: null,
+      botToken: '',
+      apiToken: '',
       hashState: null
     }
   }
@@ -106,7 +106,7 @@ export default class SlackModule extends React.Component {
   }
 
   isAuthenticate = () => {
-    if (!this.state.apiToken) return false
+    if (this.state.apiToken === '') return false
 
     return this.getAxios().get(this.getOAuthTestLink())
     .then(({data}) => {
@@ -117,8 +117,8 @@ export default class SlackModule extends React.Component {
     .catch((err) => {
       console.log(err)
       this.setState({ 
-        apiToken: null,
-        botToken: null
+        apiToken: '',
+        botToken: ''
       })
       return false
     })
@@ -127,8 +127,8 @@ export default class SlackModule extends React.Component {
   authenticate = () => {
     const code = this.getParameterByName('code')
 
-    if(!code || this.state.apiToken) return
-
+    if(!code || this.state.apiToken !== '') return
+      
     this.getAxios().get(this.getOAuthAccessLink(code))
     .then(({data}) => {
       if (!data.ok) {
@@ -177,8 +177,8 @@ export default class SlackModule extends React.Component {
 
 handleReset = () => {
   this.setState({
-    apiToken: null,
-    botToken: null
+    apiToken: '',
+    botToken: ''
   })
 
   setImmediate(() => {
