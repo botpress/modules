@@ -40,7 +40,7 @@ module.exports = {
     clientSecret: { type: 'string', default: '', env: 'SLACK_CLIENT_SECRET' },
     hostname: { type: 'string', default: '', env: 'SLACK_HOST' },
     verificationToken: { type: 'string', default: '', env: 'SLACK_VERIFICATION_TOKEN' },
-    scope: { type: 'string', default: 'admin,bot,chat:write:bot,commands,identify,incoming-webhook', env: 'SLACK_SCOPE' }
+    scope: { type: 'string', default: 'admin,bot,chat:write:bot,commands,identify,incoming-webhook,channels:read', env: 'SLACK_SCOPE' }
   },
 
   init(bp) {
@@ -107,7 +107,7 @@ module.exports = {
 
     router.post('/config', async (req, res) => {
       setConfigAndRestart(req.body)
-      res.json(await configurator.load())
+      res.json(await configurator.loadAll())
     })
 
     router.get('/status', (req, res) => {
