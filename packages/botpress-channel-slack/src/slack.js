@@ -203,6 +203,11 @@ class Slack {
   }
 
   getChannels() {
+
+    if (!/channels:read/.test(this.config.scope)) {
+      return this.data.channels
+    }
+
     const url = 'https://slack.com/api/channels.list' + '?token=' + this.config.apiToken;
     return axios.get(url).then(({data}) => {
 
