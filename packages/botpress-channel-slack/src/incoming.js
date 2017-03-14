@@ -129,7 +129,7 @@ module.exports = (bp, slack) => {
   }
 
   const isDirect = (channelId) => {
-    return !_.some(slack.getChannels(), { id: channelId })
+    return /^D/.test(channelId)
   }
 
   const router = bp.getRouter('botpress-slack', { 'auth': req => !/\/action-endpoint/i.test(req.originalUrl) })
