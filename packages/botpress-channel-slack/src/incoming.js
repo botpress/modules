@@ -185,6 +185,7 @@ module.exports = (bp, slack) => {
         if (mentionedId === slack.getBotId()) {
           bp.middlewares.sendIncoming({
             type: 'bot_mentioned',
+            bot_mentioned: true,
             text: 'Bot has been mentioned',
             user: user,
             mentionedId: mentionedId,
@@ -193,6 +194,7 @@ module.exports = (bp, slack) => {
         } else {
           bp.middlewares.sendIncoming({
             type: 'user_mentioned',
+            user_mentioned: true,
             text: 'User has been mentioned',
             user: user,
             mentionedId: mentionedId,
