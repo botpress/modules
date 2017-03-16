@@ -562,6 +562,15 @@ There's a [Slack community](https://slack.botpress.io) where you are welcome to 
 
 Get an invite and join us now! 👉[https://slack.botpress.io](https://slack.botpress.io)
 
+
+### Contributing
+
+1. Clone this repository.
+2. Link your module by running `bp install /{PATH-TO}/botpress-slack && npm link /{PATH-TO}/botpress-slack`.
+3. Inside of the botpress-slack directory, run `npm run compile` to build the module.  You can also run `npm run watch` for real-time compiling.
+4. After compiling, run your botpress installation to test!
+
+
 ### License
 
 botpress-slack is licensed under AGPL-3.0
