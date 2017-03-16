@@ -132,6 +132,18 @@ module.exports = (bp, slack) => {
     return /^D/.test(channelId)
   }
 
+  const isBotMentioned = (text) => {
+    let match = [];
+    while (match = mentionRegex.exec(text)) {
+      const mentionedId = match[1];
+      if (mentionedId === slack.getBotId()) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   const router = bp.getRouter('botpress-slack', { 'auth': req => !/\/action-endpoint/i.test(req.originalUrl) })
 
   router.post('/action-endpoint', (req, res) => {
@@ -176,6 +188,7 @@ module.exports = (bp, slack) => {
         type: 'message',
         text: message.text,
         user: user,
+        bot_mentioned: isBotMentioned(message.text),
         ...extractBasics(message)
       })
 
