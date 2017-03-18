@@ -6,12 +6,11 @@ import {
   FormControl,
   Col,
   Button,
-  ControlLabel,
-  Link,
-  Checkbox
+  ControlLabel
 } from 'react-bootstrap'
 
 import _ from 'lodash'
+import axios from 'axios'
 
 import style from './style.scss'
 
@@ -108,11 +107,11 @@ export default class SlackModule extends React.Component {
   isAuthenticate = () => {
     if (this.state.apiToken === '') return false
 
-    return this.getAxios().get(this.getOAuthTestLink())
+    return axios.get(this.getOAuthTestLink())
     .then(({data}) => {
       if (data.ok) return true
 
-      throw new Error("An error occured while testing of your API Token...")
+      throw new Error('An error occured while testing of your API Token...')
     })
     .catch((err) => {
       console.log(err)
@@ -127,7 +126,7 @@ export default class SlackModule extends React.Component {
   authenticate = () => {
     const code = this.getParameterByName('code')
 
-    if(!code || this.state.apiToken !== '') return
+    if (!code || this.state.apiToken !== '') return
       
     this.getAxios().get(this.getOAuthAccessLink(code))
     .then(({data}) => {
