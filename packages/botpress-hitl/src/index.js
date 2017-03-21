@@ -66,8 +66,6 @@ module.exports = {
     
     checkVersion(bp, __dirname)
 
-    config = await configurator.loadAll()
-
     bp.middlewares.register({
       name: 'hitl.captureInMessages',
       type: 'incoming',
@@ -85,6 +83,8 @@ module.exports = {
       module: 'botpress-hitl',
       description: 'Captures outgoing messages to show inside HITL.'
     })
+
+    config = await configurator.loadAll()
 
     bp.db.get()
     .then(knex => db = DB(knex))
