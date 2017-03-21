@@ -128,7 +128,7 @@ export default class SlackModule extends React.Component {
 
     if (!code || this.state.apiToken !== '') return
       
-    this.getAxios().get(this.getOAuthAccessLink(code))
+    axios.get(this.getOAuthAccessLink(code))
     .then(({data}) => {
       if (!data.ok) {
         throw new Error("You encountered an error during authentification, the code doesn't seems to be valid...")
