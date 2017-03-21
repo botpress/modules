@@ -47,8 +47,8 @@ function createUserSession(event) {
     platform: event.platform,
     userId: event.user.id,
     user_image_url: profileUrl,
-    last_event_on: helpers(knex).date.now().sql,
-    last_heard_on: helpers(knex).date.now().sql,
+    last_event_on: helpers(knex).date.now(),
+    last_heard_on: helpers(knex).date.now(),
     paused: 0,
     full_name: full_name,
     paused_trigger: null
@@ -60,7 +60,8 @@ function createUserSession(event) {
     session.id = results[0]
     session.is_new_session = true
   })
-  .then(() => session)
+  .then(() => knex('hitl_sessions').where({ id: session.id }).then().get(0))
+  .then(db_session => Object.assign({}, session, db_session))
 }
 
 function getUserSession(event) {
@@ -92,14 +93,22 @@ function getSession(sessionId) {
   })
 }
 
+function toPlainObject(object) {
+  // trims SQL queries from objects
+  return _.mapValues(object, v => {
+    return v.sql ? v.sql : v
+  })
+}
+
 function appendMessageToSession(event, sessionId, direction) {
-  const message = {
-    ts: helpers(knex).date.now().sql,
+
+  let message = {
     session_id: sessionId,
     type: event.type,
     text: event.text,
     raw_message: event.raw,
-    direction: direction
+    direction: direction,
+    ts: helpers(knex).date.now()
   }
 
   const update = { last_event_on: helpers(knex).date.now() }
@@ -109,12 +118,12 @@ function appendMessageToSession(event, sessionId, direction) {
   }
 
   return knex('hitl_messages')
-  .insert(_.cloneDeep(message))
+  .insert(message)
   .then(() => {
     return knex('hitl_sessions')
     .where({ id: sessionId })
     .update(update)
-    .then(() => message)
+    .then(() => toPlainObject(message))
   })
 }
 
