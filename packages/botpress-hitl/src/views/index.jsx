@@ -88,8 +88,8 @@ export default class HitlModule extends React.Component {
       text: message.text,
       direction: message.direction,
       type: message.type,
-      last_event_on: parseInt(message.ts),
-      last_heard_on: message.direction === 'in' ? parseInt(message.ts) : session.last_heard_on
+      last_event_on: new Date(),
+      last_heard_on: message.direction === 'in' ? new Date() : session.last_heard_on
     })
 
     const newSessions = {
