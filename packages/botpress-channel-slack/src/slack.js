@@ -166,6 +166,7 @@ class Slack {
 
   connectRTM(bp, rtmToken) {
     if (this.rtm) {
+      this.rtm.removeAllListeners()
       this.disconnect()
     }
 
@@ -178,8 +179,11 @@ class Slack {
 
     this.rtm.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, () => {
       bp.logger.info('slack connector is connected')
-      this.connected = true
-      incoming(bp, this)
+      
+      if (!this.connected) {
+        this.connected = true
+        incoming(bp, this)
+      }  
     })
 
     this.rtm.start()
