@@ -68,10 +68,6 @@ module.exports = {
   init: async function(bp, configurator) {
     checkVersion(bp, __dirname)
     
-    config = await configurator.loadAll()
-
-    setService()
-
     bp.middlewares.register({
       name: 'apiai.incoming',
       module: 'botpress-api.ai',
@@ -80,6 +76,9 @@ module.exports = {
       order: 10,
       description: 'Process natural language in the form of text. Structured data with an action and parameters for that action is injected in the incoming message event.'
     })
+    
+    config = await configurator.loadAll()
+    setService()
   },
 
   ready: async function(bp, configurator) {
