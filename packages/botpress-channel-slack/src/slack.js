@@ -206,21 +206,24 @@ class Slack {
     return this.data && this.data.self.name
   }
 
-  getChannels() {
-
-    if (!/channels:read/.test(this.config.scope)) {
-      return this.data.channels
-    }
-
-    const url = 'https://slack.com/api/channels.list' + '?token=' + this.config.apiToken;
+  getChannelsFromAPI() {
+    const url = 'https://slack.com/api/channels.list' + '?token=' + this.config.apiToken
     return axios.get(url).then(({data}) => {
 
       if (!data.ok) {
-        throw new Error('Error getting channels:' + data);
+        throw new Error('Error getting channels:' + data)
       }
 
-      return data.channels;
+      return data.channels
     })
+  }
+
+  getChannels() {
+    if (!/channels:read/.test(this.config.scope)) {
+      return Promise.resolve(this.data.channels)
+    }
+
+    return this.getChannelsFromAPI()
   }
 
   getTeam() {
