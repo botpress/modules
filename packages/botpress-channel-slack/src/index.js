@@ -79,6 +79,29 @@ module.exports = {
         return promise
       })
     })
+
+    // Set up endpoints as internal functions
+    bp.slack['getUserProfile'] = function(id) {
+      return slack.getUserProfile(id);
+    }
+
+    bp.slack['getUsers'] = function() {
+      return slack.getUsers();
+    }
+
+    bp.slack['getChannels'] = function() {
+      return slack.getChannels();
+    }
+
+    bp.slack['getTeam'] = function() {
+      return slack.getTeam();
+    }
+
+    bp.slack['getData'] = function() {
+      return slack.getData();
+    }
+
+
   },
 
   ready: async function(bp, configurator) {
