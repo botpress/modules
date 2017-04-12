@@ -154,7 +154,7 @@ module.exports = (bp, slack) => {
       throw new Error('You are not connected and authenticated')
     }
 
-    if (payload.token !== slack.config.verificationToken.get()) {
+    if (payload.token !== slack.config.verificationToken) {
       throw new Error('Verification token are not matching')
     }
 
