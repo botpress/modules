@@ -4,6 +4,7 @@ import db from './db'
 import util from './util'
 import moment from 'moment'
 let timerInterval = null
+let lock = false
 
 module.exports = (bp) => {
 
@@ -18,7 +19,12 @@ module.exports = (bp) => {
   }
 
   const run = () => {
-    db(bp).listExpired()
+    if (lock === true) {
+      return
+    }
+
+    lock = true
+    Promise.resolve(db(bp).listExpired())
     .then(list => {
       return Promise.map(list, expired => {
         let fromDate = null
@@ -76,10 +82,16 @@ module.exports = (bp) => {
         })
       })
     })
+    .finally(() => {
+      lock = false
+    })
   }
 
   const revive = () => db(bp).reviveAllExecuting()
-  const start = () => timerInterval = setInterval(run, 5000)
+  const start = () => {
+    clearInterval(timerInterval)
+    timerInterval = setInterval(run, 5000)
+  }
   const stop = () => clearInterval(timerInterval)
 
   return { start, stop, revive }
