@@ -167,6 +167,7 @@ module.exports = (bp, slack) => {
         user: user,
         channel: payload.channel,
         button: payload.actions[0],
+        callback_id: payload.callback_id,
         ts: payload.message_ts,
         direct: isDirect(payload.channel.id),
         raw: payload
