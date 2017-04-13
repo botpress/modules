@@ -161,11 +161,11 @@ module.exports = (bp, slack) => {
     preprocessEvent(payload)
     .then(user => {
       // Check if this is a button or a menu action
-      var action_type = 'button';
-      var action_text = ' clicked on a button';
+      let action_type = 'button'
+      let action_text = ' clicked on a button'
       if (payload.actions[0].selected_options) {
-        action_type = 'menu';
-        action_text = ' selected a menu option';
+        action_type = 'menu'
+        action_text = ' selected a menu option'
       }
 
       bp.middlewares.sendIncoming({
@@ -178,12 +178,12 @@ module.exports = (bp, slack) => {
         action_type: action_type,
         callback_id: payload.callback_id,
         ts: payload.message_ts,
-        action_ts: payload.action_ts
+        action_ts: payload.action_ts,
         direct: isDirect(payload.channel.id),
         raw: payload
       })
 
-      // Deprecated for 1.0
+      // DEPRECATED for 1.0
       bp.middlewares.sendIncoming({
         platform: 'slack',
         type: 'button',
