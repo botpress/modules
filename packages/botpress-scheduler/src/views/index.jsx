@@ -100,7 +100,8 @@ export default class SchedulerModule extends React.Component {
   }
 
   renderPrevious() {
-    const elements = this.state.previous.map((el, i) => <Previous key={i} task={el}/>)
+    const sortedElements = _.orderBy(this.state.previous, ['scheduledOn'], ['desc'])
+    const elements = sortedElements.map((el, i) => <Previous key={i} task={el}/>)
 
     const contain = this.state.previous.length === 0
       ? <div className={style.emptyText}>There are no previously run tasks</div>
