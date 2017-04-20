@@ -73,6 +73,7 @@ function initialize(knex) {
       table.string('logs')
       table.timestamp('finishedOn')
       table.string('returned')
+      table.unique(['scheduleId', 'scheduledOn'])
     })
   })
 }
@@ -169,10 +170,14 @@ function deleteScheduled(knex, id) {
 }
 
 function scheduleNext(knex, id, time) {
-  const ts = helpers(knex).date.format(time)
+  // Round the time to the nearest 2 seconds
+  const coeff = 1000 * 2
+  const rounded = new Date(Math.round(time.getTime() / coeff) * coeff)
+
+  const ts = helpers(knex).date.format(rounded)
 
   return knex('scheduler_tasks')
-  .insert({ 
+  .insert({
     scheduleId: id,
     scheduledOn: ts,
     status: 'pending'
