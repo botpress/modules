@@ -11,9 +11,10 @@ let bp = null
 let schedulingLock = false
 let sendingLock = false
 
-const intervalBase = process.env.NODE_ENV === 'production'
-  ? 60 * 1000
-  : 1000
+const INTERVAL_BASE = 30 * 1000
+
+const SCHEDULE_TO_OUTBOX_INTERVAL = INTERVAL_BASE * 1   // 30 seconds
+const SEND_BROADCAST_INTERVAL = INTERVAL_BASE * 2       // 1 minute
 
 const emitChanged = _.throttle(() => {
   bp && bp.events.emit('broadcast.changed')
@@ -206,8 +207,8 @@ module.exports = (botpress) => {
     initialize()
   })
 
-  setInterval(scheduleToOutbox, 2 * intervalBase)
-  setInterval(sendBroadcasts, 10 * intervalBase)
+  setInterval(scheduleToOutbox, SCHEDULE_TO_OUTBOX_INTERVAL)
+  setInterval(sendBroadcasts, SEND_BROADCAST_INTERVAL)
 }
 
 // SCHEDULING (Every 1m) --> Exclusive lock

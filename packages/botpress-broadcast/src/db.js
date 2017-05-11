@@ -23,7 +23,7 @@ function initialize() {
   })
   .then(function() {
     return knex.schema.createTableIfNotExists('broadcast_outbox', function (table) {
-      table.string('scheduleId').references('schedules.id')
+      table.string('scheduleId').references('broadcast_schedules.id')
       table.string('userId').references('users.id')
       table.primary(['scheduleId', 'userId'])
       table.timestamp('ts')

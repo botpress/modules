@@ -33,6 +33,7 @@ import DatePicker from 'react-bootstrap-date-picker'
 import TimePicker from 'react-bootstrap-time-picker'
 import moment from 'moment'
 import dateformat from 'dateformat'
+import classnames from 'classnames'
 
 import _ from 'lodash'
 
@@ -307,9 +308,10 @@ constructor(props){
 
     const renderModificationButton = (value) => {
       return (
-        <Button onClick={() => this.handleOpenModalForm(value, value.id)}>
+        <button className={classnames('bp-button', style.smallButton)}
+          onClick={() => this.handleOpenModalForm(value, value.id)}>
           <Glyphicon glyph='file' />
-        </Button>
+        </button>
       )
     }
 
@@ -334,12 +336,14 @@ constructor(props){
           <td style={{width:'12%'}} className={style.progress}>{formatProgress(value.progress, value.outboxed, value.errored) }</td>
           <td style={{width:'12%'}}>
             {!value.outboxed ? renderModificationButton(value) : null}
-            <Button onClick={() => this.handleOpenModalForm(value)}>
+            <button className={classnames('bp-button', style.smallButton)}
+            onClick={() => this.handleOpenModalForm(value)}>
               <Glyphicon glyph='copy' />
-            </Button>
-            <Button onClick={() => this.handleRemoveBroadcast(value.id)}>
+            </button>
+            <button className={classnames('bp-button', style.smallButton)}
+            onClick={() => this.handleRemoveBroadcast(value.id)}>
               <Glyphicon glyph='trash' />
-            </Button>
+            </button>
           </td>
         </tr>
       )
@@ -489,7 +493,7 @@ constructor(props){
         <Col smOffset={2} sm={10}>
           <ControlLabel>Add a new filter:</ControlLabel>
           <FormControl ref={(input) => this.filterInput = input} type="text"/>
-          <Button bsStyle="success" onClick={() => this.handleAddToFilteringConditions()}>
+          <Button className='bp-button' onClick={() => this.handleAddToFilteringConditions()}>
             Add
           </Button>
         </Col>
@@ -514,12 +518,14 @@ constructor(props){
     const onClickAction = this.state.modifyBroadcast ? this.handleModifyBroadcast : this.handleAddBroadcast
     const buttonName = this.state.modifyBroadcast ? 'Modify' : 'Create'
 
-    return <Button bsStyle='success' action='' onClick={onClickAction}>{buttonName}</Button>
+    return <button className='bp-button' action='' onClick={onClickAction}>{buttonName}</button>
   }
 
   renderModalForm () {
     return (
-      <Modal show={this.state.showModalForm} onHide={this.handleCloseModalForm}>
+      <Modal container={document.getElementById('app')}
+        show={this.state.showModalForm}
+        onHide={this.handleCloseModalForm}>
         <Modal.Header closeButton>
           <Modal.Title>{this.state.modifyBroadcast ? 'Modify broadcast...' : 'Create new broadcast...'}</Modal.Title>
         </Modal.Header>
@@ -528,7 +534,7 @@ constructor(props){
           </Modal.Body>
         <Modal.Footer>
           {this.renderActionButton()}
-          <Button bsStyle='danger' onClick={this.handleCloseModalForm}>Cancel</Button>
+          <button className='bp-button bp-button-danger' onClick={this.handleCloseModalForm}>Cancel</button>
         </Modal.Footer>
       </Modal>
     )
@@ -540,9 +546,10 @@ constructor(props){
         <Navbar.Collapse>
           <Nav pullRight>
             <NavItem>
-              <Button onClick={() => this.handleOpenModalForm()}>
+              <button className={classnames('pull-right', 'bp-button', style.smallButton)}
+                onClick={() => this.handleOpenModalForm()}>
                 <Glyphicon glyph='plus'></Glyphicon>
-              </Button>
+              </button>
             </NavItem>
           </Nav>
         </Navbar.Collapse>
@@ -593,7 +600,7 @@ constructor(props){
 
   render() {
     if (this.state.loading) {
-      return <h3>Loading...</h3>
+      return null
     }
 
     const allBroadcasts = _.assign([], this.state.broadcasts)
