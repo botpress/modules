@@ -1,3 +1,4 @@
+import { DatabaseHelpers as helpers } from 'botpress'
 import checkVersion from 'botpress-version-manager'
 
 import deamon from './deamon'
@@ -5,13 +6,15 @@ import DB from './db'
 import moment from 'moment'
 
 let db = null
+let knex = null
 
 module.exports = {
   init: function(bp) {
     checkVersion(bp, __dirname)
     deamon(bp)
     bp.db.get()
-    .then(knex => {
+    .then(_knex => {
+      knex = _knex
       db = DB(knex)
     })
   },
@@ -24,14 +27,16 @@ module.exports = {
       .then(rows => {
         const broadcasts = rows.map(row => {
           const [date, time] = row.date_time.split(' ')
+          
           const progress = row.total_count
             ? row.sent_count / row.total_count
-            : !!row.outboxed ? 1 : 0
+            : helpers(knex).bool.parse(row.outboxed) ? 1 : 0
+
           return {
             type: row.type,
             content: row.text,
-            outboxed: !!row.outboxed,
-            errored: !!row.errored,
+            outboxed: helpers(knex).bool.parse(row.outboxed),
+            errored: helpers(knex).bool.parse(row.errored),
             progress: progress,
             userTimezone: !row.ts,
             date: date,
