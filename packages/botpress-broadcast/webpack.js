@@ -11,7 +11,7 @@ var nodeConfig = {
     libraryTarget: 'commonjs2',
     publicPath: __dirname
   },
-  externals: [nodeExternals()],
+  externals: [nodeExternals(), 'botpress'],
   target: 'node',
   node: {
     __dirname: false

@@ -1,3 +1,5 @@
+import { DatabaseHelpers as helpers } from 'botpress'
+
 import moment from 'moment'
 import Promise from 'bluebird'
 import retry from 'bluebird-retry'
@@ -11,42 +13,69 @@ let bp = null
 let schedulingLock = false
 let sendingLock = false
 
-const INTERVAL_BASE = 30 * 1000
-
-const SCHEDULE_TO_OUTBOX_INTERVAL = INTERVAL_BASE * 1   // 30 seconds
-const SEND_BROADCAST_INTERVAL = INTERVAL_BASE * 2       // 1 minute
+const INTERVAL_BASE = 10 * 1000
+const SCHEDULE_TO_OUTBOX_INTERVAL = INTERVAL_BASE * 1
+const SEND_BROADCAST_INTERVAL = INTERVAL_BASE * 1
 
 const emitChanged = _.throttle(() => {
   bp && bp.events.emit('broadcast.changed')
 }, 1000)
+
+function padDigits(number, digits) {
+  return Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number
+}
 
 function scheduleToOutbox() {
   if (!knex || schedulingLock) {
     return
   }
 
+  const inFiveMinutes = moment().add(5, 'minutes').toDate()
+  const endOfDay = moment(inFiveMinutes).add(14, 'hours').toDate()
+
+  const upcomingFixedTime = helpers(knex).date.isAfter(inFiveMinutes, 'ts')
+  const upcomingVariableTime = helpers(knex).date.isAfter(endOfDay, 'date_time')
+
   schedulingLock = true
-  knex('broadcast_schedules')
-  .where({ outboxed: 0 })
+
+  return knex('broadcast_schedules')
+  .where({
+    outboxed: helpers(knex).bool.false()
+  })
   .andWhere(function() {
     this.where(function() {
       this.whereNotNull('ts')
-      .andWhere(knex.raw("julianday('now', '+5 minutes', 'utc') >= julianday(ts/1000, 'unixepoch', 'utc')"))
+      .andWhere(upcomingFixedTime)
     })
     .orWhere(function() {
       this.whereNull('ts')
-      .andWhere(knex.raw("julianday('now', '+14 hours', '+5 minutes', 'utc') >= julianday(date_time, 'utc')"))
+      .andWhere(upcomingVariableTime)
     })
   })
   .then(schedules => {
-    return Promise.map(schedules, (schedule) => {
-      const time = schedule.ts
-        ? schedule.ts
-        : moment(schedule.date_time + '+00', 'YYYY-MM-DD HH:mmZ').format('x') + ' - (timezone * 3600000)'
+    return Promise.map(schedules, schedule => {
 
-      return knex.raw(`insert into broadcast_outbox (userId, scheduleId, ts)
-        select userId, ?, ?
-        from (select timezone, id as userId from users)`, [schedule.id, knex.raw(time)])
+      return knex('users')
+      .distinct('timezone')
+      .select()
+      .then(timezones => {
+        return Promise.mapSeries(timezones, ({ timezone: tz }) => {
+          const initialTz = tz
+          const sign = Number(tz) >= 0 ? '+' : '-'
+          tz = padDigits(Math.abs(Number(tz)), 2)
+          const relTime = moment(`${schedule.date_time}${sign}${tz}`, 'YYYY-MM-DD HH:mmZ').toDate()
+          const adjustedTime = helpers(knex).date.format(schedule.ts ? schedule.ts : relTime)
+
+          return knex.raw(`insert into broadcast_outbox ("userId", "scheduleId", "ts")
+            select userId, ?, ?
+            from (
+              select id as userId 
+              from users
+              where timezone = ?
+            ) as q1`, [schedule.id, adjustedTime, initialTz])
+          .then()
+        })
+      })
       .then(() => {
         return knex('broadcast_outbox')
         .where({ scheduleId: schedule.id })
@@ -54,7 +83,10 @@ function scheduleToOutbox() {
         .then().get(0).then(({ count }) => {
           return knex('broadcast_schedules')
           .where({ id: schedule.id })
-          .update({ outboxed: 1, total_count: count })
+          .update({
+            outboxed: helpers(knex).bool.true(),
+            total_count: count
+          })
           .then(() => {
             bp.logger.info('[broadcast] Scheduled broadcast #'
             + schedule.id, '. [' + count + ' messages]')
@@ -132,8 +164,10 @@ function sendBroadcasts() {
 
   sendingLock = true
 
+  const isPast = helpers(knex).date.isBefore(knex.raw('"broadcast_outbox"."ts"'), helpers(knex).date.now())
+
   knex('broadcast_outbox')
-  .where(knex.raw("julianday(broadcast_outbox.ts/1000, 'unixepoch', 'utc') <= julianday('now', 'utc')"))
+  .where(isPast)
   .join('users', 'users.id', 'broadcast_outbox.userId')
   .join('broadcast_schedules', 'scheduleId', 'broadcast_schedules.id')
   .limit(1000)
@@ -182,7 +216,9 @@ function sendBroadcasts() {
 
         return knex('broadcast_schedules')
         .where({ id: row.scheduleId })
-        .update({ errored: true })
+        .update({
+          errored: helpers(knex).bool.true()
+        })
         .then(() => {
           return knex('broadcast_outbox')
           .where({ scheduleId: row.scheduleId })
@@ -210,11 +246,3 @@ module.exports = (botpress) => {
   setInterval(scheduleToOutbox, SCHEDULE_TO_OUTBOX_INTERVAL)
   setInterval(sendBroadcasts, SEND_BROADCAST_INTERVAL)
 }
-
-// SCHEDULING (Every 1m) --> Exclusive lock
-// TODO Look for outboxed + near or past
-// outbox them with good timezone
-
-// SENDING (every 1m) --> Exclusive lock
-// TODO Look for past outboxed
-// Send them
