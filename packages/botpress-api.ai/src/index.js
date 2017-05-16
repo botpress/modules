@@ -1,6 +1,7 @@
 import checkVersion from 'botpress-version-manager'
 import path from 'path'
 import fs from 'fs'
+import _ from 'lodash'
 
 import axios from 'axios'
 
@@ -47,9 +48,19 @@ const incomingMiddleware = (event, next) => {
         next()
       }
     })
-    .catch(err => {
-      var errStatus = err.response.data.status;
-      event.bp.logger.warn('botpress-api.ai', 'API Error. Could not process incoming text:', errStatus.code, errStatus.errorType + ':', errStatus.errorDetails);
+    .catch(error => {
+      let err = _.get(error, 'response.data.status')
+        || _.get(error, 'message')
+        || error
+        || 'Unknown error'
+
+      if (err && err.code) {
+        err = '[' + err.code + '] Type:' + err.errorType + ':', err.errorDetails
+      }
+
+      console.log(error.stack)
+
+      event.bp.logger.warn('botpress-api.ai', 'API Error. Could not process incoming text: ' + err);
       next()
     })
   } else {
