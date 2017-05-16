@@ -1,6 +1,6 @@
 {
   "name": "botpress-api.ai",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "Official API.AI Botpress module",
   "main": "bin/node.bundle.js",
   "botpress": {
