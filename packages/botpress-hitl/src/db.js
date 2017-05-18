@@ -38,8 +38,8 @@ function createUserSession(event) {
   let profileUrl = null
   let full_name = '#' + Math.random().toString().substr(2)
 
-  if (event.platform === 'facebook') {
-    profileUrl = event.user.profile_pic
+  if (event.user && event.user.first_name && event.user.last_name) {
+    profileUrl = event.user.profile_pic || event.user.picture_url
     full_name = event.user.first_name + ' ' + event.user.last_name
   }
 
