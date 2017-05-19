@@ -95,18 +95,21 @@ module.exports = {
 
     bp.hitl = {
       pause: (platform, userId) => {
-        db.setSessionPaused(true, platform, userId, 'code')
+        return db.setSessionPaused(true, platform, userId, 'code')
         .then(sessionId => {
           bp.events.emit('hitl.session', { id: sessionId })
           bp.events.emit('hitl.session.changed', { id: sessionId, paused: 1 })
         })
       },
       unpause: (platform, userId) => {
-        db.setSessionPaused(false, platform, userId, 'code')
+        return db.setSessionPaused(false, platform, userId, 'code')
         .then(sessionId => {
           bp.events.emit('hitl.session', { id: sessionId })
           bp.events.emit('hitl.session.changed', { id: sessionId, paused: 0 })
         })
+      },
+      isPaused: (platform, userId) => {
+        return db.isSessionPaused(platform, userId)
       }
     }
 
