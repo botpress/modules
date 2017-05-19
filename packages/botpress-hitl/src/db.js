@@ -146,6 +146,20 @@ function setSessionPaused(paused, platform, userId, trigger, sessionId = null) {
   }
 }
 
+function isSessionPaused(platform, userId, sessionId = null) {
+  const toBool = s => helpers(knex).bool.parse(s)
+
+  if (sessionId) {
+    return knex('hitl_sessions')
+    .where({ id: sessionId })
+    .select('paused').then().get(0).then(s => s && toBool(s.paused))
+  } else {
+    return knex('hitl_sessions')
+    .where({ userId, platform })
+    .select('paused').then().get(0).then(s => s && toBool(s.paused))
+  }
+}
+
 function getAllSessions(onlyPaused) {
   let condition = ''
 
@@ -190,6 +204,7 @@ module.exports = k => {
     appendMessageToSession,
     getAllSessions,
     getSessionData,
-    getSession
+    getSession,
+    isSessionPaused
   }
 }
