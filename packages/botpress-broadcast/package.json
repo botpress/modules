@@ -14,9 +14,9 @@
     "broadcast"
   ],
   "version-manager": {
-    "warn": "Can't migrate existing database, please see https://gist.github.com/slvnperron/9a3027f4d798c7d6b6b6a9b9b6bdfa7b",
-    "botpress-check": ">= 0.1 < 1",
-    "botpress-update": "^0.x",
+    "warn": "",
+    "botpress-check": ">= 0.1",
+    "botpress-update": "^1.x",
     "module-downgrade": "~1.0.x"
   },
   "scripts": {
