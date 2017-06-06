@@ -15,8 +15,8 @@
   ],
   "version-manager": {
     "warn": "",
-    "botpress-check": ">= 0.1 < 1",
-    "botpress-update": "^0.x",
+    "botpress-check": ">= 0.1",
+    "botpress-update": "^1.x",
     "module-downgrade": "~0.0.x"
   },
   "scripts": {
