@@ -1,3 +1,25 @@
+import Promise from 'bluebird'
+
+const create = obj => {
+  let resolve = null
+  let reject = null
+  const promise = new Promise((r, rj) => {
+    resolve = r
+    reject = rj
+  })
+
+  const messageId = new Date().toISOString() + Math.random()
+  
+  const newEvent = Object.assign({
+    _promise: promise,
+    _resolve: resolve,
+    _reject: reject,
+    __id: messageId
+  }, obj)
+
+  return newEvent
+}
+
 const validateChannelId = (channelId) => {
   if (!/\w+/.test(channelId)) {
     throw new Error('Invalid channel id')
@@ -20,7 +42,7 @@ const createText = (channelId, text, options = {}) => {
   validateChannelId(channelId)
   validateText(text)
 
-  return {
+  return create({
     platform: 'slack',
     type: 'text',
     text: text,
@@ -28,14 +50,14 @@ const createText = (channelId, text, options = {}) => {
       channelId: channelId,
       options: options
     }
-  }
+  })
 }
 
 const createAttachments = (channelId, attachments, options = {}) => {
   validateChannelId(channelId)
   validateAttachments(attachments)
 
-  return {
+  return create({
     platform: 'slack',
     type: 'attachments',
     text: 'App sent an attachments',
@@ -44,11 +66,11 @@ const createAttachments = (channelId, attachments, options = {}) => {
       attachments: attachments,
       options: options
     }
-  }
+  })
 }
 
 const createReaction = (name, options = {}) => {
-  return {
+  return create({
     platform: 'slack',
     type: 'reaction',
     text: 'App sent a reaction',
@@ -56,14 +78,14 @@ const createReaction = (name, options = {}) => {
       name: name,
       options: options
     }
-  }
+  })
 }
 
 const createUpdateText = (ts, channelId, text, options = {}) => {
   validateChannelId(channelId)
   validateText(text)
 
-  return {
+  return create({
     platform: 'slack',
     type: 'update_text',
     text: text,
@@ -72,14 +94,14 @@ const createUpdateText = (ts, channelId, text, options = {}) => {
       ts: ts,
       options: options
     }
-  }
+  })
 } 
 
 const createUpdateAttachments = (ts, channelId, attachments, options = {}) => {
   validateChannelId(channelId)
   validateAttachments(attachments)
 
-  return {
+  return create({
     platform: 'slack',
     type: 'update_attachments',
     text: 'App updated an attachments',
@@ -89,13 +111,13 @@ const createUpdateAttachments = (ts, channelId, attachments, options = {}) => {
       ts: ts,
       options: options
     }
-  }
+  })
 }
 
 const createDeleteTextOrAttachments = (ts, channelId, options = {}) => {
   validateChannelId(channelId)
 
-  return {
+  return create({
     platform: 'slack',
     type: 'delete_text_or_attachments',
     text: 'App deleted a text or an attachments',
@@ -104,11 +126,11 @@ const createDeleteTextOrAttachments = (ts, channelId, options = {}) => {
       ts: ts,
       options: options
     }
-  }
+  })
 }
 
 const createRemoveReaction = (name, options = {}) => {
-  return {
+  return create({
     platform: 'slack',
     type: 'remove_reaction',
     text: 'App remove a reaction',
@@ -116,7 +138,7 @@ const createRemoveReaction = (name, options = {}) => {
       name: name,
       options: options
     }
-  }
+  })
 }
 
 module.exports = {

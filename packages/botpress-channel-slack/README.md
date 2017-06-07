@@ -1,8 +1,85 @@
 # botpress-slack
 
+<img src="https://cdn.rawgit.com/botpress/botpress/7e007114/assets/supports_UMM.png" height="60px" />
+
 Official Slack connector module for [Botpress](http://github.com/botpress/botpress).
 
 This module has been built to accelerate and facilitate development of Slack bots.
+
+## Usage with UMM
+
+There's 3 supported UMM messages: text, attachments and reactions. For doing anything else, please use code (see the other methods supported in `bp.slack` below).
+
+> **Note on Slack UMM**
+> 
+> All of the Slack messages below support an optional **`option`** field which accepts any extra arguments as per the ([slack doc](https://api.slack.com/methods/chat.postMessage)) about **chat.postMessage**.
+
+#### Sending Text
+##### `content.yml`
+
+```yaml
+welcome:
+  - Hello, world!
+  - This is a message on Slack!
+  - text: this works too!
+  - |
+    This is a multi-line
+    message :).
+```
+
+#### Sending a single [Attachment](https://api.slack.com/docs/message-attachments)
+##### `content.yml`
+
+```yaml
+welcome:
+  - on: slack
+    attachment:
+      title: The Further Adventures of Slackbot
+      fields:
+        - title: Volume
+          value: 1
+          short: true
+        - title: Issue
+          value: 3
+          short: true
+      author_name: Stanford S. Strickland
+      author_icon: https://a.slack-edge.com/bfaba/img/api/homepage_custom_integrations-2x.png
+      image_url: http://i.imgur.com/OJkaVOI.jpg?1
+```
+
+#### Sending a multiple [Attachments](https://api.slack.com/docs/message-attachments)
+##### `content.yml`
+
+```yaml
+welcome:
+  - on: slack
+    attachments:
+
+      - title: The Further Adventures of Slackbot
+        fields:
+          - title: Volume
+            value: 1
+            short: true
+          - title: Issue
+            value: 3
+            short: true
+        author_name: Stanford S. Strickland
+        author_icon: https://a.slack-edge.com/bfaba/img/api/homepage_custom_integrations-2x.png
+        image_url: http://i.imgur.com/OJkaVOI.jpg?1
+
+      - title: Second Attachment
+        fields: [{ title: Price, value: 265$ }]
+```
+
+#### Sending Reaction
+##### `content.yml`
+
+```yaml
+welcome:
+  - text: Hello, world!
+  - on: slack
+    reaction: smile
+```
 
 ## Installation
 
@@ -71,7 +148,6 @@ Next step is to authenticate and connect your bot. To do it, you only need to cl
 <img alt='Connexion completed' src='/assets/completed.png' width='500px;' />
 
 If you want to have more information about documentation, options and API, we suggest you to look at the [official slack documentation](https://api.slack.com/).
-
 
 ## Features
 
@@ -354,7 +430,7 @@ bp.hear({ platform: 'slack', text: 'Hello'}, event => {
 
 ```
 
-### Attachments
+### [Attachments](https://api.slack.com/docs/message-attachments)
 
 By using this function, you can send any type of attachment to your users ([slack doc](https://api.slack.com/docs/message-formatting). Also, you should look to the [message builder](https://api.slack.com/docs/messages/builder) to have a better idea of all possible attachments you can send.
 

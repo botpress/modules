@@ -6,10 +6,10 @@ import actions from './actions'
 import _ from 'lodash'
 import Promise from 'bluebird'
 
+import UMM from './umm'
 import Slack from './slack'
 
 let slack = null
-const outgoingPending = outgoing.pending
 
 const outgoingMiddleware = (event, next) => {
   if (event.platform !== 'slack') {
@@ -20,15 +20,7 @@ const outgoingMiddleware = (event, next) => {
     return next('Unsupported event type: ' + event.type)
   }
 
-  const setValue = method => (...args) => {
-    if (event.__id && outgoingPending[event.__id]) {
-      outgoingPending[event.__id][method].apply(null, args)
-      delete outgoingPending[event.__id]
-    }
-  }
-
   outgoing[event.type](event, next, slack)
-  .then(setValue('resolve'), setValue('reject'))
 }
 
 module.exports = {
@@ -62,46 +54,33 @@ module.exports = {
       bp.slack[name] = actions[name]
       let sendName = name.replace(/^create/, 'send')
       bp.slack[sendName] = Promise.method(function() {
-
         var msg = action.apply(this, arguments)
-        msg.__id = new Date().toISOString() + Math.random()
-        const resolver = { event: msg }
-
-        const promise = new Promise(function(resolve, reject) {
-          resolver.resolve = resolve
-          resolver.reject = reject
-        })
-
-        outgoingPending[msg.__id] = resolver
-
-        bp.middlewares.sendOutgoing(msg)
-
-        return promise
+        return bp.middlewares.sendOutgoing(msg)
       })
     })
 
     // Set up endpoints as internal functions
     bp.slack['getUserProfile'] = function(id) {
-      return slack.getUserProfile(id);
+      return slack.getUserProfile(id)
     }
 
     bp.slack['getUsers'] = function() {
-      return slack.getUsers();
+      return slack.getUsers()
     }
 
     bp.slack['getChannels'] = function() {
-      return slack.getChannels();
+      return slack.getChannels()
     }
 
     bp.slack['getTeam'] = function() {
-      return slack.getTeam();
+      return slack.getTeam()
     }
 
     bp.slack['getData'] = function() {
-      return slack.getData();
+      return slack.getData()
     }
 
-
+    UMM(bp) // Initializes Slack in the UMM
   },
 
   ready: async function(bp, configurator) {
