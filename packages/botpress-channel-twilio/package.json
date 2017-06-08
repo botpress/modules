@@ -48,8 +48,5 @@
     "lodash": "^4.17.4",
     "querystring": "^0.2.0",
     "twilio": "^3.3.0"
-  },
-  "bin": {
-    "botpress-twilio": "node.bundle.js"
   }
 }
