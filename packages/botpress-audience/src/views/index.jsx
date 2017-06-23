@@ -112,13 +112,13 @@ export default class AudienceModule extends React.Component {
     return (
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Date</th>
+          <th>Avatar</th>
+          <th>ID</th> 
           <th>Name</th>
           <th>Platform</th>
-          <th>Gender</th>
+          <th>Created on</th>
           <th>Tags</th>
-          <th>Extra</th>
+          <th>Information</th>
         </tr>
       </thead>
     )
@@ -147,24 +147,27 @@ export default class AudienceModule extends React.Component {
   }
 
   renderProfilePicture(url) {
+    let picture = null
     if (!url) {
-      return <Glyphicon glyph='user' />
+      picture = <Glyphicon glyph='user' />
+    } else {
+      picture = <img src={url} alt='Profile picture' />
     }
 
-    return <img src={url} alt='Profile picture' />
+    return <div className={style.image}>
+        {picture}
+      </div>
   }
 
-  renderExtra({ locale, timezone, picture_url }) {
+  renderExtra({ locale, timezone, gender }) {
     const popover = <Popover id="popover-trigger-hover-focus">
-      <div className={style.image}>{this.renderProfilePicture(picture_url)}</div>
+      <div>{'Gender: ' + gender}</div>
       <div>{'Timezone: ' + timezone}</div>
       <div>{'Locale: ' + locale}</div>
     </Popover>
 
     return <OverlayTrigger trigger={['hover', 'focus']} placement="left" overlay={popover}>
-        <Button>
-          <Glyphicon glyph='plus' />
-        </Button>
+        <a>Additional information</a>
     </OverlayTrigger>
   }
 
@@ -172,11 +175,11 @@ export default class AudienceModule extends React.Component {
     return _.mapValues(users, (user, key) => {
       return (
         <tr key={key}>
+          <td style={{width:'10%'}}>{this.renderProfilePicture(user.picture_url)}</td>
           <td style={{width:'22%'}}>{user.id}</td>
-          <td style={{width:'15%'}}>{this.renderCreatedOn(user.created_on)}</td>
           <td style={{width:'15%'}}>{this.renderName(user.first_name, user.last_name)}</td>
-          <td style={{width:'10%'}}>{user.platform}</td>
-          <td style={{width:'10%'}}>{user.gender}</td>
+          <td style={{width:'10%'}}>{_.upperFirst(user.platform)}</td>
+          <td style={{width:'15%'}}>{this.renderCreatedOn(user.created_on)}</td>
           <td style={{width: '23%'}}>{this.renderTags(user.tags)}</td>
           <td style={{width:'5%'}}>{this.renderExtra(user)}</td>
         </tr>

@@ -14,10 +14,10 @@
   vertical-align: top;
 
   img, i {
-    padding: 0 0 10px;
     height: 60px;
     display: block;
     margin: auto;
+    border-radius: 5px;
   }
 }
 
@@ -28,6 +28,14 @@
 .usersTable {
   tbody > tr > td {
     vertical-align: middle;
+  }
+
+  a {
+    text-decoration: underline;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 }
 
