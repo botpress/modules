@@ -17,9 +17,9 @@
   ],
   "version-manager": {
     "date": "06/15/2017",
-    "warn": "Botpress 1.0 is now available.",
-    "botpress-check": ">= 0.1",
-    "botpress-update": "^1.0",
+    "warn": "Botpress 1.0.10 is now available.",
+    "botpress-check": ">= 1.0.10",
+    "botpress-update": "^1.0.10",
     "module-downgrade": "~1.0.x"
   },
   "scripts": {
