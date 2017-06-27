@@ -16,7 +16,7 @@ class Webhooks extends EventEmitter {
       throw new Error('You need to specify botpress')
     }
 
-    this.app = bp.getRouter('botpress-webhook')
+    this.app = bp.getRouter('botpress-webhook', { auth: false })
 
     this.app.use(bodyParser.json({}))
 
