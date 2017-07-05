@@ -8,20 +8,32 @@ import axios from 'axios'
 let config = null
 let service = null
 
-const setService = () => {
-  const client = axios.create({
+const getClient = () => {
+  return axios.create({
     baseURL: 'https://api.api.ai/v1',
     timeout: 5000,
     headers: {'Authorization': 'Bearer ' + config.accessToken}
   })
+}
 
+const setService = () => {
   service = (userId, text) => {
-    return client.post('/query?v=20170101', {
+    return getClient().post('/query?v=20170101', {
       query: text,
       lang: config.lang,
       sessionId: userId
     })
   }
+}
+
+const contextAdd = userId => (name, lifespan = 1) => {
+  return getClient().post('/contexts?v=20170101', [
+    { name, lifespan }
+  ], { params: {sessionId: userId } })
+}
+
+const contextRemove = userId => name => {
+  return getClient().delete('/contexts/' + name, { params: { sessionId: userId } })
 }
 
 const incomingMiddleware = (event, next) => {
@@ -44,7 +56,12 @@ const incomingMiddleware = (event, next) => {
         })
         return null // swallow the event, don't call next()
       } else {
-        event.nlp = result
+        event.nlp = Object.assign(result, {
+          context: {
+            add: contextAdd(event.user.id),
+            remove: contextRemove(event.user.id)
+          }
+        })
         next()
       }
     })
