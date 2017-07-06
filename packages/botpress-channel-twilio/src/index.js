@@ -86,16 +86,20 @@ module.exports = {
 
     router.post('/webhook', async (req, res) => {
 
-      const valid = twilio.validateExpressRequest(req, authToken, { protocol: 'https' })
-
-
       // TODO <--- Remove these
+      bp.logger.info('BEFORE VALIDATE')
+      bp.logger.info(req.protocol + '|' + req.headers.host + '|' + req.originalUrl)
+
+      const valid = twilio.validateExpressRequest(req, authToken, { protocol: 'https' })
+      
       const webhookUrl = require('url').format({
           protocol: 'https',
           host: req.headers.host,
           pathname: req.originalUrl
       })
-      console.log(req.protocol, req.headers.host, req.originalUrl)
+      bp.logger.info('AFTER VALIDATE')
+      bp.logger.info(webhookUrl, valid)
+      bp.logger.info(req.protocol + '|' + req.headers.host + '|' + req.originalUrl)
       // END --->
       
       if (!valid) {
