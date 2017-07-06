@@ -85,8 +85,19 @@ module.exports = {
     const { authToken } = await configurator.loadAll()
 
     router.post('/webhook', async (req, res) => {
+
       const valid = twilio.validateExpressRequest(req, authToken, { protocol: 'https' })
 
+
+      // TODO <--- Remove these
+      const webhookUrl = require('url').format({
+          protocol: 'https',
+          host: req.headers.host,
+          pathname: req.originalUrl
+      })
+      console.log(req.protocol, req.headers.host, req.originalUrl)
+      // END --->
+      
       if (!valid) {
         return res.sendStatus(403)
       }
