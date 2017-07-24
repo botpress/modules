@@ -2,6 +2,7 @@ import checkVersion from 'botpress-version-manager'
 import path from 'path'
 import fs from 'fs'
 import _ from 'lodash'
+import crypto from 'crypto'
 
 import axios from 'axios'
 
@@ -37,8 +38,14 @@ const contextRemove = userId => name => {
 }
 
 const incomingMiddleware = (event, next) => {
+
+  let shortUserId = event.user.id
+  if (shortUserId.length > 36) {
+    shortUserId = crypto.createHash('md5').update(shortUserId).digest("hex")
+  }
+
   if (event.type === 'message') {
-    service(event.user.id, event.text)
+    service(shortUserId, event.text)
     .then(({data}) => {
       const {result} = data
       if (config.mode === 'fulfillment' 
@@ -58,8 +65,8 @@ const incomingMiddleware = (event, next) => {
       } else {
         event.nlp = Object.assign(result, {
           context: {
-            add: contextAdd(event.user.id),
-            remove: contextRemove(event.user.id)
+            add: contextAdd(shortUserId),
+            remove: contextRemove(shortUserId)
           }
         })
         next()
