@@ -13,7 +13,8 @@ module.exports = {
   config: {
     accountSID: { type: 'string', required: true, env: 'TWILIO_SID' },
     authToken: { type: 'string', required: true, env: 'TWILIO_TOKEN' },
-    fromNumber: { type: 'string', required: true, env: 'TWILIO_FROM' }
+    fromNumber: { type: 'string', required: false, env: 'TWILIO_FROM' },
+    messagingServiceSid: { type: 'string', required: false, env: 'TWILIO_MESSAGING_SERVICE' }
   },
 
   init: async function(bp, configurator) {
@@ -26,7 +27,13 @@ module.exports = {
       description: 'Sends out text messages by SMS using Twilio'
     })
 
-    const { accountSID, authToken, fromNumber } = await configurator.loadAll()
+    const {
+      accountSID,
+      authToken,
+      fromNumber,
+      messagingServiceSid
+    } = await configurator.loadAll()
+
     client = new twilio(accountSID, authToken)
 
     function handleOutgoing(event, next) {
@@ -46,8 +53,6 @@ module.exports = {
         }
       })
     }
-
-
 
     UMM(bp)
   },
@@ -71,6 +76,8 @@ module.exports = {
 
       return users[fromNumber]
     }
+
+    bp.twilio = { getOrCreateUser }
 
     const router = bp.getRouter('botpress-twilio', {
       'bodyParser.json': false,
