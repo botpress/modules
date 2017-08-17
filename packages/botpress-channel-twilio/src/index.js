@@ -14,7 +14,7 @@ module.exports = {
     accountSID: { type: 'string', required: true, env: 'TWILIO_SID' },
     authToken: { type: 'string', required: true, env: 'TWILIO_TOKEN' },
     fromNumber: { type: 'string', required: false, env: 'TWILIO_FROM' },
-    messagingServiceSid: { type: 'string', required: false, env: 'TWILIO_MESSAGING_SERVICE' }
+    messagingServiceSid: { type: 'string', required: false, env: 'TWILIO_MESSAGING_SERVICE_SID' }
   },
 
   init: async function(bp, configurator) {
@@ -42,11 +42,18 @@ module.exports = {
         return next()
       }
 
-      client.messages.create({
-        from: fromNumber,
+      const payload = {
         to: extractNumber(event),
         body: event.text
-      })
+      }
+
+      if (!_.isNil(messagingServiceSid)) {
+        payload.messagingServiceSid = messagingServiceSid
+      } else {
+        payload.from = fromNumber
+      }
+
+      client.messages.create(payload)
       .then(() => {
         if (event._promise && event._resolve) {
           event._resolve()
