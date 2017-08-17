@@ -1,6 +1,6 @@
 {
   "name": "botpress-twilio",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Official Twilio module for Botpress",
   "main": "bin/node.bundle.js",
   "botpress": {
