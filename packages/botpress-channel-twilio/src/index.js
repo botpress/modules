@@ -66,10 +66,18 @@ module.exports = {
 
   ready: async function(bp, configurator) {
 
-    let users = {}
     async function getOrCreateUser(fromNumber) {
-      if (!users[fromNumber]) {
-        users[fromNumber] = {
+      const id = `twilio:${fromNumber}`;
+      const existingUser = await bp.db.get()
+        .then(knex => knex('users').where('id', id))
+        .then(users => users[0]);
+
+      if (existingUser) {
+        existingUser.id = fromNumber;
+        return existingUser;
+
+      } else {
+        const newUser = {
           first_name: 'Unknown',
           last_name: 'Unknown',
           profile_pic: null,
@@ -78,10 +86,9 @@ module.exports = {
           number: fromNumber
         }
 
-        await bp.db.saveUser(users[fromNumber])
+        await bp.db.saveUser(newUser);
+        return newUser;
       }
-
-      return users[fromNumber]
     }
 
     bp.twilio = { getOrCreateUser }
@@ -106,7 +113,7 @@ module.exports = {
         return res.sendStatus(403)
       }
 
-      const { 
+      const {
         Body: message,
         From: fromNumber,
         FromCountry: fromCountry,

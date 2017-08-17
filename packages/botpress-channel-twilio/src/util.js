@@ -5,7 +5,7 @@ function extractNumber(event) {
     || _.get(event, 'number')
     || _.get(event, 'raw.to')
     || _.get(event, 'raw.number')
-    || _.get(event, 'user.id')
+    || _.get(event, 'user.userId')
 
   if (!number) {
     throw new Error('Could not extract user phone number number from event')
