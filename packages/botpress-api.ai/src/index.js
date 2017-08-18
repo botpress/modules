@@ -88,6 +88,13 @@ const incomingMiddleware = (event, next) => {
       next()
     })
   } else {
+    event.nlp = {
+      context: {
+        add: contextAdd(shortUserId),
+        remove: contextRemove(shortUserId)
+      }
+    }
+    
     next()
   }
 }
