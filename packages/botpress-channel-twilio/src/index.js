@@ -66,6 +66,12 @@ module.exports = {
 
   ready: async function(bp, configurator) {
 
+    function logDebug(message) {
+      if (process.env.TWILIO_DEBUG) {
+        bp.logger.debug('[Twilio] ' + message)
+      }
+    }
+
     async function getOrCreateUser(fromNumber) {
       const id = `twilio:${fromNumber}`;
       const existingUser = await bp.db.get()
@@ -106,12 +112,17 @@ module.exports = {
     const { authToken } = await configurator.loadAll()
 
     router.post('/webhook', async (req, res) => {
-      
+      logDebug(`Incoming Twilio Message [HOST='${req.headers.host}'] [URL='${req.originalUrl}']`)
+
       const valid = twilio.validateExpressRequest(req, authToken, { protocol: 'https' })
       
       if (!valid) {
+        logDebug('Signature verification failed')
         return res.sendStatus(403)
       }
+
+      logDebug('Message verified')
+      res.sendStatus(200)
 
       const {
         Body: message,
@@ -134,6 +145,8 @@ module.exports = {
         text: message,
         raw: { message, fromNumber, fromCountry, fromCity, fromState, smsSid, messageSid }
       })
+
+      logDebug('Message delivered to bot')
     })
   }
 }
