@@ -6,10 +6,10 @@ import api from './api'
 import socket from './socket'
 import db from './db'
 
-import configTemplate from 'raw!./botpress-web.config.yml'
+import configTemplate from 'raw!./botpress-platform-webchat.config.yml'
 
 const createConfigFile = bp => {
-  const name = 'botpress-web.config.yml'
+  const name = 'botpress-platform-webchat.config.yml'
   const file = path.join(bp.projectLocation, name)
 
   if (!fs.existsSync(file)) {

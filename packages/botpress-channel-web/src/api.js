@@ -42,7 +42,7 @@ module.exports = async (bp, config) => {
 
   const { getOrCreateUser } = await users(bp, config)
 
-  const router = bp.getRouter('botpress-web', { auth: false })
+  const router = bp.getRouter('botpress-platform-webchat', { auth: false })
   
   const asyncApi = fn => async (req, res, next) => {
     try {
@@ -62,7 +62,7 @@ module.exports = async (bp, config) => {
     res.send(injectStyle)
   })
 
-  const modulePath = bp._loadedModules['botpress-web'].root
+  const modulePath = bp._loadedModules['botpress-platform-webchat'].root
   const staticFolder = path.join(modulePath, './static')
   router.use('/static', serveStatic(staticFolder))
 
@@ -137,12 +137,12 @@ module.exports = async (bp, config) => {
       __room: 'visitor:' + userId // This is used to send to the relevant user's socket
     })
 
-    bp.events.emit('guest.web.message', message)
+    bp.events.emit('guest.webchat.message', message)
 
     const user = await getOrCreateUser(userId)
 
     return bp.middlewares.sendIncoming(Object.assign({
-      platform: 'web',
+      platform: 'webchat',
       type: payload.type,
       user: user,
       text: payload.text,

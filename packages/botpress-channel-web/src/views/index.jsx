@@ -150,7 +150,7 @@ export class UMMOutgoing extends React.Component {
 export class WebInjection extends React.Component {
   render () {
     var node = window.document.createElement('script')
-    node.src = '/api/botpress-web/inject.js'
+    node.src = '/api/botpress-platform-webchat/inject.js'
     window.document.body.appendChild(node)
   }
 }

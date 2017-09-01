@@ -88,7 +88,7 @@ function processOutgoing({ event, blocName, instruction }) {
     }, options, _.pick(event && event.raw, 'conversationId'))
 
     return PromisifyEvent({
-      platform: 'web',
+      platform: 'webchat',
       type: 'text',
       user: { id: user },
       raw: raw,
@@ -116,36 +116,14 @@ function processOutgoing({ event, blocName, instruction }) {
 ////////////
 
 function getTemplates() {
-  return [
-    {
-      type: 'Text - Single message',
-      template: `block_name_sm:
-  - Text goes here..`
-    },{
-      type: 'Text - Multiple messages',
-      template: `block_name_mm:
-  - Text goes here..(1)
-  - Text goes here..(2)`
-    },{
-      type: 'Text - Random message',
-      template: `block_name_rm:
-  - text:
-    - Text goes here..(1)
-    - Text goes here..(2)`
-    },{
-      type: 'Typing - Message with typing',
-      template: `block_name_bm:
-  - text: Text goes here..(1)
-    typing: 1000ms`
-    }
-  ]
+  return []
 }
 
 module.exports = bp => {
   const [umm, registerConnector] = _.at(bp, ['umm', 'umm.registerConnector'])
 
   umm && registerConnector && registerConnector({
-    platform: 'web',
+    platform: 'webchat',
     processOutgoing: args => processOutgoing(Object.assign({}, args, { bp })),
     templates: getTemplates()
   })

@@ -8,7 +8,7 @@ import { DatabaseHelpers as helpers } from 'botpress'
 module.exports = (knex, botfile) => {
 
   async function getUserInfo(userId) {
-    const user = await knex('users').where({ platform: 'web', userId: userId }).then().get(0).then()
+    const user = await knex('users').where({ platform: 'webchat', userId: userId }).then().get(0).then()
     const name = user && (`${user.first_name} ${user.last_name}`)
     const avatar = (user && user.picture_url) || null
 
@@ -68,7 +68,7 @@ module.exports = (knex, botfile) => {
       message_type: type,
       message_text: text,
       message_raw: helpers(knex).json.set(raw),
-      message_data: helpers(knex).json.set(raw),
+      message_data: helpers(knex).json.set(data),
       sent_on: helpers(knex).date.now()
     }
 

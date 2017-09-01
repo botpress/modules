@@ -1,20 +1,14 @@
 {
-  "name": "botpress-web",
-  "version": "2.0.3",
-  "description": "A web chat and emulator for Botpress",
+  "name": "botpress-platform-webchat",
+  "version": "0.0.1",
+  "description": "An embeddable web chat for Botpress bots",
   "main": "bin/node.bundle.js",
-  "homepage": "https://github.com/botpress/botpress-web",
+  "homepage": "https://github.com/botpress/botpress-platform-webchat",
   "botpress": {
-    "menuText": "Web Emulator",
+    "menuText": "Web Chat",
     "menuIcon": "chrome_reader_mode",
     "webBundle": "bin/web.bundle.js",
-    "noInterface": true,
-    "plugins": [
-      {
-        "entry": "WebInjection",
-        "position": "overlay"
-      }
-    ]
+    "noInterface": true
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -23,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/botpress/botpress-web"
+    "url": "https://github.com/botpress/botpress-platform-webchat"
   },
   "author": "Botpress",
   "license": "AGPL-3.0",

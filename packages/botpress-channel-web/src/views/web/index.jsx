@@ -156,8 +156,8 @@ export default class Web extends React.Component {
       this.props.bp.events.setup()
     }
 
-    this.props.bp.events.on('guest.web.message', ::this.handleNewMessage)
-    this.props.bp.events.on('guest.web.typing', ::this.handleBotTyping)
+    this.props.bp.events.on('guest.webchat.message', ::this.handleNewMessage)
+    this.props.bp.events.on('guest.webchat.typing', ::this.handleBotTyping)
   }
 
   fetchData() {
@@ -169,7 +169,7 @@ export default class Web extends React.Component {
   fetchConversations() {
     const axios = this.props.bp.axios
     const userId = this.userId
-    const url = `${BOT_HOSTNAME}/api/botpress-web/conversations/${userId}`
+    const url = `${BOT_HOSTNAME}/api/botpress-platform-webchat/conversations/${userId}`
 
     return axios.get(url)
     .then(({ data }) => {
@@ -189,7 +189,7 @@ export default class Web extends React.Component {
       this.setState({ currentConversationId:  conversationIdToFetch })
     }
 
-    const url = `${BOT_HOSTNAME}/api/botpress-web/conversations/${userId}/${conversationIdToFetch}`
+    const url = `${BOT_HOSTNAME}/api/botpress-platform-webchat/conversations/${userId}/${conversationIdToFetch}`
 
     return axios.get(url)
     .then(({data}) => {
@@ -204,7 +204,7 @@ export default class Web extends React.Component {
   }
 
   fetchConfig() {
-    return this.props.bp.axios.get('/api/botpress-web/config')
+    return this.props.bp.axios.get('/api/botpress-platform-webchat/config')
     .then(({ data }) => {
       this.setState({
         config: data
@@ -273,7 +273,7 @@ export default class Web extends React.Component {
 
   playSound() { 
     if (!this.state.played && this.state.view !== 'convo') { // TODO: Remove this condition (view !== 'convo') and fix transition sounds
-      const audio = new Audio('/api/botpress-web/static/notification.mp3')
+      const audio = new Audio('/api/botpress-platform-webchat/static/notification.mp3')
       audio.play()
 
       this.setState({ 
@@ -304,7 +304,7 @@ export default class Web extends React.Component {
 
   handleSendMessage() {
     const userId = window.__BP_VISITOR_ID
-    const url = `${BOT_HOSTNAME}/api/botpress-web/messages/${userId}`
+    const url = `${BOT_HOSTNAME}/api/botpress-platform-webchat/messages/${userId}`
     const config = { params: { conversationId: this.state.currentConversationId } }
 
     this.props.bp.axios.post(url, { type: 'text', text: this.state.textToSend }, config)
@@ -331,13 +331,13 @@ export default class Web extends React.Component {
 
   handleSendQuickReply(title, payload) {
     const userId = window.__BP_VISITOR_ID
-    const url = `${BOT_HOSTNAME}/api/botpress-web/messages/${userId}`
+    const url = `${BOT_HOSTNAME}/api/botpress-platform-webchat/messages/${userId}`
     const config = { params: { conversationId: this.state.currentConversationId } }
 
-    this.props.bp.axios.post(url, { 
-      type: 'quick_reply', 
-      text: title, 
-      data: { payload } 
+    this.props.bp.axios.post(url, {
+      type: 'quick_reply',
+      text: title,
+      data: { payload }
     }, config).then()
   }
 
