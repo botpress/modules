@@ -1,42 +1,22 @@
-# botpress-web (alpha)
+# botpress-platform-webchat (BETA)
 
-<img src="https://rawgit.com/botpress/botpress-web/next/assets/webview_convo.png" height="200px" />
+[<img src="https://cdn.rawgit.com/botpress/botpress/7e007114/assets/supports_UMM.png" height="60px" />](https://botpress.io/docs/foundamentals/umm.html)
 
-Official Webchat connector module for [Botpress](http://github.com/botpress/botpress). This module has been build to accelerate and facilitate development of bots.
+<img src="https://rawgit.com/botpress/botpress-platform-webchat/master/assets/webview_convo.png" height="200px" />
 
-## How to install it
+Official Webchat connector module for [Botpress](http://github.com/botpress/botpress). This module allows you to embed your chatbot on any website and also allows you to serve it as a full-screen web app.
 
-Actually, there's two ways of installing `botpress-web`. The reason is because the module is still under development and it's not officially unreleased yet. 
-
-> **Note about release**
-> 
-> Official release should be done in the next few weeks. There's still some works to do and bug to fix. It should be working, but we don't garanty it. 
+## Installation
 
 ### Using NPM
 
-Installing modules on Botpress is simple. By using the CLI, you only need to type this command in your terminal to add the messenger module to your bot.
-
 ```
-  npm install botpress-web@next
+npm install botpress-platform-webchat
 ```
-
-> **Note about branch**
-> 
-> The module is still under development, so we pushed it to on a branch `next`. It's the reason why you need to add a @tag to install the good version from NPM.
-
-### Fork or clone from Github
-
-You will need to compile it yourself on branch (`next`) if you want to use it this way.
-
-- Clone or fork the repository on branch `next`
-- Compile the module `npm run compile` under the module repository
-- Install it on your bot `bp i botpress-web`
-- Link it to your local version `npm link {$path}/botpress-web` (e.g. `npm link /Users/dfs/botpress-web`)
-- Run your bot `bp start` and go to the interface
 
 ## How to use it
 
-You can use it a the same way you use **botpress-messenger** and **botpress-slack** or any other connector. The way of coding it remains the same, so you should use to code the interactions:
+[TODO] More instructions coming.
 
 - [UMM](https://botpress.io/docs/foundamentals/umm.html)
 - [Flows](https://botpress.io/docs/foundamentals/flow.html).
@@ -79,34 +59,30 @@ welcome:
 
 #### Other type of messages
 
-We are still working on other type of messages to increase the power of this module. **Pull requests** are always welcome if you want to help us to improve it and accelerate the development.
+We are still working on other type of messages to increase the power of this module. Botpress is a community effort, so **Pull Requests are welcomed**.
 
 - Caroussel **(soon)**
 - Image **(soon)**
 - Video **(soon)**
 - Audio **(soon)**
+- Location Picker **(soon)**
+- Web Widgets **(soon)**
 
 ## Supported views
 
-### Mobile view
+### Mobile View (Fullscreen)
 
 When your bot is running, you can have access to a mobile view at `${HOSTNAME}/lite/?m=web&v=fullscreen` *(e.g `http://localhost:3000/lite/?m=web&v=fullscreen`)*.
 
-This **URL** is public so you can share it we other people, so they can try and talk with your bot.
+This **URL is public** (no authentication required) so you can share it we other people.
 
 <img src="https://rawgit.com/botpress/botpress-web/next/assets/mobile_view.png" height="200px" />
 
-### Web view (in the UI)
+### Web View (Embedded on Websites)
 
-The webchat is really useful to test and develop your bot. You won't have to connect your bot to any platform. You can access and test it directly in the UI of Botpress. When `botpress-web` is installed, it's automatically added to the plugins of your bot.
+To embedded the web interface to a website, you simply need to add this script at the end of the `<body>` tag. Don't forget to set the `hostname` correctly to match the public hostname of your bot.
 
-<img src="https://rawgit.com/botpress/botpress-web/next/assets/webview_side.png" height="200px" />
-
-### Web view (on external website)
-
-To embedded the web interface to an existing website, you simply need to add this `script` at the end of your `<body>`. Don't forget to set the `hostname` correctly to match the **URL** of your bot.
-
-```js
+```html
 <script>
   window.botpressSettings = {
     hostname: "botpress.pagekite.me" // <<-- Change this to your bot hostname
@@ -119,7 +95,7 @@ To embedded the web interface to an existing website, you simply need to add thi
 
 ## Customize the view
 
-A configuration file (`botpress-web.config.yml`) has been created at the `root` of your bot when you installed the module. By changing the values, you gonna be able to change some settings (name, messages, colors...) of your bot.
+A configuration file (`botpress-web.config.yml`) has been created at the `root` of your bot when you installed the module. You can change these values to change the look and feel of the web chat.
 
 ```yaml
 # DEFAULT SETTINGS
@@ -146,7 +122,6 @@ textColorOnForeground: '#ffffff'  ## Element text color (header, composer, butto
 > 
 > You need to restart your bot by running `bp start` again for new settings to be effective.
 
-
 ### Community
 
 There's a [Slack community](https://slack.botpress.io) where you are welcome to join us, ask any question and even help others.
@@ -155,4 +130,4 @@ Get an invite and join us now! 👉 [https://slack.botpress.io](https://slack.bo
 
 ### License
 
-botpress-messenger is licensed under AGPL-3.0
+Licensed under AGPL-3.0
