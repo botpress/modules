@@ -1,0 +1,20 @@
+✔ Group messages by "sent by" and "time <= 5 minutes" @high @done (17-07-10 11:10)
+  ☐ At the beginning of the group put the date separator
+  ✔ Don't repeat "Bot" @done (17-07-10 11:10)
+  ✔ Avatar shows up at the end of the group only @done (17-07-10 11:10)
+  ✔ Bubbles have squared corners when in between messages @done (17-07-10 11:10)
+  ✔ Very small margins between messages @done (17-07-10 11:10)
+✔ Display "typing" @critical @done (17-07-08 20:17)
+✔ Display quick replies if last message @critical @done (17-07-09 16:43)
+✔ When clicking on a convo, switch to that convo @critical @done (17-07-09 17:07)
+✔ Default bot avatar @critical @done (17-07-09 19:56)
+✔ Header should contain Title + Icon of the convo @critical @done (17-07-09 20:31)
+✔ Play sound when no focus & new message in @high @done (17-07-11 16:24)
+- On receive new message & not active convo @high
+  - Amend convo last message
+  - Mark as unread
+- Send "mark_seen" on seen convo (scroll to bottom) @high
+- Put a separator where unseen @low
+- Mouve hover show tooltip with time message was sent @low
+- Change font for Roboto & Roboto Light @low
+- Text bot "Reply to ...." should be lighter @low
