@@ -1,0 +1,37 @@
+
+APIS:
+  ✔ List conversations (from userId) @critical @done (17-07-03 11:52)
+  ✔ Send New Message (from userId, optional conversationId, type, data) @critical @done (17-07-03 13:47)
+    ✔ If conversationId = null, check if there is a recent conversation @done (17-07-03 13:47)
+      ✔ If no recent convo, create one @done (17-07-03 13:47)
+      ✔ If recent convo, append message to the convo @done (17-07-03 13:47)
+      - Make "recent" time configurable
+    ✔ Message types @done (17-07-03 13:48)
+      ✔ Text @done (17-07-03 13:48)
+      - File --> Store in database
+      - Conversation Status
+        - "Sylvain joined the Conversation"
+  - Send New Event (from userId, event name, event data)
+  - Complete User Profile @low
+
+Socket:
+  ✔ --> New Message from Bot @critical @done (17-07-03 15:03)
+  - --> Bot/Agent seen the message @low
+  - <-- Mark as Read @low
+  ✔ --> Typing Indicator {time in MS} (bot) @high @done (17-07-03 15:03)
+  - <-- User is typing @low
+
+Users:
+  ✔ Get or Create User (userId) @critical @done (17-07-03 14:12)
+    ✔ Give users "Silly Names" until Profile is Complete @done (17-07-03 14:12)
+
+Connect with front-end:
+  ✔ Ping-pong Socket Test @critical @done (17-07-03 17:00)
+  ✔ List conversations @critical @done (17-07-07 11:27)
+  ✔ Send new message to conversationId = null when typing in the initial widget @critical @done (17-07-07 11:27)
+  ✔ Send new message to conversationId when typing in the conversation window @high @done (17-07-07 12:12)
+  ✔ Receive new text message from bot @high @done (17-07-07 17:23)
+    ✔ Unified events from middlewares @done (17-07-07 17:23)
+    ✔ Patch conversations as socket events come in @done (17-07-07 17:23)
+    - Provide bot default name, avatar, etc.
+  - Bot "Typing" event @high
