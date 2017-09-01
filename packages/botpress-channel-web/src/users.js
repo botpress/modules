@@ -8,7 +8,7 @@ module.exports = async (bp, config) => {
     const realUserId = userId.startsWith('web:') ? userId.substr(4) : userId
     
     const user = await knex('users').where({
-      platform: 'web',
+      platform: 'webchat',
       userId: realUserId
     }).then().get(0).then()
 
@@ -31,7 +31,7 @@ module.exports = async (bp, config) => {
       last_name: last_name,
       profile_pic: null,
       id: userId,
-      platform: 'web'
+      platform: 'webchat'
     }
 
     return bp.db.saveUser(user)

@@ -27,7 +27,7 @@ npm install botpress-platform-webchat
 
 ### Supported messages
 
-<img src="https://rawgit.com/botpress/botpress-web/next/assets/quick_replies.png" height="200px" /><img src="https://rawgit.com/botpress/botpress-web/next/assets/mobile_view.png" height="200px" />
+<img src="https://rawgit.com/botpress/botpress-platform-webchat/master/assets/quick_replies.png" height="200px" /><img src="https://rawgit.com/botpress/botpress-platform-webchat/master/assets/mobile_view.png" height="200px" />
 
 #### Sending Text
 
@@ -72,11 +72,11 @@ We are still working on other type of messages to increase the power of this mod
 
 ### Mobile View (Fullscreen)
 
-When your bot is running, you can have access to a mobile view at `${HOSTNAME}/lite/?m=web&v=fullscreen` *(e.g `http://localhost:3000/lite/?m=web&v=fullscreen`)*.
+When your bot is running, you can have access to a mobile view at `${HOSTNAME}/lite/?m=platform-webchat&v=fullscreen` *(e.g `http://localhost:3000/lite/?m=platform-webchat&v=fullscreen`)*.
 
 This **URL is public** (no authentication required) so you can share it we other people.
 
-<img src="https://rawgit.com/botpress/botpress-web/next/assets/mobile_view.png" height="200px" />
+<img src="https://rawgit.com/botpress/botpress-platform-webchat/master/assets/mobile_view.png" height="200px" />
 
 ### Web View (Embedded on Websites)
 
@@ -89,13 +89,13 @@ To embedded the web interface to a website, you simply need to add this script a
   };
 </script>
 <script>
-  !function(){function t(){var t=n.createElement("script");t.type="text/javascript",t.async=!0,t.src="https://"+a.hostname+"/api/botpress-web/inject.js";var e=n.getElementsByTagName("script")[0];e.parentNode.insertBefore(t,e)}var e=window,a=e.botpressSettings,n=document;e.attachEvent?e.attachEvent("onload",t):e.addEventListener("load",t,!1)}();
+  !function(){function t(){var t=n.createElement("script");t.type="text/javascript",t.async=!0,t.src="https://"+a.hostname+"/api/botpress-platform-webchat/inject.js";var e=n.getElementsByTagName("script")[0];e.parentNode.insertBefore(t,e)}var e=window,a=e.botpressSettings,n=document;e.attachEvent?e.attachEvent("onload",t):e.addEventListener("load",t,!1)}();
 </script>
 ```
 
 ## Customize the view
 
-A configuration file (`botpress-web.config.yml`) has been created at the `root` of your bot when you installed the module. You can change these values to change the look and feel of the web chat.
+A configuration file (`botpress-platform-webchat.config.yml`) has been created at the `root` of your bot when you installed the module. You can change these values to change the look and feel of the web chat.
 
 ```yaml
 # DEFAULT SETTINGS

@@ -22,7 +22,7 @@ $(function() {
 
     if ($('#bp-web-widget').length <= 0) {
 
-      var style = $('<link href="' + host + '/api/botpress-web/inject.css" rel="stylesheet">');
+      var style = $('<link href="' + host + '/api/botpress-platform-webchat/inject.css" rel="stylesheet">');
       style.appendTo('head');
 
       var widgetContainer = $("<div id='bp-web-widget'></div>");
@@ -30,6 +30,6 @@ $(function() {
 
       $('<iframe id="bp-widget">')
       .appendTo('#bp-web-widget')
-      .attr({ src: host + '/lite/?m=web&v=embedded' });
+      .attr({ src: host + '/lite/?m=platform-webchat&v=embedded' });
     }
 });

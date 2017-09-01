@@ -18,17 +18,17 @@ module.exports = async (bp, config) => {
   } = config || {}
 
   bp.middlewares.register({
-    name: 'web.sendMessages',
+    name: 'webchat.sendMessages',
     type: 'outgoing',
     order: 100,
     handler: outgoingHandler,
-    module: 'botpress-web',
-    description: 'Sends out messages that targets platform = web.' +
+    module: 'botpress-platform-webchat',
+    description: 'Sends out messages that targets platform = webchat.' +
     ' This middleware should be placed at the end as it swallows events once sent.'
   })
 
   async function outgoingHandler(event, next) {
-    if (event.platform !== 'web') {
+    if (event.platform !== 'webchat') {
       return next()
     }
 
@@ -43,11 +43,13 @@ module.exports = async (bp, config) => {
     const conversationId = _.get(event, 'raw.conversationId')
       || await getOrCreateRecentConversation(user.id)
 
+    const socketId = user.userId.replace('webchat:', '')
+
     if (typing) {
-      bp.events.emit('guest.web.typing', { 
+      bp.events.emit('guest.webchat.typing', { 
         timeInMs: typing, 
         userId: null,
-        __room: 'visitor:' + user.userId,
+        __room: 'visitor:' + socketId,
         conversationId
       })
 
@@ -57,10 +59,10 @@ module.exports = async (bp, config) => {
     const message = await appendBotMessage(bot_name, bot_avatar, conversationId, event)
 
     Object.assign(message, {
-      __room: 'visitor:' + user.userId // This is used to send to the relevant user's socket
+      __room: 'visitor:' + socketId // This is used to send to the relevant user's socket
     })
 
-    bp.events.emit('guest.web.message', message)
+    bp.events.emit('guest.webchat.message', message)
 
     // Resolve the event promise
     event._promise && event._resolve && event._resolve()
