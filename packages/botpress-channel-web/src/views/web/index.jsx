@@ -307,13 +307,10 @@ export default class Web extends React.Component {
     const url = `${BOT_HOSTNAME}/api/botpress-platform-webchat/messages/${userId}`
     const config = { params: { conversationId: this.state.currentConversationId } }
 
-    this.props.bp.axios.post(url, { type: 'text', text: this.state.textToSend }, config)
+    return this.handleSendData({ type: 'text', text: this.state.textToSend })
     .then(() => {
       this.handleSwitchView('side')
-
-      this.setState({
-        textToSend: ''
-      })
+      this.setState({ textToSend: '' })
     })
   }
 
@@ -330,15 +327,26 @@ export default class Web extends React.Component {
   }
 
   handleSendQuickReply(title, payload) {
-    const userId = window.__BP_VISITOR_ID
-    const url = `${BOT_HOSTNAME}/api/botpress-platform-webchat/messages/${userId}`
-    const config = { params: { conversationId: this.state.currentConversationId } }
-
-    this.props.bp.axios.post(url, {
+    return this.handleSendData({
       type: 'quick_reply',
       text: title,
       data: { payload }
-    }, config).then()
+    })
+  }
+
+  handleLoginPrompt(username, password) {
+    return this.handleSendData({
+      type: 'login_prompt',
+      text: 'Provided login information',
+      data: { username, password }
+    })
+  }
+
+  handleSendData(data) {
+    const userId = window.__BP_VISITOR_ID
+    const url = `${BOT_HOSTNAME}/api/botpress-platform-webchat/messages/${userId}`
+    const config = { params: { conversationId: this.state.currentConversationId } }
+    return this.props.bp.axios.post(url, data, config).then()
   }
 
   handleSwitchConvo(convoId) {
@@ -416,7 +424,8 @@ export default class Web extends React.Component {
       onSwitchConvo={::this.handleSwitchConvo}
       onTextSend={::this.handleSendMessage}
       onTextChanged={::this.handleTextChanged}
-      onQuickReplySend={::this.handleSendQuickReply} />
+      onQuickReplySend={::this.handleSendQuickReply}
+      onLoginPromptSend={::this.handleLoginPrompt} />
   }
 
   render() {

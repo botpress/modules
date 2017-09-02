@@ -193,8 +193,10 @@ export default class Side extends React.Component {
       typingUntil: this.props.currentConversation && this.props.currentConversation.typingUntil,
       messages: this.props.currentConversation && this.props.currentConversation.messages,
       fgColor: this.props.config && this.props.config.foregroundColor,
+      textColor: this.props.config && this.props.config.textColorOnForeground,
       avatarUrl: this.props.config && this.props.config.botAvatarUrl,
-      onQuickReplySend: this.props.onQuickReplySend
+      onQuickReplySend: this.props.onQuickReplySend,
+      onLoginPromptSend: this.props.onLoginPromptSend
     }
 
     return <div className={style.conversation}>
