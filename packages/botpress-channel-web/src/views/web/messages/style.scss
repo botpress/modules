@@ -53,7 +53,7 @@
   align-items: flex-end;
   padding-right: 18px;
   padding-left: 0;
-
+  
   .message-container {
     width: 100%;
     -webkit-box-orient: vertical;
@@ -123,6 +123,10 @@
       p {
         margin: 0;
       }
+
+      .specialAction {
+        opacity: 0.6;
+      }
     }
   }
 }
@@ -167,6 +171,39 @@
         }
       }
     }
+  }
+}
+
+.loginPromptContainer {
+  label {
+    display: block;
+  }
+
+  .loginInput {
+    height: 30px;
+    border: none;
+    outline: none;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #bbb;
+    width: 200px;
+    text-align: center;
+    margin: 10px;
+    font-size: 14px;
+  }
+
+  .loginButton {
+    display: block;
+    font-size: 16px;
+    height: 30px;
+    width: 130px;
+    text-align: center;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: none;
+    outline: none;
+    background-color: black;
+    color: white;
   }
 }
 

@@ -79,6 +79,23 @@ function processOutgoing({ event, blocName, instruction }) {
   /// Processing
   /////////
 
+  if (instruction.type === 'login_prompt') {
+    const user = getUserId(event)
+
+    const raw = Object.assign({
+      to: user,
+      message: instruction.text
+    }, options, _.pick(event && event.raw, 'conversationId'))
+
+    return PromisifyEvent({
+      platform: 'webchat',
+      type: 'login_prompt',
+      user: { id: user },
+      raw: raw,
+      text: instruction.text
+    })
+  }
+
   if (!_.isNil(instruction.text)) {
     const user = getUserId(event)
 

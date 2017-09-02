@@ -4,7 +4,7 @@ import Promise from 'bluebird'
 import users from './users'
 import db from './db'
 
-const outgoingTypes = ['text']
+const outgoingTypes = ['text', 'login_prompt']
 
 module.exports = async (bp, config) => {
 

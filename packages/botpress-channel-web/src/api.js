@@ -80,8 +80,8 @@ module.exports = async (bp, config) => {
     let { conversationId } = (req.query || {})
     conversationId = conversationId && parseInt(conversationId)
 
-    if (!_.includes(['text', 'quick_reply'], payload.type)) { // TODO: Support files
-      res.status(400).send(ERR_MSG_TYPE)
+    if (!_.includes(['text', 'quick_reply', 'login_prompt'], payload.type)) { // TODO: Support files
+      return res.status(400).send(ERR_MSG_TYPE)
     }
 
     if (!conversationId) {
@@ -131,7 +131,15 @@ module.exports = async (bp, config) => {
 
     const sanitizedPayload = _.pick(payload, ['text', 'type', 'data'])
 
-    const message = await appendUserMessage(userId, conversationId, sanitizedPayload)
+    // Because we don't necessarily persist what we emit/received
+    const persistedPayload = Object.assign({}, sanitizedPayload)
+
+    // We remove the password from the persisted messages for security reasons
+    if (payload.type === 'login_prompt') {
+      persistedPayload.data = _.omit(persistedPayload.data, ['password'])
+    }
+
+    const message = await appendUserMessage(userId, conversationId, persistedPayload)
 
     Object.assign(message, {
       __room: 'visitor:' + userId // This is used to send to the relevant user's socket

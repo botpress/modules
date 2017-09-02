@@ -6,6 +6,7 @@ import differenceInMinutes from 'date-fns/difference_in_minutes'
 
 import BotAvatar from '../bot_avatar'
 import QuickReplies from './quick_replies'
+import LoginPrompt from './login_prompt'
 
 import style from './style.scss'
 
@@ -37,6 +38,7 @@ class MessageGroup extends Component {
     })
 
     const bubbleColor = this.props.fgColor
+    const textColor = this.props.textColor
 
     return <div className={className}>
       {isBot && this.renderAvatar()}
@@ -44,7 +46,14 @@ class MessageGroup extends Component {
         {isBot && <div className={style['info-line']}>{sample.full_name}</div>}
         <div className={style.group}>
           {this.props.messages.map((data, i) => {
-            return <Message bubbleColor={bubbleColor} key={`msg-${i}`} data={data} />
+            return <Message
+              onLoginPromptSend={this.props.onLoginPromptSend}
+              textColor={textColor}
+              bubbleColor={bubbleColor} 
+              key={`msg-${i}`}
+              isLastOfGroup={i >= this.props.messages.length - 1}
+              isLastGroup={this.props.isLastGroup}
+              data={data} />
           })}
         </div>
       </div>
@@ -128,21 +137,24 @@ export default class MessageList extends Component {
     }
 
     return <div>
-      {groups.map((messages, i) => {
+      {groups.map((group, i) => {
         const lastGroup = groups[i - 1]
         const lastDate = lastGroup && lastGroup[lastGroup.length - 1] && lastGroup[lastGroup.length - 1].sent_on 
-        const groupDate = messages && messages[0].sent_on
+        const groupDate = group && group[0].sent_on
 
         const isDateNeeded = !groups[i - 1]
           || differenceInMinutes(new Date(groupDate), new Date(lastDate)) > TIME_BETWEEN_DATES
 
         return <div>
-            {isDateNeeded ? this.renderDate(messages[0].sent_on) : null}
+            {isDateNeeded ? this.renderDate(group[0].sent_on) : null}
             <MessageGroup 
               avatarUrl={this.props.avatarUrl}
               fgColor={this.props.fgColor}
+              textColor={this.props.textColor}
               key={`msg-group-${i}`}
-              messages={messages} />
+              onLoginPromptSend={this.props.onLoginPromptSend}
+              isLastGroup={i >= groups.length - 1}
+              messages={group} />
           </div>
       })}
     </div>
@@ -152,14 +164,6 @@ export default class MessageList extends Component {
     return <div className={style.messages} ref={(m) => { this.messagesDiv = m }}>
       {this.renderMessageGroups()}
       {this.renderQuickReplies()}
-    </div>
-
-    return <div>
-      <span>
-        {messages.map((m, k) => {
-          return <Message config={this.props.config} data={m} key={k} />
-        })} 
-      </span>
     </div>
   }
 }
@@ -174,9 +178,23 @@ class Message extends Component {
     return <div><p>{this.props.data.message_text}</p></div>
   }
 
+  render_login_prompt() {
+    const isLastMessage = this.props.isLastOfGroup && this.props.isLastGroup
+    const isBotMessage = !this.props.data.userId
+
+    return <div>
+      <LoginPrompt
+        isLastMessage={isLastMessage}
+        isBotMessage={isBotMessage}
+        bgColor={this.props.bubbleColor}
+        onLoginPromptSend={this.props.onLoginPromptSend}
+        textColor={this.props.textColor} />
+    </div>
+  }
+
   render_typing() {
     const bubble = () => <div className={style.typingBubble} 
-      style={{ backgroundColor: this.props.bubbleColor }}/>
+      style={{ backgroundColor: this.props.bubbleColor, color: this.props.textColor }}/>
 
     return <div className={style.typingGroup}>
       {bubble()}
@@ -191,7 +209,7 @@ class Message extends Component {
 
   render() {
     const bubbleStyle = !!this.props.data.userId
-      ? { backgroundColor: this.props.bubbleColor }
+      ? { backgroundColor: this.props.bubbleColor, color: this.props.textColor }
       : null
 
     const renderer = (this['render_' + this.props.data.message_type] || this.render_unsupported).bind(this)
