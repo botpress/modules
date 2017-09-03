@@ -1,5 +1,8 @@
 import _ from 'lodash'
 import path from 'path'
+import multer from 'multer'
+import multers3 from 'multer-s3'
+import aws from 'aws-sdk'
 
 import injectScript from 'raw!./inject.js'
 import injectStyle from 'raw!./inject.css'
@@ -12,6 +15,7 @@ import users from './users'
 
 const ERR_USER_ID_REQ = "`userId` is required and must be valid"
 const ERR_MSG_TYPE = "`type` is required and must be valid"
+const ERR_CONV_ID_REQ = "`conversationId` is required and must be valid"
 
 /*
   Supported message types:
@@ -32,6 +36,60 @@ const ERR_MSG_TYPE = "`type` is required and must be valid"
  */
 
 module.exports = async (bp, config) => {
+
+  const diskStorage = multer.diskStorage({
+    limits: {
+      files: 1,
+      fileSize: 5242880 // 5MB
+    },
+    filename: function (req, file, cb) {
+      const userId = _.get(req, 'params.userId') || 'anonymous'
+      const ext = path.extname(file.originalname)
+
+      cb(null, `${userId}_${new Date().getTime()}${ext}`)
+    }
+  })
+
+  let upload = multer({ storage: diskStorage })
+
+  if (config.uploadsUseS3) {
+    /*
+      You can override AWS's default settings here. Example:
+      { region: 'us-east-1', apiVersion: '2014-10-01', credentials: {...} }
+     */
+    let awsConfig = {
+      region: config.uploadsS3Region,
+      credentials: {
+        accessKeyId: config.uploadsS3AWSAccessKey,
+        secretAccessKey: config.uploadsS3AWSAccessSecret
+      }
+    }
+
+    if (!awsConfig.credentials.accessKeyId && !awsConfig.credentials.secretAccessKey) {
+      delete awsConfig.credentials
+    }
+
+    if (!awsConfig.region) {
+      delete awsConfig.region
+    }
+
+    const s3 = new aws.S3(awsConfig)
+    const s3Storage = multers3({
+      s3: s3,
+      bucket: config.uploadsS3Bucket || 'uploads',
+      contentType: multers3.AUTO_CONTENT_TYPE,
+      cacheControl: 'max-age=31536000', // one year caching
+      acl: 'public-read',
+      key: function (req, file, cb) {
+        const userId = _.get(req, 'params.userId') || 'anonymous'
+        const ext = path.extname(file.originalname)
+
+        cb(null, `${userId}_${new Date().getTime()}${ext}`)
+      }
+    })
+
+    upload = multer({ storage: s3Storage })
+  }
 
   const knex = await bp.db.get()
 
@@ -86,6 +144,40 @@ module.exports = async (bp, config) => {
 
     if (!conversationId) {
       conversationId = await getOrCreateRecentConversation(userId)
+    }
+
+    await sendNewMessage(userId, conversationId, payload)
+
+    return res.sendStatus(200)
+  }))
+
+  // ?conversationId=xxx (required)
+  router.post('/messages/:userId/files', upload.single('file'), asyncApi(async (req, res) => {
+    const { userId } = req.params || {}
+
+    if (!validateUserId(userId)) {
+      return res.status(400).send(ERR_USER_ID_REQ)
+    }
+
+    await getOrCreateUser(userId) // Just to create the user if it doesn't exist
+
+    let { conversationId } = (req.query || {})
+    conversationId = conversationId && parseInt(conversationId)
+
+    if (!conversationId) {
+      return res.status(400).send(ERR_CONV_ID_REQ)
+    }
+
+    const payload = {
+      text: `Uploaded a file [${req.file.originalname}]`,
+      type: 'file',
+      data: {
+        storage: req.file.location ? 's3' : 'local',
+        url: req.file.location || null,
+        name: req.file.originalname,
+        mime: req.file.contentType || req.file.mimetype,
+        size: req.file.size
+      }
     }
 
     await sendNewMessage(userId, conversationId, payload)

@@ -38,7 +38,13 @@ module.exports = {
     backgroundColor: { type: 'string', required: false, default: '#000000' },
     textColorOnBackground: { type: 'string', required: false, default: '#666666' },
     foregroundColor: { type: 'string', required: false, default: '#0176ff' },
-    textColorOnForeground: { type: 'string', required: false, default: '#ffffff' }
+    textColorOnForeground: { type: 'string', required: false, default: '#ffffff' },
+
+    uploadsUseS3: { type: 'bool', required: false, default: false, env: 'WEBCHAT_USE_S3' },
+    uploadsS3Bucket: { type: 'string', required: false, default: 'bucket-name', env: 'WEBCHAT_S3_BUCKET' },
+    uploadsS3Region: { type: 'any', required: false, default: null, env: 'WEBCHAT_S3_REGION' },
+    uploadsS3AWSAccessKey: { type: 'any', required: false, default: null, env: 'WEBCHAT_S3_ACCESS_KEY' },
+    uploadsS3AWSAccessSecret: { type: 'any', required: false, default: null, env: 'WEBCHAT_S3_KEY_SECRET' }
   },
 
   init: async function(bp, configurator) {
