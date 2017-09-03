@@ -342,6 +342,17 @@ export default class Web extends React.Component {
     })
   }
 
+  handleFileUploadSend(title, payload, file) {
+    const userId = window.__BP_VISITOR_ID
+    const url = `${BOT_HOSTNAME}/api/botpress-platform-webchat/messages/${userId}/files`
+    const config = { params: { conversationId: this.state.currentConversationId } }
+
+    let data = new FormData()
+    data.append('file', file)
+
+    return this.props.bp.axios.post(url, data, config).then()
+  }
+
   handleSendData(data) {
     const userId = window.__BP_VISITOR_ID
     const url = `${BOT_HOSTNAME}/api/botpress-platform-webchat/messages/${userId}`
@@ -425,6 +436,7 @@ export default class Web extends React.Component {
       onTextSend={::this.handleSendMessage}
       onTextChanged={::this.handleTextChanged}
       onQuickReplySend={::this.handleSendQuickReply}
+      onFileUploadSend={::this.handleFileUploadSend}
       onLoginPromptSend={::this.handleLoginPrompt} />
   }
 

@@ -7,6 +7,7 @@ import differenceInMinutes from 'date-fns/difference_in_minutes'
 import BotAvatar from '../bot_avatar'
 import QuickReplies from './quick_replies'
 import LoginPrompt from './login_prompt'
+import FileMessage from './file'
 
 import style from './style.scss'
 
@@ -89,7 +90,8 @@ export default class MessageList extends Component {
     return <QuickReplies 
       quick_replies={quick_replies}
       fgColor={this.props.fgColor}
-      onQuickReplySend={this.props.onQuickReplySend} />
+      onQuickReplySend={this.props.onQuickReplySend}
+      onFileUploadSend={this.props.onFileUploadSend} />
   }
 
   renderDate(date) {
@@ -203,6 +205,10 @@ class Message extends Component {
     </div>
   }
 
+  render_file() {
+    return <FileMessage file={this.props.data.message_data}/>
+  }
+
   render_unsupported() {
     return <div><p>*Unsupported message type*</p></div>
   }
@@ -214,7 +220,13 @@ class Message extends Component {
 
     const renderer = (this['render_' + this.props.data.message_type] || this.render_unsupported).bind(this)
 
-    return <div className={style.bubble} style={bubbleStyle}>
+    let className = style.bubble
+
+    if (style[this.props.data.message_type]) {
+      className += ' ' + style[this.props.data.message_type]
+    }
+
+    return <div className={className} style={bubbleStyle}>
       {renderer()}
     </div>
   }
