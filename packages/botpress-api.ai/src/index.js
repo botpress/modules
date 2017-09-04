@@ -12,7 +12,7 @@ let service = null
 const getClient = () => {
   return axios.create({
     baseURL: 'https://api.api.ai/v1',
-    timeout: 5000,
+    timeout: process.env.BOTPRESS_HTTP_TIMEOUT || 5000,
     headers: {'Authorization': 'Bearer ' + config.accessToken}
   })
 }

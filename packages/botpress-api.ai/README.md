@@ -43,6 +43,13 @@ There's a [Slack community](https://slack.botpress.io) where you are welcome to 
 
 Get an invite and join us now! 👉[https://slack.botpress.io](https://slack.botpress.io)
 
+## ENV Variables
+
+| ENV | Default | Description |
+|---|---|---|
+| BOTPRESS_HTTP_TIMEOUT | 5000 | The timeout to API.AI requests |
+| APIAI_TOKEN | null | Override the API token |
+
 ## License
 
 botpress-api.ai is licensed under [AGPL-3.0](/LICENSE)
