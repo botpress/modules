@@ -73,8 +73,12 @@ export default class Side extends React.Component {
       ? this.props.config.botConvoTitle
       : 'Conversations'
 
+    const description = this.props.config.botConvoDescription
+    const hasDescription = description && description.length > 0
+    
     return <div className={style.title}>
         <div className={style.name}>{title}{this.props.unreadCount > 0 ? this.renderUnreadCount() : null}</div>
+        {hasDescription && <div className={style.status}>{description}</div>}
       </div>
   }
 

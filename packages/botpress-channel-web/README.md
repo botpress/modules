@@ -102,6 +102,7 @@ A configuration file (`botpress-platform-webchat.config.yml`) has been created a
 botName: 'Bot' ## Name of your bot
 botAvatarUrl: null ## Default avatar url of the image (e.g. 'https://avatars3.githubusercontent.com/u/1315508?v=4&s=400' )
 botConvoTitle: 'Technical Support' ## Title of the first conversation with the bot
+botConvoDescription: 'This is a description'
 
 # POPUP CONVERSATION SETTINGS
 welcomeMsgEnable: true

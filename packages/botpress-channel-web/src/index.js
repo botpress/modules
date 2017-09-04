@@ -29,7 +29,8 @@ module.exports = {
 
     botName: { type: 'string', required: false, default: 'Bot' },
     botAvatarUrl: { type: 'any', required: false, default: null },
-    botConvoTitle: { type: 'string', required: false, default: 'Support'},
+    botConvoTitle: { type: 'string', required: false, default: 'Support' },
+    botConvoDescription: { type: 'string', required: false, default: '' },
 
     welcomeMsgEnable: { type: 'bool', required: false, default: false },
     welcomeMsgDelay: { type: 'any', required: false, default: 5000 },
