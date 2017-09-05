@@ -1,6 +1,7 @@
 import Promise from 'bluebird'
 import moment from 'moment'
 import { DatabaseHelpers as helpers } from 'botpress'
+import _ from 'lodash'
 
 let knex = null
 let bp = null
@@ -27,8 +28,39 @@ function initializeDb() {
   .then(() => knex)
 }
 
-function saveFacebookOut(event) {
-  const userId = 'facebook:' + event.raw.to
+function saveInteractionIn(event) {
+
+  let user = _.get(event, 'user.id')
+    || _.get(event, 'user.userId')
+    || _.get(event, 'raw.from')
+    || _.get(event, 'user')
+
+  if (!user.startsWith(event.platform)) {
+    user = event.platform + ':' + user
+  }
+
+  const interactionRow = {
+    ts: helpers(knex).date.now(),
+    type: event.type,
+    text: event.text,
+    user: user,
+    direction: 'in'
+  }
+
+  return knex('analytics_interactions').insert(interactionRow)
+}
+
+function saveInteractionOut(event) {
+
+  let userId = _.get(event, 'user.id')
+    || _.get(event, 'user.userId')
+    || _.get(event, 'raw.to')
+    || _.get(event, 'user')
+
+  if (!userId.startsWith(event.platform)) {
+    userId = event.platform + ':' + userId
+  }
+
   const interactionRow = {
     ts: helpers(knex).date.now(),
     type: event.type,
@@ -39,24 +71,6 @@ function saveFacebookOut(event) {
 
   return knex('analytics_interactions').insert(interactionRow)
   .then(function(result) { return true })
-}
-
-function saveInteractionIn(event) {
-  const interactionRow = {
-    ts: helpers(knex).date.now(),
-    type: event.type,
-    text: event.text,
-    user: event.platform + ':' + event.user.id,
-    direction: 'in'
-  }
-
-  return knex('analytics_interactions').insert(interactionRow)
-}
-
-function saveInteractionOut(event) {
-  if(event.platform === 'facebook') {
-    return saveFacebookOut(event)
-  }
 }
 
 module.exports = (k, botpress) => {
