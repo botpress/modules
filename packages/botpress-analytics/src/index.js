@@ -22,11 +22,15 @@ const incomingMiddleware = (event, next) => {
   }
 
   if (event.user) {
-    db && db.saveIncoming(event)
-    .then(() => next())
-  } else {
-    next()
+    // Asynchronously save the interaction (non-blocking)
+    db && db.saveIncoming(event).then()
+    .catch(() => {
+      event.bp && event.bp.logger.debug('[Analytics] Could not save incoming interaction for ' + event.platform)
+    })
   }
+
+  
+  next()
 }
 
 const outgoingMiddleware = (event, next) => {
@@ -34,7 +38,12 @@ const outgoingMiddleware = (event, next) => {
     return next()
   }
 
-  db && db.saveOutgoing(event)
+  // Asynchronously save the interaction (non-blocking)
+  db && db.saveOutgoing(event).then()
+  .catch(() => {
+    event.bp && event.bp.logger.debug('[Analytics] Could not save outgoing interaction for ' + event.platform)
+  })
+
   next()
 }
 
