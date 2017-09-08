@@ -40,7 +40,7 @@ module.exports = (knex, botfile) => {
         table.integer('conversationId')
         table.string('userId')
         table.string('message_type')
-        table.string('message_text')
+        table.text('message_text')
         table.jsonb('message_raw')
         table.binary('message_data') // Only useful if type = file
         table.string('full_name')
