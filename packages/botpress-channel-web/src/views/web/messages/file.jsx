@@ -18,7 +18,7 @@ class FileMessage extends Component {
   }
 
   renderRemoteFile() {
-    if (this.props.file.mime.includes('image/')) {
+    if (this.props.file && this.props.file.mime && this.props.file.mime.includes('image/')) {
       return this.renderRemoteImage()
     }
 
