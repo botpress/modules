@@ -1,6 +1,7 @@
 const checkVersion = require('botpress-version-manager')
 
 const Analytics = require('./analytics')
+const CustomAnalytics = require('./custom_analytics')
 const DB = require('./db')
 const _ = require('lodash')
 
@@ -68,6 +69,10 @@ module.exports = {
       description: 'Tracks outgoing messages for Analytics purposes'
     })
 
+    bp.analytics = {
+      custom: CustomAnalytics({ bp })
+    }
+
     bp.db.get()
     .then(knex => {
       db = DB(knex, bp)
@@ -89,5 +94,10 @@ module.exports = {
       .then(metadata => res.send(metadata))
     })
 
+    bp.getRouter('botpress-analytics')
+    .get('/custom_metrics', async (req, res, next) => {
+      const metrics = await bp.analytics.custom.getAll(req.query.from, req.query.to)
+      res.send(metrics)
+    })
   }
 }

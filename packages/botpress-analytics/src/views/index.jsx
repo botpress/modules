@@ -26,6 +26,8 @@ import {
   YAxis
 } from 'recharts'
 
+import CustomMetrics from './custom'
+
 import style from './style.scss'
 import _ from 'lodash'
 import classnames from 'classnames'
@@ -454,6 +456,9 @@ export default class AnalyticsModule extends React.Component {
     )
   }
 
+  renderCustomMetrics() {
+    return <CustomMetrics axios={this.props.bp.axios} />
+  }
 
   renderBasicMetrics() {
     return (
@@ -504,6 +509,14 @@ export default class AnalyticsModule extends React.Component {
     return (
       <div>
         <StatsHeader axios={this.props.bp.axios}/>
+        {this.renderCustomMetrics()}
+        <Row>
+          <Col sm={12}>
+            <div className={style.title}>Generic Analytics</div>
+            <hr/>
+          </Col>
+          <hr/>
+        </Row>
         {this.renderBasicMetrics()}
         {this.renderAdvancedMetrics()}
       </div>
