@@ -25,6 +25,14 @@ function initializeDb() {
       table.timestamp('ts')
     })
   })
+  .then(function() {
+    return helpers(knex).createTableIfNotExists('analytics_custom', function(table) {
+      table.string('date')
+      table.string('name')
+      table.integer('count')
+      table.unique(['date', 'name'])
+    })
+  })
   .then(() => knex)
 }
 

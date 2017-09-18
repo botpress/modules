@@ -8,8 +8,42 @@
   background-color: #fff;
 }
 
+.customCount {
+  font-size: 48px;
+  text-align: center;
+  font-weight: bolder;
+}
+
+.customCountSmall {
+  margin-top: 10px;
+  font-size: 15px;
+  text-align: center;
+  color: #888;
+}
+
+.rangeDropdown {
+  display: inline-block;
+  width: 200px;
+  margin: -10px;
+  margin-left: 20px;
+}
+
+.title {
+  font-size: 20px;
+  padding-left: 15px;
+}
+
+hr {
+  margin: 10px 15px 20px 15px;
+  border-color: #d6d6d6;
+}
+
 .graphContainer {
   height: 350px;
+}
+
+.smallGraphContainer {
+  height: 150px;
 }
 
 .graphContainerTwoColumn {
