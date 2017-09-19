@@ -7,6 +7,7 @@ import Bootstrap, {
   Panel,
   Row,
   Tooltip as BTooltip,
+  OverlayTrigger,
   DropdownButton,
   MenuItem,
   ButtonGroup
@@ -185,8 +186,8 @@ export default class CustomMetrics extends React.Component {
     }
 
     const sum = _.sumBy(metric.results, 'percent')
-    let avgPerDay = (sum / metric.results.length).toFixed(2)
-    let absAvg = (sum / data.length).toFixed(2)
+    let avgPerDay = (sum / metric.results.length * 100).toFixed(1)
+    let absAvg = (sum / data.length * 100).toFixed(1)
 
     avgPerDay = isNaN(avgPerDay) ? 0 : avgPerDay
     absAvg = isNaN(absAvg) ? 0 : absAvg
@@ -194,10 +195,10 @@ export default class CustomMetrics extends React.Component {
     return (
       <div>
         <div className={style.customCount} style={{ height: '50px' }}>
-          {avgPerDay * 100}%
+          {avgPerDay}%
         </div>
         <div className={style.customCountSmall} style={{ height: '25px' }}>
-          Abs Average: {absAvg * 100}%
+          Abs Average: {absAvg}%
         </div>
         <ResponsiveContainer width="100%" height={75}>
           <AreaChart data={data}>
@@ -228,8 +229,24 @@ export default class CustomMetrics extends React.Component {
   renderCustomMetric(metric) {
     const renderer = this['render_' + metric.type]
 
+    const descriptionTooltip = <BTooltip id={`metric-${metric.name}-tooltip`}>{metric.description}</BTooltip>
+
+    const tooltip = (
+      <span className={classnames(style.metricInfo, 'bp-info')}>
+        <OverlayTrigger placement="top" overlay={descriptionTooltip}>
+          <i className="material-icons">info</i>
+        </OverlayTrigger>
+      </span>
+    )
+
+    const header = (
+      <div>
+        <span className={style.metricName}>{metric.name}</span>
+        {tooltip}
+      </div>
+    )
     return (
-      <Panel header={metric.name}>
+      <Panel header={header}>
         <div className={style.smallGraphContainer}>{renderer && renderer(metric)}</div>
       </Panel>
     )
