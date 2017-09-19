@@ -8,6 +8,20 @@
   background-color: #fff;
 }
 
+.metricInfo {
+  float: right;
+  i {
+    font-size: 16px;
+  }
+}
+
+.metricName {
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 0;
+  margin: 0;
+}
+
 .customCount {
   font-size: 48px;
   text-align: center;
@@ -60,7 +74,7 @@ hr {
   }
   h1 {
     font-size: 40px;
-    margin : 15px;
+    margin: 15px;
   }
   h3 {
     margin: 10px;
@@ -81,7 +95,6 @@ hr {
 }
 
 .busyHoursHeatMap {
-
   overflow-x: scroll;
   table {
     min-width: 800px;
@@ -91,7 +104,8 @@ hr {
     th {
       text-align: right;
     }
-    td, th{
+    td,
+    th {
       border-style: none;
       border-width: 0px;
       font-size: 12px;
@@ -99,7 +113,8 @@ hr {
   }
   tbody {
     tr {
-      td, th{
+      td,
+      th {
         border-style: solid;
         border-color: #ffffff;
         border-width: 3px;
