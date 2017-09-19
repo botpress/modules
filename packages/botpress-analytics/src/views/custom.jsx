@@ -72,6 +72,12 @@ const ranges = {
     label: 'This week'
   }),
 
+  yesterday: () => ({
+    from: moment().subtract(1, 'day'),
+    to: moment().subtract(1, 'day'),
+    label: 'Yesterday'
+  }),
+
   today: () => ({
     from: moment(),
     to: moment(),
