@@ -6,23 +6,15 @@ import Bootstrap, {
   Grid,
   Panel,
   Row,
+  Tooltip as BTooltip,
   DropdownButton,
   MenuItem,
   ButtonGroup
- } from 'react-bootstrap'
+} from 'react-bootstrap'
 
 import Select from 'react-select'
 
-
-import {
-  Area,
-  AreaChart,
-  Legend,
-  Tooltip,
-  PieChart,
-  Pie,
-  ResponsiveContainer
-} from 'recharts'
+import { Area, AreaChart, Legend, Tooltip, PieChart, Pie, ResponsiveContainer } from 'recharts'
 
 import style from './style.scss'
 import _ from 'lodash'
@@ -41,37 +33,45 @@ const color = {
 }
 
 const ranges = {
-  'lastweek': () => ({
-    from: moment().startOf('week').subtract(7, 'days'),
-    to: moment().endOf('week').subtract(7, 'days'),
+  lastweek: () => ({
+    from: moment()
+      .startOf('week')
+      .subtract(7, 'days'),
+    to: moment()
+      .endOf('week')
+      .subtract(7, 'days'),
     label: 'Last week'
   }),
 
-  'lastmonth': () => ({
-    from: moment().startOf('month').subtract(1, 'month'),
-    to: moment().endOf('month').subtract(1, 'month'),
+  lastmonth: () => ({
+    from: moment()
+      .startOf('month')
+      .subtract(1, 'month'),
+    to: moment()
+      .endOf('month')
+      .subtract(1, 'month'),
     label: 'Last month'
   }),
 
-  'last7days': () => ({
+  last7days: () => ({
     from: moment().subtract(7, 'days'),
     to: moment(),
     label: 'Last 7 days'
   }),
 
-  'thismonth': () => ({
+  thismonth: () => ({
     from: moment().startOf('month'),
     to: moment(),
     label: 'This month'
   }),
 
-  'thisweek': () => ({
+  thisweek: () => ({
     from: moment().startOf('week'),
     to: moment(),
     label: 'This week'
   }),
 
-  'today': () => ({
+  today: () => ({
     from: moment(),
     to: moment(),
     label: 'Today'
@@ -79,7 +79,6 @@ const ranges = {
 }
 
 export default class CustomMetrics extends React.Component {
-
   constructor(props) {
     super(props)
     this.state = {
@@ -99,15 +98,16 @@ export default class CustomMetrics extends React.Component {
   fetchMetrics() {
     const range = this.getCurrentRange()
 
-    return this.props.axios.get('/api/botpress-analytics/custom_metrics', {
-      params: {
-        from: range.from,
-        to: range.to
-      }
-    })
-    .then(({ data }) => {
-      this.setState({ metrics: data })
-    })
+    return this.props.axios
+      .get('/api/botpress-analytics/custom_metrics', {
+        params: {
+          from: range.from,
+          to: range.to
+        }
+      })
+      .then(({ data }) => {
+        this.setState({ metrics: data })
+      })
   }
 
   getCurrentRange() {
@@ -122,8 +122,7 @@ export default class CustomMetrics extends React.Component {
     const range = ranges[this.state.range]()
     const i = moment(range.from)
 
-    while(i.isSameOrBefore(range.to, 'day')) {
-
+    while (i.isSameOrBefore(range.to, 'day')) {
       const name = i.format('YYYY-MM-DD')
 
       if (!_.find(data, { name: name })) {
@@ -140,9 +139,11 @@ export default class CustomMetrics extends React.Component {
   }
 
   render_count(metric) {
-    const data = this.mergeDataWithDates(metric.results.map(row => {
-      return { name: row.date, value: row.count }
-    }))
+    const data = this.mergeDataWithDates(
+      metric.results.map(row => {
+        return { name: row.date, value: row.count }
+      })
+    )
 
     if (data.length === 1) {
       data.push(data[0])
@@ -155,25 +156,29 @@ export default class CustomMetrics extends React.Component {
     avgPerDay = isNaN(avgPerDay) ? 0 : avgPerDay
     absAvg = isNaN(absAvg) ? 0 : absAvg
 
-    return <div>
-      <div className={style.customCount} style={{ height: '50px'}}>
-        {sum}
+    return (
+      <div>
+        <div className={style.customCount} style={{ height: '50px' }}>
+          {sum}
+        </div>
+        <div className={style.customCountSmall} style={{ height: '25px' }}>
+          Avg {avgPerDay} ({absAvg})
+        </div>
+        <ResponsiveContainer width="100%" height={75}>
+          <AreaChart data={data}>
+            <Area type="monotone" dataKey="value" stroke="#8884d8" fill="#8884d8" />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
-      <div className={style.customCountSmall} style={{ height: '25px'}}>
-        Avg {avgPerDay} ({absAvg})
-      </div>
-      <ResponsiveContainer width='100%' height={75}>
-        <AreaChart data={data}>
-          <Area type='monotone' dataKey='value' stroke='#8884d8' fill='#8884d8' />
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
+    )
   }
 
   render_percent(metric) {
-    const data = this.mergeDataWithDates(metric.results.map(row => {
-      return { name: row.date, value: row.percent }
-    }))
+    const data = this.mergeDataWithDates(
+      metric.results.map(row => {
+        return { name: row.date, value: row.percent }
+      })
+    )
 
     if (data.length === 1) {
       data.push(data[0])
@@ -186,19 +191,21 @@ export default class CustomMetrics extends React.Component {
     avgPerDay = isNaN(avgPerDay) ? 0 : avgPerDay
     absAvg = isNaN(absAvg) ? 0 : absAvg
 
-    return <div>
-      <div className={style.customCount} style={{ height: '50px'}}>
-        {avgPerDay * 100}%
+    return (
+      <div>
+        <div className={style.customCount} style={{ height: '50px' }}>
+          {avgPerDay * 100}%
+        </div>
+        <div className={style.customCountSmall} style={{ height: '25px' }}>
+          Abs Average: {absAvg * 100}%
+        </div>
+        <ResponsiveContainer width="100%" height={75}>
+          <AreaChart data={data}>
+            <Area type="monotone" dataKey="value" stroke="#8884d8" fill="#8884d8" />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
-      <div className={style.customCountSmall} style={{ height: '25px'}}>
-        Abs Average: {absAvg*100}%
-      </div>
-      <ResponsiveContainer width='100%' height={75}>
-        <AreaChart data={data}>
-          <Area type='monotone' dataKey='value' stroke='#8884d8' fill='#8884d8' />
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
+    )
   }
 
   render_piechart(metric) {
@@ -206,25 +213,24 @@ export default class CustomMetrics extends React.Component {
       return { name: row.name, value: row.count }
     })
 
-    return <ResponsiveContainer width='100%' height='100%'>
-      <PieChart>
-        <Pie data={data} cy={70} innerRadius={0} outerRadius={70} fill="#82ca9d"/>
-        <Tooltip/>
-      </PieChart>
-    </ResponsiveContainer>
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie data={data} cy={70} innerRadius={0} outerRadius={70} fill="#82ca9d" />
+          <Tooltip />
+        </PieChart>
+      </ResponsiveContainer>
+    )
 
     return null
   }
 
   renderCustomMetric(metric) {
-
     const renderer = this['render_' + metric.type]
 
-    return(
+    return (
       <Panel header={metric.name}>
-        <div className={style.smallGraphContainer}>
-          { renderer && renderer(metric) }
-        </div>
+        <div className={style.smallGraphContainer}>{renderer && renderer(metric)}</div>
       </Panel>
     )
   }
@@ -238,14 +244,15 @@ export default class CustomMetrics extends React.Component {
 
     const renderChunk = chunk => {
       return chunk.map(metric => {
-        return <Col sm={6} md={3} key={`col-metric-${metric.name}`}>
-          {this.renderCustomMetric(metric)}
-        </Col>
+        return (
+          <Col sm={6} md={3} key={`col-metric-${metric.name}`}>
+            {this.renderCustomMetric(metric)}
+          </Col>
+        )
       })
     }
 
-    const chunkElements = chunks.map((chunk, i) =>
-      <Row key={`chunk-${i}`}>{renderChunk(chunk)}</Row>)
+    const chunkElements = chunks.map((chunk, i) => <Row key={`chunk-${i}`}>{renderChunk(chunk)}</Row>)
 
     const currentSelection = ranges[this.state.range]().label
 
@@ -256,14 +263,20 @@ export default class CustomMetrics extends React.Component {
           this.fetchMetrics()
         }, 100)
       }
-      return <MenuItem key={key} eventKey={key} onSelect={cc}>{ranges[key]().label}</MenuItem>
+      return (
+        <MenuItem key={key} eventKey={key} onSelect={cc}>
+          {ranges[key]().label}
+        </MenuItem>
+      )
     })
 
-    const dropdown = <ButtonGroup>
-    <DropdownButton title={currentSelection} className={style.rangeDropdown} id="selectRangeDropdown">
-      {options}
-    </DropdownButton>
-    </ButtonGroup>
+    const dropdown = (
+      <ButtonGroup>
+        <DropdownButton title={currentSelection} className={style.rangeDropdown} id="selectRangeDropdown">
+          {options}
+        </DropdownButton>
+      </ButtonGroup>
+    )
 
     const options2 = _.keys(ranges).map(range => {
       return {
@@ -279,29 +292,29 @@ export default class CustomMetrics extends React.Component {
       }, 100)
     }
 
-    const dropdown2 = <Select
-      options={options2}
-      onChange={_onSelect.bind(this)}
-      value={this.state.range}
-      clearable={false}
-      autoBlur={true}
-      className={style.rangeDropdown}
-      placeholder="Select a date range" />
+    const dropdown2 = (
+      <Select
+        options={options2}
+        onChange={_onSelect.bind(this)}
+        value={this.state.range}
+        clearable={false}
+        autoBlur={true}
+        className={style.rangeDropdown}
+        placeholder="Select a date range"
+      />
+    )
 
     return (
-        <div>
-          <Row>
+      <div>
+        <Row>
           <Col sm={12}>
             <span className={style.title}>Custom Analytics</span>
             {dropdown2}
-            <hr/>
+            <hr />
           </Col>
         </Row>
-        <Grid fluid >
-          {chunkElements}
-        </Grid>
+        <Grid fluid>{chunkElements}</Grid>
       </div>
     )
   }
-
 }
