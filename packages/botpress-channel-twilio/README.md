@@ -2,7 +2,30 @@
 
 <img src="https://cdn.rawgit.com/botpress/botpress/7e007114/assets/supports_UMM.png" height="60px" />
 
-**TODO: THIS MODULE IS STILL UNDER DEVELOPMENT**
+Official Twilio (SMS) connector module for [Botpress](http://github.com/botpress/botpress).
+
+This module has been build to accelerate and facilitate development of SMS bots.
+
+## Sending Text
+##### `content.yml`
+
+```yaml
+welcome:
+  - Hello, world!
+  - This is a message on Twilio!
+  - text: this works too!
+  - |
+    This is a multi-line
+    message :).
+```
+
+To send a message only on Twilio (in case of multi-messenger bots):
+
+```yaml
+welcome:
+  - platform: twilio
+    text: Hello
+```
 
 ## Configuration
 
