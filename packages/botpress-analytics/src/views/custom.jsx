@@ -15,7 +15,7 @@ import Bootstrap, {
 
 import Select from 'react-select'
 
-import { Area, AreaChart, Legend, Tooltip, PieChart, Pie, ResponsiveContainer } from 'recharts'
+import { Area, AreaChart, Legend, Tooltip, PieChart, Pie, ResponsiveContainer, Cell } from 'recharts'
 
 import style from './style.scss'
 import _ from 'lodash'
@@ -32,6 +32,9 @@ const color = {
   female: '#de5454',
   conversation: '#de5454'
 }
+
+const pieChartColors = ['#F18F01', '#ADCAD6', '#006E90', '#99C24D', '#4cbdb9', '#4cbdb9']
+const RADIAN = Math.PI / 180
 
 const ranges = {
   lastweek: () => ({
@@ -83,6 +86,18 @@ const ranges = {
     to: moment(),
     label: 'Today'
   })
+}
+
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5
+  const x = cx + radius * Math.cos(-midAngle * RADIAN)
+  const y = cy + radius * Math.sin(-midAngle * RADIAN)
+
+  return (
+    <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  )
 }
 
 export default class CustomMetrics extends React.Component {
@@ -223,7 +238,9 @@ export default class CustomMetrics extends React.Component {
     return (
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
-          <Pie data={data} cy={70} innerRadius={0} outerRadius={70} fill="#82ca9d" />
+          <Pie data={data} cy={70} innerRadius={0} outerRadius={70} fill="#82ca9d" label={renderCustomizedLabel}>
+            {data.map((entry, index) => <Cell key={index} fill={pieChartColors[index % pieChartColors.length]} />)}
+          </Pie>
           <Tooltip />
         </PieChart>
       </ResponsiveContainer>

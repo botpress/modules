@@ -3,7 +3,6 @@ import _ from 'lodash'
 import Promise from 'bluebird'
 
 module.exports = ({ bp }) => {
-
   const graphs = []
 
   async function update(name, operation, value, racing = false) {
@@ -21,21 +20,21 @@ module.exports = ({ bp }) => {
     }
 
     const result = await knex('analytics_custom')
-    .where('date', today)
-    .andWhere('name', name)
-    .update('count', operation)
-    .then()
+      .where('date', today)
+      .andWhere('name', name)
+      .update('count', operation)
+      .then()
 
     if (result == 0 && !racing) {
       await knex('analytics_custom')
-      .insert({
-        'name': name,
-        'date': today,
-        'count': value
-      })
-      .catch(err => {
-        return update(name, operation, value, true)
-      })
+        .insert({
+          name: name,
+          date: today,
+          count: value
+        })
+        .catch(err => {
+          return update(name, operation, value, true)
+        })
     }
   }
 
@@ -44,9 +43,7 @@ module.exports = ({ bp }) => {
       throw new Error('Invalid count increment, expected a valid number')
     }
 
-    const countQuery = (count < 0)
-      ? ('count - ' + Math.abs(count))
-      : ('count + ' + Math.abs(count))
+    const countQuery = count < 0 ? 'count - ' + Math.abs(count) : 'count + ' + Math.abs(count)
 
     const knex = await bp.db.get()
 
@@ -63,7 +60,6 @@ module.exports = ({ bp }) => {
 
   //{ name, type, description, variables }
   function addGraph(graph) {
-
     if (!_.includes(['count', 'percent', 'piechart'], graph.type)) {
       throw new Error('Unknown graph of type ' + graph.type)
     }
@@ -72,28 +68,27 @@ module.exports = ({ bp }) => {
   }
 
   const getters = {
-    'count': async function(graph, from, to) {
+    count: async function(graph, from, to) {
       const knex = await bp.db.get()
 
       const variable = _.first(graph.variables)
 
       const rows = await knex('analytics_custom')
-      .select(['date', knex.raw('sum(count) as count')])
-      .where('date', '>=', from)
-      .andWhere('date', '<=', to)
-      .andWhere('name', 'LIKE', variable + '~%')
-      .groupBy('date')
-      .then(rows => {
-        return rows.map(row => {
-          return Object.assign(row, { count: parseInt(row.count) })
+        .select(['date', knex.raw('sum(count) as count')])
+        .where('date', '>=', from)
+        .andWhere('date', '<=', to)
+        .andWhere('name', 'LIKE', variable + '~%')
+        .groupBy('date')
+        .then(rows => {
+          return rows.map(row => {
+            return Object.assign(row, { count: parseInt(row.count) })
+          })
         })
-      })
 
       return Object.assign({}, graph, { results: rows })
     },
 
-    'percent': async function(graph, from, to) {
-
+    percent: async function(graph, from, to) {
       const variable1 = _.first(graph.variables)
       const variable2 = _.last(graph.variables)
 
@@ -122,27 +117,27 @@ module.exports = ({ bp }) => {
       return Object.assign({}, graph, { results: rows })
     },
 
-    'piechart': async function(graph, from, to) {
+    piechart: async function(graph, from, to) {
       const knex = await bp.db.get()
 
       const variable = _.first(graph.variables)
 
       const rows = await knex('analytics_custom')
-      .select(['name', knex.raw('sum(count) as count')])
-      .where('date', '>=', from)
-      .andWhere('date', '<=', to)
-      .andWhere('name', 'LIKE', variable + '~%')
-      .groupBy('name')
-      .then(rows => {
-        return rows.map(row => {
-          const name = _.drop(row.name.split('~')).join('~')
+        .select(['name', knex.raw('sum(count) as count')])
+        .where('date', '>=', from)
+        .andWhere('date', '<=', to)
+        .andWhere('name', 'LIKE', variable + '~%')
+        .groupBy('name')
+        .then(rows => {
+          return rows.map(row => {
+            const name = _.drop(row.name.split('~')).join('~')
 
-          return Object.assign(row, {
-            name: _.isEmpty(name) ? 'unknown' : name,
-            count: parseInt(row.count)
+            return Object.assign(row, {
+              name: _.isEmpty(name) ? 'unknown' : name,
+              count: parseInt(row.count)
+            })
           })
         })
-      })
 
       return Object.assign({}, graph, { results: rows })
     }
