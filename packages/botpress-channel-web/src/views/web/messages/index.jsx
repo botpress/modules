@@ -14,20 +14,18 @@ import style from './style.scss'
 const TIME_BETWEEN_DATES = 10 // 10 minutes
 
 class MessageGroup extends Component {
-  
   renderAvatar() {
     let content = <BotAvatar foregroundColor={this.props.fgColor} />
 
     if (this.props.avatarUrl) {
-      content = <div 
-        className={style.picture} 
-        style={{ backgroundImage: 'url(' + this.props.avatarUrl +')'}}>
-      </div>
+      content = <div className={style.picture} style={{ backgroundImage: 'url(' + this.props.avatarUrl + ')' }} />
     }
 
-    return <div className={style.avatar} style={{ color: this.props.fgColor }}>
-      {content}
-    </div>
+    return (
+      <div className={style.avatar} style={{ color: this.props.fgColor }}>
+        {content}
+      </div>
+    )
   }
 
   render() {
@@ -41,32 +39,35 @@ class MessageGroup extends Component {
     const bubbleColor = this.props.fgColor
     const textColor = this.props.textColor
 
-    return <div className={className}>
-      {isBot && this.renderAvatar()}
-      <div className={style['message-container']}>
-        {isBot && <div className={style['info-line']}>{sample.full_name}</div>}
-        <div className={style.group}>
-          {this.props.messages.map((data, i) => {
-            return <Message
-              onLoginPromptSend={this.props.onLoginPromptSend}
-              textColor={textColor}
-              bubbleColor={bubbleColor} 
-              key={`msg-${i}`}
-              isLastOfGroup={i >= this.props.messages.length - 1}
-              isLastGroup={this.props.isLastGroup}
-              data={data} />
-          })}
+    return (
+      <div className={className}>
+        {isBot && this.renderAvatar()}
+        <div className={style['message-container']}>
+          {isBot && <div className={style['info-line']}>{sample.full_name}</div>}
+          <div className={style.group}>
+            {this.props.messages.map((data, i) => {
+              return (
+                <Message
+                  onLoginPromptSend={this.props.onLoginPromptSend}
+                  textColor={textColor}
+                  bubbleColor={bubbleColor}
+                  key={`msg-${i}`}
+                  isLastOfGroup={i >= this.props.messages.length - 1}
+                  isLastGroup={this.props.isLastGroup}
+                  data={data}
+                />
+              )
+            })}
+          </div>
         </div>
       </div>
-    </div>
+    )
   }
 }
 
 export default class MessageList extends Component {
-  
   constructor(props) {
     super(props)
-
     this.messagesDiv = null
   }
 
@@ -87,18 +88,23 @@ export default class MessageList extends Component {
     const message = messages[messages.length - 1]
     const quick_replies = message && message['message_raw'] && message['message_raw']['quick_replies']
 
-    return <QuickReplies 
-      quick_replies={quick_replies}
-      fgColor={this.props.fgColor}
-      onQuickReplySend={this.props.onQuickReplySend}
-      onFileUploadSend={this.props.onFileUploadSend} />
+    return (
+      <QuickReplies
+        quick_replies={quick_replies}
+        fgColor={this.props.fgColor}
+        onQuickReplySend={this.props.onQuickReplySend}
+        onFileUploadSend={this.props.onFileUploadSend}
+      />
+    )
   }
 
   renderDate(date) {
-    return <div className={style.date}>
+    return (
+      <div className={style.date}>
         {format(new Date(date), 'MMMM Do YYYY, h:mm a')}
-        <div className={style.smallLine}></div>
+        <div className={style.smallLine} />
       </div>
+    )
   }
 
   renderMessageGroups() {
@@ -138,79 +144,111 @@ export default class MessageList extends Component {
       })
     }
 
-    return <div>
-      {groups.map((group, i) => {
-        const lastGroup = groups[i - 1]
-        const lastDate = lastGroup && lastGroup[lastGroup.length - 1] && lastGroup[lastGroup.length - 1].sent_on 
-        const groupDate = group && group[0].sent_on
+    return (
+      <div>
+        {groups.map((group, i) => {
+          const lastGroup = groups[i - 1]
+          const lastDate = lastGroup && lastGroup[lastGroup.length - 1] && lastGroup[lastGroup.length - 1].sent_on
+          const groupDate = group && group[0].sent_on
 
-        const isDateNeeded = !groups[i - 1]
-          || differenceInMinutes(new Date(groupDate), new Date(lastDate)) > TIME_BETWEEN_DATES
+          const isDateNeeded =
+            !groups[i - 1] || differenceInMinutes(new Date(groupDate), new Date(lastDate)) > TIME_BETWEEN_DATES
 
-        return <div>
-            {isDateNeeded ? this.renderDate(group[0].sent_on) : null}
-            <MessageGroup 
-              avatarUrl={this.props.avatarUrl}
-              fgColor={this.props.fgColor}
-              textColor={this.props.textColor}
-              key={`msg-group-${i}`}
-              onLoginPromptSend={this.props.onLoginPromptSend}
-              isLastGroup={i >= groups.length - 1}
-              messages={group} />
-          </div>
-      })}
-    </div>
+          return (
+            <div>
+              {isDateNeeded ? this.renderDate(group[0].sent_on) : null}
+              <MessageGroup
+                avatarUrl={this.props.avatarUrl}
+                fgColor={this.props.fgColor}
+                textColor={this.props.textColor}
+                key={`msg-group-${i}`}
+                onLoginPromptSend={this.props.onLoginPromptSend}
+                isLastGroup={i >= groups.length - 1}
+                messages={group}
+              />
+            </div>
+          )
+        })}
+      </div>
+    )
   }
 
   render() {
-    return <div className={style.messages} ref={(m) => { this.messagesDiv = m }}>
-      {this.renderMessageGroups()}
-      {this.renderQuickReplies()}
-    </div>
+    return (
+      <div
+        className={style.messages}
+        ref={m => {
+          this.messagesDiv = m
+        }}
+      >
+        {this.renderMessageGroups()}
+        {this.renderQuickReplies()}
+      </div>
+    )
   }
 }
 
 class Message extends Component {
-
   render_text() {
-    return <div><p>{this.props.data.message_text}</p></div>
+    return (
+      <div>
+        <p>{this.props.data.message_text}</p>
+      </div>
+    )
   }
 
   render_quick_reply() {
-    return <div><p>{this.props.data.message_text}</p></div>
+    return (
+      <div>
+        <p>{this.props.data.message_text}</p>
+      </div>
+    )
   }
 
   render_login_prompt() {
     const isLastMessage = this.props.isLastOfGroup && this.props.isLastGroup
     const isBotMessage = !this.props.data.userId
 
-    return <div>
-      <LoginPrompt
-        isLastMessage={isLastMessage}
-        isBotMessage={isBotMessage}
-        bgColor={this.props.bubbleColor}
-        onLoginPromptSend={this.props.onLoginPromptSend}
-        textColor={this.props.textColor} />
-    </div>
+    return (
+      <div>
+        <LoginPrompt
+          isLastMessage={isLastMessage}
+          isBotMessage={isBotMessage}
+          bgColor={this.props.bubbleColor}
+          onLoginPromptSend={this.props.onLoginPromptSend}
+          textColor={this.props.textColor}
+        />
+      </div>
+    )
   }
 
   render_typing() {
-    const bubble = () => <div className={style.typingBubble} 
-      style={{ backgroundColor: this.props.bubbleColor, color: this.props.textColor }}/>
+    const bubble = () => (
+      <div
+        className={style.typingBubble}
+        style={{ backgroundColor: this.props.bubbleColor, color: this.props.textColor }}
+      />
+    )
 
-    return <div className={style.typingGroup}>
-      {bubble()}
-      {bubble()}
-      {bubble()}
-    </div>
+    return (
+      <div className={style.typingGroup}>
+        {bubble()}
+        {bubble()}
+        {bubble()}
+      </div>
+    )
   }
 
   render_file() {
-    return <FileMessage file={this.props.data.message_data}/>
+    return <FileMessage file={this.props.data.message_data} />
   }
 
   render_unsupported() {
-    return <div><p>*Unsupported message type*</p></div>
+    return (
+      <div>
+        <p>*Unsupported message type*</p>
+      </div>
+    )
   }
 
   render() {
@@ -226,8 +264,10 @@ class Message extends Component {
       className += ' ' + style[this.props.data.message_type]
     }
 
-    return <div className={className} style={bubbleStyle}>
-      {renderer()}
-    </div>
+    return (
+      <div className={className} style={bubbleStyle}>
+        {renderer()}
+      </div>
+    )
   }
 }
