@@ -18,6 +18,7 @@ const handleMessage = (event, id, user, platform, sendTo, text, sendText) => {
   const options = {}
   rs.setUservar(id, 'platform', platform)
   rs.setUservars(id, user)
+  rs.setUservar(id, 'text', text)
   rs.replyAsync(id, text)
   .then(reply => {
     deliveries.forEach(delivery => {

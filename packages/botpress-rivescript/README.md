@@ -38,13 +38,20 @@ For Facebook, `first_name`, `last_name`, `timezone`, `locale`, `gender`, `avatar
 - According to your facebook profile, your name is <get first_name> <get last_name>
 ```
 
-#### Platform
+#### Others
 
 The platform is injected in the user variables as the `platform` name.
 
 ```
 + what platform am i using
 - Your talking to me on <get platform>, silly!
+```
+
+And the original message from user input under `text` name. 
+
+```
++ *
+- Your query: <get text>
 ```
 
 ### Subroutines
