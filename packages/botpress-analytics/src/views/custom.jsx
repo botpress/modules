@@ -100,6 +100,19 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
   )
 }
 
+const renderEmptyLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5
+  const x = cx + radius * Math.cos(-midAngle * RADIAN)
+  const y = cy + radius * Math.sin(-midAngle * RADIAN)
+
+  let str = 'No data'
+  return (
+    <text x={x - str.length} y={y - 20} fill="rgba(226, 226, 226, 0.72)">
+      {str}
+    </text>
+  )
+}
+
 export default class CustomMetrics extends React.Component {
   constructor(props) {
     super(props)
@@ -235,18 +248,35 @@ export default class CustomMetrics extends React.Component {
       return { name: row.name, value: row.count }
     })
 
-    return (
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie data={data} cy={70} innerRadius={0} outerRadius={70} fill="#82ca9d" label={renderCustomizedLabel}>
-            {data.map((entry, index) => <Cell key={index} fill={pieChartColors[index % pieChartColors.length]} />)}
-          </Pie>
-          <Tooltip />
-        </PieChart>
-      </ResponsiveContainer>
-    )
+    console.log(data.length != 0)
+    console.log(data)
 
-    return null
+    if (data.length != 0) {
+      return (
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie data={data} cy={70} innerRadius={0} outerRadius={70} fill="#82ca9d" label={renderCustomizedLabel}>
+              {data.map((entry, index) => <Cell key={index} fill={pieChartColors[index % pieChartColors.length]} />)}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      )
+    } else {
+      return (
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={[{ name: 'Group A', value: 100 }]}
+              innerRadius={0}
+              outerRadius={70}
+              fill="#666"
+              label={renderEmptyLabel}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      )
+    }
   }
 
   renderCustomMetric(metric) {
@@ -285,7 +315,7 @@ export default class CustomMetrics extends React.Component {
     const renderChunk = chunk => {
       return chunk.map(metric => {
         return (
-          <Col sm={6} md={3} key={`col-metric-${metric.name}`}>
+          <Col sm={6} md={4} key={`col-metric-${metric.name}`}>
             {this.renderCustomMetric(metric)}
           </Col>
         )

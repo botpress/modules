@@ -2093,6 +2093,10 @@ lcid@^1.0.0:
   dependencies:
     invert-kv "^1.0.0"
 
+link-local@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/link-local/-/link-local-1.1.1.tgz#d84b7519ab7fa97f3558d57b62729ebd26df8248"
+
 load-json-file@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/load-json-file/-/load-json-file-1.1.0.tgz#956905708d58b4bab4c2261b04f59f31c99374c0"
