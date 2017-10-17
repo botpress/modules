@@ -1,15 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Bootstrap, {
-  Col,
-  Grid,
-  Panel,
-  Row,
-  Table,
-  Tooltip as BTooltip,
-  OverlayTrigger,
-  Button
- } from 'react-bootstrap'
+import Bootstrap, { Col, Grid, Panel, Row, Table, Tooltip as BTooltip, OverlayTrigger, Button } from 'react-bootstrap'
 
 import {
   Area,
@@ -32,10 +23,9 @@ import style from './style.scss'
 import _ from 'lodash'
 import classnames from 'classnames'
 
-
 const toPercent = (decimal, fixed = 0) => {
-	return `${(decimal * 100).toFixed(fixed)}%`;
-};
+  return `${(decimal * 100).toFixed(fixed)}%`
+}
 
 const color = {
   facebook: '#8884d8',
@@ -48,24 +38,23 @@ const color = {
   busyHours: '255, 162, 22' //rgb, convert in rgba in code
 }
 
-const renderLine = (data) => {
+const renderLine = data => {
   return _.mapValues(data, (value, key) => {
-    if(key !== 'name'){
-      return <Line key={key} type="monotone" dataKey={key} stroke={color[key]} activeDot={{r: 8}}/>
+    if (key !== 'name') {
+      return <Line key={key} type="monotone" dataKey={key} stroke={color[key]} activeDot={{ r: 8 }} />
     }
   })
 }
 
-const renderArea = (data) => {
+const renderArea = data => {
   return _.mapValues(data, (value, key) => {
-    if(key !== 'name'){
-      return <Area key={key} type='monotone' dataKey={key} stackId="1" stroke={color[key]} fill={color[key]} />
+    if (key !== 'name') {
+      return <Area key={key} type="monotone" dataKey={key} stackId="1" stroke={color[key]} fill={color[key]} />
     }
   })
 }
 
 class StatsHeader extends React.Component {
-
   constructor(props) {
     super(props)
 
@@ -83,8 +72,7 @@ class StatsHeader extends React.Component {
   }
 
   fetchMetadata() {
-    this.props.axios.get('/api/botpress-analytics/metadata')
-    .then(({ data }) => {
+    this.props.axios.get('/api/botpress-analytics/metadata').then(({ data }) => {
       this.setState({ ...data })
     })
   }
@@ -94,30 +82,32 @@ class StatsHeader extends React.Component {
     const size = this.state.size.toFixed(2)
     const className = classnames('pull-right', style.metadata)
 
-    const infoText = "Updated periodically depending on the size of the database. " +
-      "Usually refresh every 5 minutes for DB smaller than 5MB, " +
-      "and every hour for larger databases."
+    const infoText =
+      'Updated periodically depending on the size of the database. ' +
+      'Usually refresh every 5 minutes for DB smaller than 5MB, ' +
+      'and every hour for larger databases.'
 
     const tooltip = <BTooltip id="tooltip">{infoText}</BTooltip>
 
-    return <Row>
-      <Col sm={12}>
-        <div className={className}>
-          <span>
-            {'Last updated: ' + this.state.lastUpdated}
-            {' | ' + 'DB Size: ' + size + 'mb'}
-          </span>
-          <OverlayTrigger placement="left" overlay={tooltip}>
-            <i className="material-icons">info</i>
-          </OverlayTrigger>
-        </div>
-      </Col>
-    </Row>
+    return (
+      <Row>
+        <Col sm={12}>
+          <div className={className}>
+            <span>
+              {'Last updated: ' + this.state.lastUpdated}
+              {' | ' + 'DB Size: ' + size + 'mb'}
+            </span>
+            <OverlayTrigger placement="left" overlay={tooltip}>
+              <i className="material-icons">info</i>
+            </OverlayTrigger>
+          </div>
+        </Col>
+      </Row>
+    )
   }
 }
 
 export default class AnalyticsModule extends React.Component {
-
   constructor(props) {
     super(props)
     this.state = { loading: true }
@@ -126,25 +116,21 @@ export default class AnalyticsModule extends React.Component {
   componentDidMount() {
     this.unmounting = false
 
-    this.props.bp.axios.get('/api/botpress-analytics/graphs')
-    .then(({ data }) => {
+    this.props.bp.axios.get('/api/botpress-analytics/graphs').then(({ data }) => {
       if (this.unmounting) return
       this.setState({ ...data })
     })
 
-    this.props.bp.events.on('data.send', (data) => {
+    this.props.bp.events.on('data.send', data => {
       if (this.unmounting) return
       this.setState({
-          ...data
-        }
-      )
+        ...data
+      })
     })
   }
 
   renderErrorMessage() {
-    return <p className={style.errorMessage}>
-      {this.state.error}
-    </p>
+    return <p className={style.errorMessage}>{this.state.error}</p>
   }
 
   renderActiveUsersSimpleLineChart() {
@@ -153,20 +139,19 @@ export default class AnalyticsModule extends React.Component {
     const legend = sortedByKeys[sortedByKeys.length - 1]
 
     const SimpleLineChart = React.createClass({
-    	render () {
-      	return (
+      render() {
+        return (
           <ResponsiveContainer>
-          	<LineChart data={data}
-                  margin={{top: 5, right: 30, left: 20, bottom: 5}}>
-             <XAxis dataKey="name"/>
-             <YAxis/>
-             <CartesianGrid strokeDasharray="3 3"/>
-             <Tooltip/>
-             <Legend />
-             {_.values(renderLine(legend))}
+            <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <CartesianGrid strokeDasharray="3 3" />
+              <Tooltip />
+              <Legend />
+              {_.values(renderLine(legend))}
             </LineChart>
           </ResponsiveContainer>
-        );
+        )
       }
     })
     return <SimpleLineChart />
@@ -177,21 +162,20 @@ export default class AnalyticsModule extends React.Component {
     const sortedByKeys = _.sortBy(data, o => _.keys(o).length)
     const legend = sortedByKeys[sortedByKeys.length - 1]
 
-    const StackedAreaChart = React.createClass( {
-      render () {
+    const StackedAreaChart = React.createClass({
+      render() {
         return (
-          <ResponsiveContainer >
-            <AreaChart data={data}
-                  margin={{top: 20, right: 50, left: 0, bottom: 0}}>
-              <XAxis dataKey="name"/>
-              <YAxis/>
-              <CartesianGrid strokeDasharray="3 3"/>
-              <Tooltip/>
+          <ResponsiveContainer>
+            <AreaChart data={data} margin={{ top: 20, right: 50, left: 0, bottom: 0 }}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <CartesianGrid strokeDasharray="3 3" />
+              <Tooltip />
               <Legend />
               {_.values(renderArea(data[0]))}
             </AreaChart>
           </ResponsiveContainer>
-        );
+        )
       }
     })
     return <StackedAreaChart />
@@ -203,20 +187,19 @@ export default class AnalyticsModule extends React.Component {
     const legend = sortedByKeys[sortedByKeys.length - 1]
 
     const StackedAreaChart = React.createClass({
-    	render () {
-      	return (
+      render() {
+        return (
           <ResponsiveContainer>
-          	<AreaChart data={data} stackOffset="expand"
-                  margin={{top: 10, right: 30, left: 0, bottom: 0}} >
-              <XAxis dataKey="name"/>
-              <YAxis tickFormatter={toPercent}/>
-              <CartesianGrid strokeDasharray="3 3"/>
+            <AreaChart data={data} stackOffset="expand" margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <XAxis dataKey="name" />
+              <YAxis tickFormatter={toPercent} />
+              <CartesianGrid strokeDasharray="3 3" />
               <Tooltip />
               <Legend />
               {_.values(renderArea(legend))}
             </AreaChart>
           </ResponsiveContainer>
-        );
+        )
       }
     })
     return <StackedAreaChart />
@@ -226,14 +209,13 @@ export default class AnalyticsModule extends React.Component {
     const data = this.state.typicalConversationLengthInADay
 
     const SimpleBarChart = React.createClass({
-    	render () {
-      	return (
+      render() {
+        return (
           <ResponsiveContainer>
-            <BarChart data={data}
-              margin={{top: 5, right: 30, left: 20, bottom: 5}}>
-              <XAxis dataKey="name"/>
-              <YAxis/>
-              <CartesianGrid strokeDasharray="3 3"/>
+            <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <CartesianGrid strokeDasharray="3 3" />
               <Tooltip />
               <Bar dataKey="count" fill={color['conversation']} />
             </BarChart>
@@ -253,21 +235,27 @@ export default class AnalyticsModule extends React.Component {
         <h1>{nbOfInteractions}</h1>
 
         <h4>Number of active users</h4>
-        <h3><small>Today :</small> {data.numberOfUsersToday}</h3>
-        <h5><small>Yesterday :</small> {data.numberOfUsersYesterday}</h5>
-        <h5><small>Week :</small> {data.numberOfUsersThisWeek}</h5>
+        <h3>
+          <small>Today :</small> {data.numberOfUsersToday}
+        </h3>
+        <h5>
+          <small>Yesterday :</small> {data.numberOfUsersYesterday}
+        </h5>
+        <h5>
+          <small>Week :</small> {data.numberOfUsersThisWeek}
+        </h5>
       </div>
     )
   }
 
-  renderDays(){
-    const days = [1,2,3,4,5,6,7]
-    return days.map((i) => {
+  renderDays() {
+    const days = [1, 2, 3, 4, 5, 6, 7]
+    return days.map(i => {
       return <td key={i}>Day {i}</td>
     })
   }
 
-  renderRetentionHeatMapHeader(){
+  renderRetentionHeatMapHeader() {
     return (
       <thead>
         <tr>
@@ -280,23 +268,31 @@ export default class AnalyticsModule extends React.Component {
     )
   }
 
-  renderRetentionData(value, i){
-    if(value === null) {
-      return <td key={i} className={style.noData}>&nbsp;</td>
+  renderRetentionData(value, i) {
+    if (value === null) {
+      return (
+        <td key={i} className={style.noData}>
+          &nbsp;
+        </td>
+      )
     }
 
-    if(i === 0){
+    if (i === 0) {
       return <td key={i}>{value}</td>
     }
 
     const opacity = value * value
     const bgStyle = {
-      'backgroundColor': 'rgba(' + color['retention'] + ',' + opacity + ')'
-     }
-    return <td style={bgStyle} key={i}>{toPercent(value)}</td>
+      backgroundColor: 'rgba(' + color['retention'] + ',' + opacity + ')'
+    }
+    return (
+      <td style={bgStyle} key={i}>
+        {toPercent(value)}
+      </td>
+    )
   }
 
-  renderRetentionRow(rowValues, key){
+  renderRetentionRow(rowValues, key) {
     const date = key
     const rowData = rowValues.map(this.renderRetentionData.bind(this))
     return (
@@ -309,11 +305,7 @@ export default class AnalyticsModule extends React.Component {
 
   renderRetentionHeatMapBody() {
     const dataPerDate = _.mapValues(this.state.retentionHeatMap, this.renderRetentionRow.bind(this))
-    return (
-      <tbody key='retention'>
-        {_.values(dataPerDate)}
-      </tbody>
-    )
+    return <tbody key="retention">{_.values(dataPerDate)}</tbody>
   }
 
   renderRetentionHeatMapChart() {
@@ -325,13 +317,13 @@ export default class AnalyticsModule extends React.Component {
     )
   }
 
-  renderHours(){
+  renderHours() {
     const hours = []
     for (var i = 0; i < 24; i++) {
       hours.push(i)
     }
 
-    return hours.map((i) => {
+    return hours.map(i => {
       return <td key={i}>{i}</td>
     })
   }
@@ -350,9 +342,13 @@ export default class AnalyticsModule extends React.Component {
   renderBusyHoursData(value, i) {
     const opacity = value
     const bgStyle = {
-      'backgroundColor': 'rgba(' + color['busyHours'] + ',' + opacity + ')'
-     }
-    return <td style={bgStyle} key={i}>&nbsp;</td>
+      backgroundColor: 'rgba(' + color['busyHours'] + ',' + opacity + ')'
+    }
+    return (
+      <td style={bgStyle} key={i}>
+        &nbsp;
+      </td>
+    )
   }
 
   renderBusyHoursRow(rowValues, key) {
@@ -361,18 +357,14 @@ export default class AnalyticsModule extends React.Component {
     return (
       <tr key={date}>
         <th>{date}</th>
-          {rowData}
+        {rowData}
       </tr>
     )
   }
 
   renderBusyHoursHeatMapBody() {
     const dataPerDate = _.mapValues(this.state.busyHoursHeatMap, this.renderBusyHoursRow.bind(this))
-    return (
-      <tbody key='busyhours'>
-        {_.values(dataPerDate)}
-      </tbody>
-    )
+    return <tbody key="busyhours">{_.values(dataPerDate)}</tbody>
   }
 
   renderBusyHoursHeatMapChart() {
@@ -387,71 +379,57 @@ export default class AnalyticsModule extends React.Component {
   }
 
   renderTotalNumberOfUsersPanel() {
-    return(
-      <Panel header='Total number of users'>
-        <div className={style.graphContainer}>
-          {this.renderStackedLineChartForTotalUsers()}
-        </div>
+    return (
+      <Panel header="Total number of users">
+        <div className={style.graphContainer}>{this.renderStackedLineChartForTotalUsers()}</div>
       </Panel>
     )
   }
 
   renderActiveUsersPanel() {
-    return(
-      <Panel header='Active users in last 2 weeks'>
-        <div className={style.graphContainerTwoColumn}>
-          {this.renderActiveUsersSimpleLineChart()}
-        </div>
+    return (
+      <Panel header="Active users in last 2 weeks">
+        <div className={style.graphContainerTwoColumn}>{this.renderActiveUsersSimpleLineChart()}</div>
       </Panel>
     )
   }
 
   renderGenderUsagePanel() {
-    return(
-      <Panel header='Gender usage in last week'>
-        <div className={style.graphContainerTwoColumn}>
-          {this.renderGenderPercentAreaChart()}
-        </div>
+    return (
+      <Panel header="Gender usage in last week">
+        <div className={style.graphContainerTwoColumn}>{this.renderGenderPercentAreaChart()}</div>
       </Panel>
     )
   }
 
   renderSpecificMetricForLastDaysPanel() {
-      return(
-        <Panel header='Insights'>
-          <div className={style.graphContainerTwoColumn}>
-            {this.renderSpecificMetricForLastDaysValues()}
-          </div>
-        </Panel>
-      )
+    return (
+      <Panel header="Insights">
+        <div className={style.graphContainerTwoColumn}>{this.renderSpecificMetricForLastDaysValues()}</div>
+      </Panel>
+    )
   }
 
   renderTypicalConversationInADayPanel() {
-    return(
-      <Panel header='Average incoming interactions (last 2 weeks)'>
-        <div className={style.graphContainerTwoColumn}>
-          {this.renderTypicalConversationLengthInADayChart()}
-        </div>
+    return (
+      <Panel header="Average incoming interactions (last 2 weeks)">
+        <div className={style.graphContainerTwoColumn}>{this.renderTypicalConversationLengthInADayChart()}</div>
       </Panel>
     )
   }
 
   renderRetentionHeatMapPanel() {
     return (
-      <Panel header='Rentention for last 7 days'>
-        <div className={style.graphContainer}>
-          {this.renderRetentionHeatMapChart()}
-        </div>
+      <Panel header="Rentention for last 7 days">
+        <div className={style.graphContainer}>{this.renderRetentionHeatMapChart()}</div>
       </Panel>
     )
   }
 
   renderBusyHoursHeatMapPanel() {
     return (
-      <Panel header='Busy hours for last 7 days'>
-        <div className={style.graphContainer}>
-          {this.renderBusyHoursHeatMapChart()}
-        </div>
+      <Panel header="Busy hours for last 7 days">
+        <div className={style.graphContainer}>{this.renderBusyHoursHeatMapChart()}</div>
       </Panel>
     )
   }
@@ -462,27 +440,17 @@ export default class AnalyticsModule extends React.Component {
 
   renderBasicMetrics() {
     return (
-      <Grid fluid >
+      <Grid fluid>
         <Row>
-          <Col md={12}>
-            {this.renderTotalNumberOfUsersPanel()}
-          </Col>
+          <Col md={12}>{this.renderTotalNumberOfUsersPanel()}</Col>
         </Row>
         <Row>
-          <Col md={6}>
-            {this.renderActiveUsersPanel()}
-          </Col>
-          <Col md={6}>
-            {this.renderGenderUsagePanel()}
-          </Col>
+          <Col md={6}>{this.renderActiveUsersPanel()}</Col>
+          <Col md={6}>{this.renderGenderUsagePanel()}</Col>
         </Row>
         <Row>
-          <Col md={4}>
-            {this.renderSpecificMetricForLastDaysPanel()}
-          </Col>
-          <Col md={8}>
-            {this.renderTypicalConversationInADayPanel()}
-          </Col>
+          <Col md={4}>{this.renderSpecificMetricForLastDaysPanel()}</Col>
+          <Col md={8}>{this.renderTypicalConversationInADayPanel()}</Col>
         </Row>
       </Grid>
     )
@@ -490,16 +458,12 @@ export default class AnalyticsModule extends React.Component {
 
   renderAdvancedMetrics() {
     return (
-      <Grid fluid >
+      <Grid fluid>
         <Row>
-          <Col md={12}>
-            {this.renderRetentionHeatMapPanel()}
-          </Col>
+          <Col md={12}>{this.renderRetentionHeatMapPanel()}</Col>
         </Row>
         <Row>
-          <Col md={12}>
-            {this.renderBusyHoursHeatMapPanel()}
-          </Col>
+          <Col md={12}>{this.renderBusyHoursHeatMapPanel()}</Col>
         </Row>
       </Grid>
     )
@@ -508,14 +472,14 @@ export default class AnalyticsModule extends React.Component {
   renderAllMetrics() {
     return (
       <div>
-        <StatsHeader axios={this.props.bp.axios}/>
+        <StatsHeader axios={this.props.bp.axios} />
         {this.renderCustomMetrics()}
         <Row>
           <Col sm={12}>
             <div className={style.title}>Generic Analytics</div>
-            <hr/>
+            <hr />
           </Col>
-          <hr/>
+          <hr />
         </Row>
         {this.renderBasicMetrics()}
         {this.renderAdvancedMetrics()}
@@ -524,27 +488,27 @@ export default class AnalyticsModule extends React.Component {
   }
 
   renderNoAnalyticsYet() {
-    return <Grid fluid >
-      <Row>
-        <Col md={12}>
-          <Panel header='Generating analytics data'>
-            <div>
-              There are no analytics available yet.
-              Generating analytics can take up to 5 minutes after receiving a message.
-            </div>
-          </Panel>
-        </Col>
-      </Row>
-    </Grid>
+    return (
+      <Grid fluid>
+        <Row>
+          <Col md={12}>
+            <Panel header="Generating analytics data">
+              <div>
+                There are no analytics available yet. Generating analytics can take up to 5 minutes after receiving a
+                message.
+              </div>
+            </Panel>
+          </Col>
+        </Row>
+      </Grid>
+    )
   }
 
   render() {
-    if(this.state.noData || !this.state.totalUsersChartData) {
+    if (this.state.noData || !this.state.totalUsersChartData) {
       return this.renderNoAnalyticsYet()
     }
 
-    return <div>
-      {this.state.loading ? <h3>Wait, we are loading graphs...</h3> : this.renderAllMetrics()}
-    </div>
+    return <div>{this.state.loading ? <h3>Wait, we are loading graphs...</h3> : this.renderAllMetrics()}</div>
   }
 }
