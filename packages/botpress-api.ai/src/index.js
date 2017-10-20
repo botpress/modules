@@ -38,13 +38,13 @@ const contextRemove = userId => name => {
 }
 
 const incomingMiddleware = (event, next) => {
-  if (event.type === 'message') {
-
-  let shortUserId = event.user.id
+  let shortUserId = _.get(event, 'user.id') || ''
   if (shortUserId.length > 36) {
     shortUserId = crypto.createHash('md5').update(shortUserId).digest("hex")
   }
-
+  
+  if (event.type === 'message') {
+    
     service(shortUserId, event.text)
     .then(({data}) => {
       const {result} = data
