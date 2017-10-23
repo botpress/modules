@@ -47,7 +47,7 @@ function create(knex, platform) {
 
   return knex('webhooks')
   .insert({
-    created_on: moment().format('x'),
+    created_on: moment().toISOString(),
     platform: platform
   })
 }
