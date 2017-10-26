@@ -138,7 +138,7 @@ module.exports = async (bp, config) => {
     let { conversationId } = (req.query || {})
     conversationId = conversationId && parseInt(conversationId)
 
-    if (!_.includes(['text', 'quick_reply', 'login_prompt'], payload.type)) { // TODO: Support files
+    if (!_.includes(['text', 'quick_reply', 'form', 'login_prompt'], payload.type)) { // TODO: Support files
       return res.status(400).send(ERR_MSG_TYPE)
     }
 
@@ -230,6 +230,10 @@ module.exports = async (bp, config) => {
     if (payload.type === 'login_prompt') {
       persistedPayload.data = _.omit(persistedPayload.data, ['password'])
     }
+
+      if (payload.type === 'form') {
+          persistedPayload.data.formId = payload.formId;
+      }
 
     const message = await appendUserMessage(userId, conversationId, persistedPayload)
 

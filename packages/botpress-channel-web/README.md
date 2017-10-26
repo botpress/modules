@@ -14,6 +14,12 @@ Official Webchat connector module for [Botpress](http://github.com/botpress/botp
 npm install botpress-platform-webchat
 ```
 
+### Using Yarn 
+
+```bash
+yarn add botpress-platform-webchat
+```
+
 ## How to use it
 
 [TODO] More instructions coming.
@@ -55,6 +61,105 @@ welcome:
     quick_replies:
       - <QR_YES> Yes
       - <QR_NO> No
+```
+
+##### Web form
+
+##### `content.yml`
+
+```yaml
+welcome:
+  - text: Hello, world!
+    typing: 250ms
+    form:
+      title: Survey
+      id: survey
+      elements:
+        - input:
+            label: Email
+            placeholder: Your email
+            name: email
+            subtype: email
+            required: true
+        - textarea:
+            label: Text
+            placeholder: Your text
+            name: text
+            maxlength: 100
+            minlength: 2
+```
+
+It's look's like a usually web form. After submitted, you can handle this event with botpress.hear method. For example:
+```js
+bp.hear({ type: 'form', formId: "survey" }, (event, next) => {
+    // Your code
+});
+```
+
+You can always catch formId in the hear function, because Id is not an option in the form element. You  choose a value to go with your id keys.
+
+```yaml
+welcome: 
+  - text: "Welcome"
+    typing: 250ms
+    form:
+      title: welcome
+      id: welcome
+      ...
+      ...
+
+
+form-email:
+  - text: Provide me your email 
+    form:
+      title: Email
+      id: email
+      ...
+      ...
+#
+```
+
+
+in your `bp.hear` function
+
+```js
+bp.hear({type:'form',formId:'welcome'},(event,next))=> {} // welcome content
+bp.hear({type:'form',formId:'email'},(event,next))=> {} // form-email content
+```
+
+###### Form Elements
+
+`input`
+
+Has next attributes: label, name, placeholder, subtype, required, maxlength, minlength, which works like a same attributes in html5 (`subtype` is a same as `type` in html5)
+
+`textarea`
+
+Has a same attributes like `input`, but has no `subtype` attribute
+
+`select`
+
+Has a same attributes like `textarea`, but has no `maxlength` and `minlength` attributes, and has `options` attribute, which contain an option elements.
+
+Example:
+```yaml
+- select:
+    label: Select one item
+    name: select
+    placeholder: Select one option
+    options:
+      - option:
+          label: "Hindu (Indian) vegetarian"
+          value: "hindu"
+      - option:
+          label: "Strict vegan"
+          value: "vegan"
+      - option:
+          label: "Kosher"
+          value: "kosher"
+      - option:
+          label: "Just put it in a burrito"
+          value: "burrito"
 ```
 
 #### Other type of messages

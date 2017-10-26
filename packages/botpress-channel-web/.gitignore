@@ -39,3 +39,8 @@ jspm_packages
 # Bot modules specific
 bin
 stats.json
+
+# IDE files
+.vscode
+.idea
+compile.sh

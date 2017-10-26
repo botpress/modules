@@ -334,6 +334,15 @@ export default class Web extends React.Component {
     })
   }
 
+  handleSendForm(fields, formId, repr) {
+      return this.handleSendData({
+          type: 'form',
+          formId: formId,
+          text: repr,
+          data: fields
+      })
+  }
+
   handleLoginPrompt(username, password) {
     return this.handleSendData({
       type: 'login_prompt',
@@ -436,6 +445,7 @@ export default class Web extends React.Component {
       onTextSend={::this.handleSendMessage}
       onTextChanged={::this.handleTextChanged}
       onQuickReplySend={::this.handleSendQuickReply}
+      onFormSend={::this.handleSendForm}
       onFileUploadSend={::this.handleFileUploadSend}
       onLoginPromptSend={::this.handleLoginPrompt} />
   }
