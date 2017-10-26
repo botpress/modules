@@ -1,6 +1,6 @@
 {
   "name": "botpress-platform-webchat",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "An embeddable web chat for Botpress bots",
   "main": "bin/node.bundle.js",
   "homepage": "https://github.com/botpress/botpress-platform-webchat",
