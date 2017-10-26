@@ -68,6 +68,7 @@ export default class UMMComponent extends Component {
         <div className={classNames}>
           {this.props.text}
         </div>
+        {this.renderForm()}
         {this.renderQuickReplies()}
       </div>
   }
@@ -93,7 +94,26 @@ export default class UMMComponent extends Component {
         {this.props.raw.quick_replies.map(this.renderQuickRepliesButton)}
       </div>
   }
+  renderFormInputs({ placeholder, name }, key) {
+      const tooltip = <Tooltip id="tooltip">
+        On click, payload event <strong>{name}</strong> is emitted.
+      </Tooltip>
 
+      return <OverlayTrigger key={key} placement="top" overlay={tooltip}>
+        <Button >{placeholder}</Button>
+      </OverlayTrigger>
+  }
+  renderForm() {
+        if (!this.props.raw.form) {
+            return null
+        }
+
+        const classNames = classnames(style.quickReplies, 'bp-web-quick-replies')
+
+        return <div className={classNames}>
+            {this.props.raw.form.map(this.renderFormInputs)}
+        </div>
+    }
   renderNotSupported() {
     return <div>Visual preview is not supported yet</div>
   }

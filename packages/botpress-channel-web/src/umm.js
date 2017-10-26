@@ -15,7 +15,6 @@ function processQuickReplies(qrs, blocName) {
   return qrs.map(qr => {
     if (_.isString(qr) && QUICK_REPLY_PAYLOAD.test(qr)) {
       let [, payload, text] = QUICK_REPLY_PAYLOAD.exec(qr)
-
       // <.HELLO> becomes <BLOCNAME.HELLO>
       if (payload.startsWith('.')) {
         payload = blocName + payload
@@ -34,14 +33,7 @@ function processQuickReplies(qrs, blocName) {
 function loginPrompt(event, instruction, options) {
   const user = getUserId(event)
 
-  const raw = Object.assign(
-    {
-      to: user,
-      message: instruction.text
-    },
-    options,
-    _.pick(event && event.raw, 'conversationId')
-  )
+  const raw = buildObjectRaw(event, instruction, options, user)
 
   return PromisifyEvent({
     platform: 'webchat',
@@ -68,14 +60,7 @@ function uploadFile(event, instruction, options) {
 
   let basename = path.basename(url, extension)
 
-  const raw = Object.assign(
-    {
-      to: user,
-      message: basename
-    },
-    options,
-    _.pick(event && event.raw, 'conversationId')
-  )
+  const raw = buildObjectRaw(event, instruction, options, user)
 
   return PromisifyEvent({
     platform: 'webchat',
@@ -93,18 +78,10 @@ function uploadFile(event, instruction, options) {
 }
 
 function defaultText(event, instruction, options) {
+  const user = getUserId(event)
+  const raw = buildObjectRaw(event, instruction, options, user)
+
   if (!_.isNil(instruction.text)) {
-    const user = getUserId(event)
-
-    const raw = Object.assign(
-      {
-        to: user,
-        message: instruction.text
-      },
-      options,
-      _.pick(event && event.raw, 'conversationId')
-    )
-
     return PromisifyEvent({
       platform: 'webchat',
       type: 'text',
@@ -115,6 +92,73 @@ function defaultText(event, instruction, options) {
   }
 }
 
+// Build the raw obj to pass to the Promise
+function buildObjectRaw(event, instruction, options, user) {
+  const raw = Object.assign(
+    {
+      to: user,
+      message: instruction.text || null
+    },
+    options,
+    _.pick(event && event.raw, 'conversationId')
+  )
+
+  return raw
+}
+
+function processForm(formElement) {
+  if (_.isArray(formElement)) {
+    throw new Error('Expected `form` to be an object!')
+  }
+  if (!formElement.hasOwnProperty('id') || formElement.id === null) {
+    throw new Error('Expected `form.id` field')
+  }
+  if (!formElement.hasOwnProperty('elements') || !_.isArray(formElement.elements)) {
+    throw new Error('Expected `form.elements` to be an Array!')
+  }
+  return {
+    title: formElement.title,
+    id: formElement.id,
+    elements: formElement.elements.map(field => {
+      if ('input' in field) {
+        // Input field
+        return {
+          label: field.input.label,
+          placeholder: field.input.placeholder || '',
+          name: field.input.name,
+          type: 'input',
+          subtype: field.input.subtype || '',
+          maxlength: field.input.maxlength || '',
+          minlength: field.input.minlength || '',
+          required: field.input.required || false
+        }
+      } else if ('textarea' in field) {
+        // Textarea field
+        return {
+          label: field.textarea.label,
+          placeholder: field.textarea.placeholder || '',
+          name: field.textarea.name,
+          type: 'textarea',
+          maxlength: field.textarea.maxlength || '',
+          minlength: field.textarea.minlength || '',
+          required: field.textarea.required || false
+        }
+      } else if ('select' in field) {
+        // Select field
+        return {
+          label: field.select.label,
+          placeholder: field.select.placeholder || '',
+          name: field.select.name,
+          options: field.select.options,
+          required: field.select.required || false,
+          type: 'select'
+        }
+      } else {
+        throw new Error('Cannot recognize element type!')
+      }
+    })
+  }
+}
 function getUserId(event) {
   const userId =
     _.get(event, 'user.id') ||
@@ -149,7 +193,7 @@ function processOutgoing({ event, blocName, instruction }) {
   // PRE-PROCESSING
   ////////
 
-  const optionsList = ['typing', 'quick_replies', 'file']
+  const optionsList = ['typing', 'quick_replies', 'file', 'form']
 
   const options = _.pick(instruction, optionsList)
 
@@ -163,6 +207,9 @@ function processOutgoing({ event, blocName, instruction }) {
 
   // TODO : Make a Quick_replies than handle text and picture.
 
+  if (options.form) {
+    options.form = processForm(options.form)
+  }
   /////////
   /// Processing
   /////////
@@ -179,9 +226,7 @@ function processOutgoing({ event, blocName, instruction }) {
       break
     default:
       const text = defaultText(event, instruction, options)
-      if (text) {
-        return text
-      }
+      return text
   }
 
   ////////////

@@ -10,6 +10,7 @@ import LoginPrompt from './login_prompt'
 import FileMessage from './file'
 
 import style from './style.scss'
+import Form from './form'
 
 const TIME_BETWEEN_DATES = 10 // 10 minutes
 
@@ -98,6 +99,15 @@ export default class MessageList extends Component {
     )
   }
 
+  renderForm() {
+    const messages = this.props.messages || []
+    const message = messages[messages.length - 1]
+    if (message && message['message_raw'] && message['message_raw']['form']) {
+      const form = message['message_raw']['form']
+      return <Form elements={form.elements} formId={form.id} title={form.title} onFormSend={this.props.onFormSend} />
+    }
+  }
+
   renderDate(date) {
     return (
       <div className={style.date}>
@@ -182,6 +192,7 @@ export default class MessageList extends Component {
         }}
       >
         {this.renderMessageGroups()}
+        {this.renderForm()}
         {this.renderQuickReplies()}
       </div>
     )
@@ -196,7 +207,13 @@ class Message extends Component {
       </div>
     )
   }
-
+  render_form() {
+    return (
+      <div>
+        <p>{this.props.data.message_text}</p>
+      </div>
+    )
+  }
   render_quick_reply() {
     return (
       <div>
