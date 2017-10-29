@@ -17,7 +17,7 @@ module.exports = {
       .then((values) => {
         res.send(values)
       })
-      .catch((err) => res.status.send(500).send({ message:err.message }))
+      .catch((err) => res.status(500).send({ message:err.message }))
     })
 
     router.get('/users/count', (req, res) => {
@@ -25,7 +25,7 @@ module.exports = {
       .then((count) => {
         res.send(count)
       })
-      .catch((err) => res.status.send(500).send({ message:err.message }))
+      .catch((err) => res.status(500).send({ message:err.message }))
     })
   }
 }
