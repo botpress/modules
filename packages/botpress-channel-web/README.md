@@ -19,6 +19,11 @@ npm install botpress-platform-webchat
 ```bash
 yarn add botpress-platform-webchat
 ```
+### Using Botpress
+
+```bash
+botpress install botpress-platform-webchat
+```
 
 ## How to use it
 
