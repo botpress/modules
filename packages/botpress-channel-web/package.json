@@ -40,6 +40,7 @@
     "css-loader": "^0.25.0",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.9.0",
+    "image-webpack-loader": "^3.4.2",
     "json-loader": "^0.5.4",
     "node-sass": "^3.11.2",
     "react": "^15.3.2",
@@ -50,8 +51,10 @@
     "react-dropzone": "^3.13.1",
     "react-file-input": "^0.2.5",
     "react-resizable-box": "^2.0.4",
+    "react-slick": "^0.15.4",
     "react-spinkit": "^3.0.0",
     "sass-loader": "^4.0.2",
+    "slick-carousel": "^1.8.1",
     "style-loader": "^0.13.1",
     "webpack": "^1.13.3",
     "webpack-node-externals": "^1.5.4"

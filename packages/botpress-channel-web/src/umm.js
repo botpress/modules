@@ -77,6 +77,20 @@ function uploadFile(event, instruction, options) {
   })
 }
 
+function carousel(event, instruction, options) {
+  const user = getUserId(event)
+
+  const raw = buildObjectRaw(event, instruction, options, user)
+
+  return PromisifyEvent({
+    platform: 'webchat',
+    type: 'carousel',
+    user: { id: user },
+    raw: raw,
+    text: instruction.text
+  })
+}
+
 function defaultText(event, instruction, options) {
   const user = getUserId(event)
   const raw = buildObjectRaw(event, instruction, options, user)
@@ -193,7 +207,7 @@ function processOutgoing({ event, blocName, instruction }) {
   // PRE-PROCESSING
   ////////
 
-  const optionsList = ['typing', 'quick_replies', 'file', 'form']
+  const optionsList = ['typing', 'quick_replies', 'file', 'form', 'elements']
 
   const options = _.pick(instruction, optionsList)
 
@@ -221,12 +235,13 @@ function processOutgoing({ event, blocName, instruction }) {
     case 'file':
       return uploadFile(event, instruction, options)
       break
+    case 'carousel':
+      return carousel(event, instruction, options)
     case 'location_picker': //TODO : SOON
       // code_block
       break
     default:
-      const text = defaultText(event, instruction, options)
-      return text
+      return defaultText(event, instruction, options)
   }
 
   ////////////

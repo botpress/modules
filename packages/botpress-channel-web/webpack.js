@@ -73,6 +73,10 @@ var webConfig = {
     }, {
       test: /\.json$/,
       loader: 'json-loader'
+    },
+    {
+      test: /\.(jpe?g|png|gif|svg)$/i,
+      loaders: [ 'file-loader', 'image-webpack-loader']
     }]
   }
 }

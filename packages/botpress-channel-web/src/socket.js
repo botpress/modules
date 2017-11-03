@@ -4,7 +4,7 @@ import Promise from 'bluebird'
 import users from './users'
 import db from './db'
 
-const outgoingTypes = ['text', 'login_prompt', 'file']
+const outgoingTypes = ['text', 'login_prompt', 'file', 'carousel']
 
 module.exports = async (bp, config) => {
   const knex = await bp.db.get()
