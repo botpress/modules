@@ -8,6 +8,7 @@ import BotAvatar from '../bot_avatar'
 import QuickReplies from './quick_replies'
 import LoginPrompt from './login_prompt'
 import FileMessage from './file'
+import CarouselMessage from './carousel'
 
 import style from './style.scss'
 import Form from './form'
@@ -200,6 +201,7 @@ export default class MessageList extends Component {
 }
 
 class Message extends Component {
+
   render_text() {
     return (
       <div>
@@ -207,6 +209,7 @@ class Message extends Component {
       </div>
     )
   }
+
   render_form() {
     return (
       <div>
@@ -214,6 +217,7 @@ class Message extends Component {
       </div>
     )
   }
+
   render_quick_reply() {
     return (
       <div>
@@ -236,6 +240,13 @@ class Message extends Component {
           textColor={this.props.textColor}
         />
       </div>
+    )
+  }
+
+  render_carousel() {
+    console.log('RENDER CAROUSEL', this.props)
+    return (
+      <CarouselMessage carousel={this.props.data.message_raw}/>
     )
   }
 

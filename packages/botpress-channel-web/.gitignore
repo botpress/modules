@@ -44,3 +44,5 @@ stats.json
 .vscode
 .idea
 compile.sh
+
+fonts/**
