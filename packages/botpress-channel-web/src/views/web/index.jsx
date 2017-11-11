@@ -25,6 +25,8 @@ export default class Web extends React.Component {
   constructor(props) {
     super(props)
 
+    const options = window.botpressChatOptions || {}
+
     this.state = {
       view: null,
       textToSend: '',
@@ -34,8 +36,11 @@ export default class Web extends React.Component {
       conversations: null,
       currentConversation: null,
       currentConversationId: null,
-      unreadCount: 0
+      unreadCount: 0,
+      isButtonHidden: options.hideWidget
     }
+
+    this.handleIframeApi = this.handleIframeApi.bind(this)
   }
 
   componentWillMount() {
@@ -47,12 +52,24 @@ export default class Web extends React.Component {
     .then(::this.fetchData)
     .then(() => {
       this.handleSwitchView('widget')
-      this.showConvoPopUp()
+      if(!this.state.isButtonHidden) this.showConvoPopUp()
 
-      this.setState({
-        loading: false
-      })
+      this.setState({ loading: false })
     })
+
+    window.addEventListener('message', this.handleIframeApi);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('message', this.handleIframeApi);
+  }
+  
+  handleIframeApi({ data }) {
+    if (data === 'show') {
+      this.handleSwitchView('side')
+    } else if (data === 'hide') {
+      this.handleSwitchView('widget')
+    }
   }
 
   setUserId() {
@@ -399,6 +416,7 @@ export default class Web extends React.Component {
   }
 
   renderButton() {
+    if (this.state.isButtonHidden) return null
     return <button
       className={style[this.state.widgetTransition]}
       onClick={::this.handleButtonClicked}

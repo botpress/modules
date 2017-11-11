@@ -252,6 +252,8 @@ foregroundColor: '#0176ff' ## Element background color (header, composer, button
 textColorOnForeground: '#ffffff'  ## Element text color (header, composer, button..)
 ```
 
+You can open/close sidebar programmatically by calling `window.botpressChat('show')` or `window.botpressChat('hide')`
+
 > **Note**
 > 
 > You need to restart your bot by running `bp start` again for new settings to be effective.
