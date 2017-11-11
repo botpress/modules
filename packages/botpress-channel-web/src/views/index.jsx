@@ -154,3 +154,29 @@ export class WebInjection extends React.Component {
     window.document.body.appendChild(node)
   }
 }
+
+export class WebBotpressUIInjection extends React.Component {
+  render () {
+    if (document.querySelector('#botpress-platform-webchat-injection')) return null;
+
+    var node = window.document.createElement('script')
+    node.src = '/api/botpress-platform-webchat/inject.js'
+    node.id = 'botpress-platform-webchat-injection'
+    node.dataset.optionsJson = JSON.stringify({ hideWidget: true })
+
+    window.document.body.appendChild(node)
+
+    let button = document.createElement('li')
+    const buttonOptions = {
+      role: 'presentation',
+      onclick: () => botpressChat('show'),
+      innerHTML: `<a role="button" href="#">
+                    <span class="bp-full-screen">
+                      <span class="glyphicon glyphicon-comment"></span>
+                    </span>
+                  </a>`
+    }
+    Object.keys(buttonOptions).forEach(key => button[key] = buttonOptions[key])
+    document.querySelector('.nav.navbar-nav').appendChild(button)
+  }
+}

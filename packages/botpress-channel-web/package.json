@@ -8,7 +8,13 @@
     "menuText": "Web Chat",
     "menuIcon": "chrome_reader_mode",
     "webBundle": "bin/web.bundle.js",
-    "noInterface": true
+    "noInterface": true,
+    "plugins": [
+      {
+        "entry": "WebBotpressUIInjection",
+        "position": "overlay"
+      }
+    ]
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
