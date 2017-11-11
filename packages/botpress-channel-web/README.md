@@ -167,6 +167,29 @@ Example:
           value: "burrito"
 ```
 
+#### Carousel (soon)
+
+Example
+
+```yaml
+suggestions-carousel:
+  - type: carousel
+    text: Here are some suggestions for you
+    elements:
+      - title: "First Minute Capital joins $5.8M seed for AR treasure hunt game Snatch"
+        picture: "http://cdn-image.travelandleisure.com/sites/default/files/styles/1600x1000/public/1444253482/DG2015-san-francisco.jpg?itok=MdRJm2Zo"
+        subtitle: "techcrunch.com"
+        buttons:
+          - url: "http://localhost:3000/api/botpress-smart-knowledge/files/0c16accacb6443ef16f0917fc9091a4e"
+            title: View document
+      - title: "First Minute Capital joins $5.8M seed for AR treasure hunt game Snatch"
+        picture: "http://cdn-image.travelandleisure.com/sites/default/files/styles/1600x1000/public/1444253482/DG2015-san-francisco.jpg?itok=MdRJm2Zo"
+        subtitle: "techcrunch.com"
+        buttons:
+          - url: "http://localhost:3000/api/botpress-smart-knowledge/files/0c16accacb6443ef16f0917fc9091a4e"
+            title: View document
+```
+
 #### Other type of messages
 
 We are still working on other type of messages to increase the power of this module. Botpress is a community effort, so **Pull Requests are welcomed**.
