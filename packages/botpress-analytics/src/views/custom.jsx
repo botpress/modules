@@ -321,7 +321,7 @@ export default class CustomMetrics extends React.Component {
   }
 
   render() {
-    const chunks = _.chunk(this.state.metrics || [], 4)
+    const chunks = _.chunk(this.state.metrics || [], 3)
 
     if (!chunks.length) {
       return null
