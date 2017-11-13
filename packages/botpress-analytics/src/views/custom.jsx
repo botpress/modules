@@ -37,6 +37,17 @@ const pieChartColors = ['#F18F01', '#ADCAD6', '#006E90', '#99C24D', '#4cbdb9', '
 const RADIAN = Math.PI / 180
 
 const ranges = {
+  today: () => ({
+    from: moment(),
+    to: moment(),
+    label: 'Today'
+  }),
+
+  yesterday: () => ({
+    from: moment().subtract(1, 'day'),
+    to: moment().subtract(1, 'day'),
+    label: 'Yesterday'
+  }),
   lastweek: () => ({
     from: moment()
       .startOf('week')
@@ -45,6 +56,12 @@ const ranges = {
       .endOf('week')
       .subtract(7, 'days'),
     label: 'Last week'
+  }),
+
+  last7days: () => ({
+    from: moment().subtract(7, 'days'),
+    to: moment(),
+    label: 'Last 7 days'
   }),
 
   lastmonth: () => ({
@@ -57,16 +74,14 @@ const ranges = {
     label: 'Last month'
   }),
 
-  last7days: () => ({
-    from: moment().subtract(7, 'days'),
-    to: moment(),
-    label: 'Last 7 days'
-  }),
-
-  thismonth: () => ({
-    from: moment().startOf('month'),
-    to: moment(),
-    label: 'This month'
+  lastYear: () => ({
+    from: moment()
+      .startOf('year')
+      .subtract(1, 'year'),
+    to: moment()
+      .endOf('year')
+      .subtract(1, 'year'),
+    label: 'Last year'
   }),
 
   thisweek: () => ({
@@ -75,16 +90,16 @@ const ranges = {
     label: 'This week'
   }),
 
-  yesterday: () => ({
-    from: moment().subtract(1, 'day'),
-    to: moment().subtract(1, 'day'),
-    label: 'Yesterday'
+  thismonth: () => ({
+    from: moment().startOf('month'),
+    to: moment(),
+    label: 'This month'
   }),
 
-  today: () => ({
-    from: moment(),
+  thisYear: () => ({
+    from: moment().startOf('year'),
     to: moment(),
-    label: 'Today'
+    label: 'This year'
   })
 }
 
