@@ -145,7 +145,7 @@
       &.carousel {
         background: none;
         padding: 0;
-        //width: 80%;
+        margin: 10px 0;
       }
 
       p {
@@ -453,15 +453,15 @@
 
   .info {
     padding: 6px 12px 12px 12px;
+    min-height: 150px;
 
     .title {
-      overflow: hidden;
       text-overflow: ellipsis;
       white-space: normal;
       font-weight: bold;
       line-height: 1.28em;
-      height: 20px;
       max-height: 40px;
+      overflow: hidden;
     }
 
     .subtitle {
