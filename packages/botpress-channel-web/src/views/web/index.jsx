@@ -2,7 +2,6 @@
 /* global: window */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import classnames from 'classnames'
 
 // import { Emoji } from 'emoji-mart'
@@ -14,6 +13,10 @@ import Convo from './convo'
 import Side from './side'
 
 import style from './style.scss'
+
+if (!window.location.origin) {
+  window.location.origin = window.location.protocol + '//' + window.location.hostname + (window.location.port ? (':' + window.location.port) : '')
+}
 
 const BOT_HOSTNAME = window.location.origin
 const ANIM_DURATION = 300
@@ -57,7 +60,17 @@ export default class Web extends React.Component {
       this.setState({ loading: false })
     })
 
-    window.addEventListener('message', this.handleIframeApi);
+    window.addEventListener('message', this.handleIframeApi)
+
+    this.props.bp.axios.interceptors.request.use(function (config) {
+      if (/\/api\/botpress-platform-webchat\//i.test(config.url)) {
+        const prefix = config.url.indexOf('?') > 0 ? '&' : '?'
+        config.url += prefix + '__ts=' + new Date().getTime()
+      }
+      return config
+    }, function (error) {
+      return Promise.reject(error)
+    })
   }
 
   componentWillUnmount() {
