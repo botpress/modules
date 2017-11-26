@@ -33,13 +33,14 @@ module.exports = async (bp, config) => {
       return next('Unsupported event type: ' + event.type)
     }
 
+
     let user = await getOrCreateUser(event.user.id)
 
     const typing = parseTyping(event)
 
     const conversationId = _.get(event, 'raw.conversationId') || (await getOrCreateRecentConversation(user.id))
 
-    const socketId = user.userId.replace('webchat:', '')
+    const socketId = user.userId.replace(/webchat:/ig, '')
 
     if (typing) {
       bp.events.emit('guest.webchat.typing', {

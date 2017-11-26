@@ -5,7 +5,7 @@ module.exports = async (bp, config) => {
   const knex = await bp.db.get()
 
   async function getOrCreateUser(userId, throwIfNotFound = false) {
-    const realUserId = userId.startsWith('web:') ? userId.substr(4) : userId
+    const realUserId = userId.startsWith('webchat:') ? userId.substr(8) : userId
     
     const user = await knex('users').where({
       platform: 'webchat',
