@@ -1,18 +1,21 @@
 .navbar {
   margin-bottom: 0px;
   border-radius: 0px;
+  
   li > a {
     padding: 8px !important;
   }
+
   background-color: #fff;
+  border: none;
+  border-bottom: 1px solid #f1f4f7;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 }
 
 .mainPanel {
-  border-radius: 0px;
-  border-style: solid;
-  border-color: #e4e0e0;
-  border-width: 1px;
-  border-top: none;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
 }
 
 .scheduledTable {
