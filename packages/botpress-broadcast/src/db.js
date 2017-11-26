@@ -1,6 +1,5 @@
 import { DatabaseHelpers as helpers } from 'botpress'
 
-import Promise from 'bluebird'
 import moment from 'moment'
 
 var knex = null
