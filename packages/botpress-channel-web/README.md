@@ -29,8 +29,8 @@ botpress install botpress-platform-webchat
 
 [TODO] More instructions coming.
 
-- [UMM](https://botpress.io/docs/foundamentals/umm.html)
-- [Flows](https://botpress.io/docs/foundamentals/flow.html).
+- [UMM](https://botpress.io/docs/en/docs/foundamentals/umm)
+- [Flows](https://botpress.io/docs/en/docs/foundamentals/flow).
 
 > **Note on Views**
 > 
