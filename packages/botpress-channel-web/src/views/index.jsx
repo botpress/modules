@@ -181,7 +181,8 @@ export class WebBotpressUIInjection extends React.Component {
       `
     })
 
-    document.querySelector('.nav.navbar-nav').appendChild(button)
+    const target = document.querySelector('.bp-navbar-module-buttons') || document.querySelector('.nav.navbar-nav')
+    target.appendChild(button)
   }
 
   render() {
