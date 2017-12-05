@@ -1,10 +1,10 @@
-# botpress-rasa_nlu
-A module to use [Rasa.ai](http://rasa.ai) with your Botpress bot.
+# botpress-rasa
+A module to use [Rasa NLU](http://rasa.ai) with your Botpress bot.
 
 ## Getting started
 
 ```
-botpress install rasa_nlu
+botpress install rasa
 ```
 
 The Rasa NLU module should now be available in your dashboard.
@@ -33,4 +33,4 @@ Get an invite and join us now! 👉[https://slack.botpress.io](https://slack.bot
 
 ## License
 
-botpress-rasa_nlu is licensed under [AGPL-3.0](/LICENSE)
+botpress-rasa is licensed under [AGPL-3.0](/LICENSE)
