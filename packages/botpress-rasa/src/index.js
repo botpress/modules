@@ -16,7 +16,7 @@ const setRasaClient = () => {
 
 const incomingMiddleware = (event, next) => {
 
-  if (event.type === 'message') {
+  if (["message", "postback", "text", "quick_reply"].includes(event.type)) {
     service(event.text)
       .then(({data}) => {
         event.rasa_nlu = data
