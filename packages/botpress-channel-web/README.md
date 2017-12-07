@@ -53,7 +53,15 @@ welcome:
   - |
     This is a multi-line
     message :).
+  - text: Hello
+    web-style:
+      padding: 10px
+      color: red
 ```
+
+##### web-style
+
+`web-style` (optional) will pass the arguments as []DOM style](https://www.w3schools.com/jsref/dom_obj_style.asp) properties. This allows you to customize how specific messages look.
 
 ##### Quick replies
 
