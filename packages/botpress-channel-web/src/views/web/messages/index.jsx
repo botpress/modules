@@ -202,10 +202,14 @@ export default class MessageList extends Component {
 
 class Message extends Component {
 
+  getAddStyle() {
+    return this.props.data.message_raw && this.props.data.message_raw['web-style']
+  }
+
   render_text() {
     return (
       <div>
-        <p>{this.props.data.message_text}</p>
+        <p style={this.getAddStyle()}>{this.props.data.message_text}</p>
       </div>
     )
   }
@@ -213,7 +217,7 @@ class Message extends Component {
   render_form() {
     return (
       <div>
-        <p>{this.props.data.message_text}</p>
+        <p style={this.getAddStyle()}>{this.props.data.message_text}</p>
       </div>
     )
   }
@@ -231,7 +235,7 @@ class Message extends Component {
     const isBotMessage = !this.props.data.userId
 
     return (
-      <div>
+      <div style={this.getAddStyle()}>
         <LoginPrompt
           isLastMessage={isLastMessage}
           isBotMessage={isBotMessage}
@@ -244,7 +248,6 @@ class Message extends Component {
   }
 
   render_carousel() {
-    console.log('RENDER CAROUSEL', this.props)
     return (
       <CarouselMessage carousel={this.props.data.message_raw}/>
     )
@@ -273,7 +276,7 @@ class Message extends Component {
 
   render_unsupported() {
     return (
-      <div>
+      <div style={this.getAddStyle()}>
         <p>*Unsupported message type*</p>
       </div>
     )
