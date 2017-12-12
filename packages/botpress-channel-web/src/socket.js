@@ -11,7 +11,7 @@ module.exports = async (bp, config) => {
   const { appendBotMessage, getOrCreateRecentConversation } = db(knex, bp.botfile)
   const { getOrCreateUser } = await users(bp, config)
 
-  const { bot_name = 'Bot', bot_avatar = null } = config || {}
+  const { botName = 'Bot', botAvatarUrl = null } = config || {}
 
   bp.middlewares.register({
     name: 'webchat.sendMessages',
@@ -53,7 +53,7 @@ module.exports = async (bp, config) => {
       await Promise.delay(typing)
     }
 
-    const message = await appendBotMessage(bot_name, bot_avatar, conversationId, event)
+    const message = await appendBotMessage(botName, botAvatarUrl, conversationId, event)
 
     Object.assign(message, {
       __room: 'visitor:' + socketId // This is used to send to the relevant user's socket
