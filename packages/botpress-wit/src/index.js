@@ -8,7 +8,7 @@ import Wit from './wit'
 let wit = null
 
 const incomingMiddleware = (event, next) => {
-  if (event.type === 'message') {
+  if (event.type === 'message' || event.type === 'text') {
     if (event.bp.wit.mode === 'understanding') {
       Object.assign(wit.getUserContext(event.user.id).context, {
         botpress_platform: event.platform,
