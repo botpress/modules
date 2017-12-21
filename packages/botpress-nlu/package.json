@@ -4,9 +4,12 @@
   "description": "Botpress NLU module",
   "main": "bin/node.bundle.js",
   "botpress": {
-    "menuText": "botpress-nlu",
-    "menuIcon": "view_module",
-    "webBundle": "bin/web.bundle.js"
+    "menuText": "NLU",
+    "menuIcon": "fiber_smart_record",
+    "webBundle": "bin/web.bundle.js",
+    "moduleView": {
+      "stretched": true
+    }
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -16,10 +19,6 @@
   "author": "Botpress, Inc.",
   "license": "Botpress Proprietary License",
   "devDependencies": {
-    "webpack-node-externals": "^1.5.4",
-    "react": "^15.3.2",
-    "react-bootstrap": "^0.30.6",
-    "react-dom": "^15.3.2",
     "babel-core": "^6.18.2",
     "babel-loader": "^6.2.7",
     "babel-plugin-transform-async-to-generator": "^6.22.0",
@@ -37,8 +36,13 @@
     "file-loader": "^0.9.0",
     "json-loader": "^0.5.4",
     "node-sass": "^3.11.2",
+    "react": "^15.3.2",
+    "react-bootstrap": "^0.30.6",
+    "react-dom": "^15.3.2",
+    "react-splitter-layout": "^3.0.0",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
-    "webpack": "^1.13.3"
+    "webpack": "^1.13.3",
+    "webpack-node-externals": "^1.5.4"
   }
 }
