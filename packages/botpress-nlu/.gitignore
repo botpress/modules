@@ -39,3 +39,5 @@ jspm_packages
 # Bot modules specific
 bin
 stats.json
+
+.idea/**

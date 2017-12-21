@@ -1,1 +1,117 @@
+.workspace {
+  width: 100%;
+  height: calc(100vh - 51px);
+}
 
+.workspace > div {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+footer {
+  flex: 0 0 auto;
+  font-size: 12px;
+  padding: 12px 20px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.main {
+  flex: 1 1 auto;
+  display: flex;
+}
+
+.navigationBar {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  width: 240px;
+  background-color: #fcfcfc;
+  border-right: 1px solid #e5e5e5;
+
+  .filter {
+    width: 100%;
+    padding: 7px;
+
+    input {
+      width: 100%;
+      padding: 5px;
+      font-size: 14px;
+    }
+  }
+
+  .list {
+    flex-grow: 2;
+    position: relative;
+    overflow: hidden;
+
+    ul {
+      list-style: none;
+      padding: 0;
+
+      li {
+        padding: 3px 0;
+        &:hover {
+          background: #999;
+        }
+      }
+    }
+  }
+
+  .create {
+    width: 100%;
+    padding: 10px 15px;
+
+    button {
+      width: 100%;
+      background: #19f;
+      color: white;
+      font-size: 14px;
+      border-radius: 2px;
+      line-height: 30px;
+      height: 32px;
+      padding: 0 14px;
+      border-color: #19f;
+      transition: all .15s ease-in-out;
+      outline: none;
+
+      &:hover {
+        background: #0b6cff;
+        border-color: #0b6cff;
+      }
+
+      &:active {
+        background: #0559ff;
+        border-color: #0559ff;
+      }
+    }
+  }
+}
+
+.childContent {
+  flex: 1 1 auto;
+  position: relative;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.header {
+  background: blue;
+  height: 50px;
+}
+
+.caret {
+  display: inline-block;
+  cursor: pointer;
+  padding: 0px 6px 0 3px;
+
+  &:hover {
+    background: #999;
+  }
+
+  &.inverted :global(.caret) {
+    transform: rotate(180deg);
+  }
+}
