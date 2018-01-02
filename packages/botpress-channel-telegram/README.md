@@ -14,6 +14,19 @@ Installing modules on Botpress is simple. By using CLI, users only need to type 
 botpress install telegram // Not publish yet on NPM
 ```
 
+## Get started
+
+To setup connexion of your chatbot to Messenger, you need to fill the connexion settings directly in the module interface. In fact, you only need to follow  steps and your bot will be active.
+
+botfile.js
+```js
+config: {
+    'botpress-telegram': {
+      botToken: '451660170:AAHM2CD-Z8Kt3AwqcQLnaUgIk5bUJay3s0M',
+    }
+  }```
+
+
 ## Community
 
 There's a [Slack community](https://slack.botpress.io) where you are welcome to join us, ask any question and even help others.
