@@ -24,7 +24,8 @@ config: {
     'botpress-telegram': {
       botToken: '451660170:AAHM2CD-Z8Kt3AwqcQLnaUgIk5bUJay3s0M',
     }
-  }```
+  }
+```
 
 
 ## Community
