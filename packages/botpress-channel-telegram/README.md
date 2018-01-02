@@ -22,10 +22,12 @@ botfile.js
 ```js
 config: {
     'botpress-telegram': {
-      botToken: '451660170:AAHM2CD-Z8Kt3AwqcQLnaUgIk5bUJay3s0M',
+      botToken: '451660170:AAHM2CD-Z8Kt3AwqcQLnaUgIk5bUJay3s0M'
     }
   }
 ```
+
+You can also set the `TELEGRAM_TOKEN` environement variable
 
 
 ## Community
