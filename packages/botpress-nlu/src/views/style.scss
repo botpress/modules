@@ -46,15 +46,22 @@ footer {
     flex-grow: 2;
     position: relative;
     overflow: hidden;
+    padding: 7px;
 
     ul {
       list-style: none;
       padding: 0;
 
       li {
-        padding: 3px 0;
+        padding: 3px 7px;
+        cursor: pointer;
+
         &:hover {
-          background: #999;
+          background: #e9e9e9;
+        }
+
+        &.active {
+          font-weight: bold;
         }
       }
     }
@@ -97,18 +104,14 @@ footer {
   background-color: #ffffff;
 }
 
-.header {
-  background: blue;
-  height: 50px;
-}
-
 .caret {
+  margin-left: 5px;
   display: inline-block;
   cursor: pointer;
   padding: 0px 6px 0 3px;
 
   &:hover {
-    background: #999;
+    background: #e9e9e9;
   }
 
   &.inverted :global(.caret) {
