@@ -1,22 +1,42 @@
-/*
-  Botpress module template. This is your module's entry point.
-  Please have a look at the docs for more information about config, init and ready.
-  https://botpress.io/docs
-*/
+import Storage from './storage'
+
+let storage
 
 module.exports = {
-  config: {},
-
-  init: async function(bp, configurator) {
-    // This is called before ready.
-    // At this point your module is just being initialized, it is not loaded yet.
+  config: {
+    intentsDir: { type: 'string', required: true, default: './intents', env: 'NLU_INTENTS_DIR' },
+    entitiesDir: { type: 'string', required: true, default: './entities', env: 'NLU_ENTITIES_DIR' }
   },
 
-  ready: async function(bp, configurator) {
-    // Your module's been loaded by Botpress.
-    // Serve your APIs here, execute logic, etc.
-
+  init: async function(bp, configurator) {
     const config = await configurator.loadAll()
-    // Do fancy stuff here :)
+    storage = new Storage({ bp, config })
+    await storage.initializeGhost()
+  },
+
+  ready: async function(bp) {
+    const router = bp.getRouter('botpress-nlu')
+
+    router.delete('/intents/:intent', async (req, res) => {
+      await storage.deleteIntent(req.params.intent)
+      res.sendStatus(200)
+    })
+
+    router.post('/intents/:intent', async (req, res) => {
+      await storage.saveIntent(req.params.intent, req.body && req.body.content)
+      res.sendStatus(200)
+    })
+
+    router.get('/intents', async (req, res) => {
+      res.send(await storage.getIntents())
+    })
+
+    router.get('/intents/:intent', async (req, res) => {
+      res.send(await storage.getIntent(req.params.intent))
+    })
+
+    // router.delete('/entities/:entity', async (req, res, next) => {
+    //   // TODO Implement
+    // })
   }
 }
