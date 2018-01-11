@@ -7,7 +7,7 @@
     "menuText": "Choice",
     "menuIcon": "view_module",
     "webBundle": "bin/web.bundle.js",
-    "noInterfce": true
+    "noInterface": true
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
