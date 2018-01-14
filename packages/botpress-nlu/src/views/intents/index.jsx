@@ -8,6 +8,9 @@ import ReactMarkdown from 'react-markdown'
 import style from './style.scss'
 
 export default class IntentsEditor extends React.Component {
+
+  addedEntitiesToMonaco = false
+
   state = {
     content: '',
     initialContent: ''
@@ -70,6 +73,32 @@ export default class IntentsEditor extends React.Component {
 
   isDirty = () => this.state.content !== this.state.initialContent
 
+  fetchEntities = () => {
+    return this.props.axios.get(`/api/botpress-nlu/entities`).then(res => res.data)
+  }
+
+  editorWillMount = monaco => {
+    if (this.addedEntitiesToMonaco) {
+      return
+    } else {
+      this.addedEntitiesToMonaco = true
+    }
+
+    this.fetchEntities()
+    .then(entities => entities.map(entity => entity.startsWith('@') ? entity.substr(1) : entity))
+    .then(entities => {
+      monaco.languages.registerCompletionItemProvider('markdown', {
+        provideCompletionItems: function() {
+          return entities.map(entity => ({
+            label: `${entity}`,
+            kind: monaco.languages.CompletionItemKind.Text,
+            insertText: entity
+          }))
+        }
+      })
+    })
+  }
+
   renderEditor() {
     const requireConfig = {
       url: 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.1/require.min.js',
@@ -85,11 +114,13 @@ export default class IntentsEditor extends React.Component {
         onChange={this.onChange}
         height="95%"
         width="100%"
+        editorWillMount={this.editorWillMount}
         value={this.state.content}
         options={{
           scrollBar: {
             vertical: 'visible'
-          }
+          },
+          quickSuggestions: { other: true, comments: true, strings: true }
         }}
         requireConfig={requireConfig}
       />
@@ -97,9 +128,11 @@ export default class IntentsEditor extends React.Component {
   }
 
   renderNone() {
-    return <div>
-      <h1>No intent selected</h1>
-    </div>
+    return (
+      <div>
+        <h1>No intent selected</h1>
+      </div>
+    )
   }
 
   render() {

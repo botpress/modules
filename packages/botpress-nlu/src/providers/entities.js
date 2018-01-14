@@ -7,7 +7,7 @@ export default {
   '@native.time-period': { '@luis': 'datetimeV2', '@dialogflow': 'time-period' },
 
   // Numbers
-  '@native.number': { '@dialogflow': 'number' },
+  '@native.number': { '@dialogflow': 'number', '@luis': 'number' },
   '@native.cardinal': { '@dialogflow': 'cardinal' },
   '@native.ordinal': { '@luis': 'ordinal', '@dialogflow': 'ordinal' },
   '@native.number-integer': { '@dialogflow': 'number-integer' },

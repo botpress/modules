@@ -33,6 +33,8 @@
     "copy-webpack-plugin": "^4.3.1",
     "core-js": "^2.4.1",
     "css-loader": "^0.25.0",
+    "draft-js": "^0.10.4",
+    "draftjs-utils": "^0.9.1",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.9.0",
     "json-loader": "^0.5.4",
@@ -49,6 +51,7 @@
     "webpack-node-externals": "^1.5.4"
   },
   "dependencies": {
+    "axios": "^0.17.1",
     "bluebird": "^3.5.1",
     "lodash": "^4.17.4",
     "markdown-it": "^8.4.0",
