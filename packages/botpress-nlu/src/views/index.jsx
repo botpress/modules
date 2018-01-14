@@ -6,7 +6,7 @@ import _ from 'lodash'
 // TODO remove that
 import mock from './mock'
 
-import IntentEditor from './intents'
+import IntentEditor from './intents/draft'
 
 import style from './style.scss'
 
