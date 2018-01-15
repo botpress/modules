@@ -11,7 +11,7 @@ import {
   SelectionState
 } from 'draft-js'
 
-import { mergeEntities, removeEntity, getSelectionFirstEntity } from './extensions'
+import { mergeEntities, removeEntity, getSelectionFirstEntity, getSelectionText } from './extensions'
 
 import style from './style.scss'
 
@@ -104,6 +104,10 @@ export default class IntentEditor extends React.Component {
     return 'not-handled'
   }
 
+  onBlur = () => {
+    this.onEnterAction = null
+  }
+
   handleBeforeInput = chars => {
     const state = this.state.editorState
     const selection = state.getSelection()
@@ -127,58 +131,50 @@ export default class IntentEditor extends React.Component {
     return 'not-handled'
   }
 
-  render() {
+  tagSelected = () => {
     let selection = this.state.editorState.getSelection()
-    const anchorKey = selection.getAnchorKey()
-    const currentContent = this.state.editorState.getCurrentContent()
-    const currentBlock = currentContent.getBlockForKey(anchorKey)
+    const contentState = this.state.editorState.getCurrentContent()
+    const contentStateWithEntity = contentState.createEntity('LABEL', 'MUTABLE', { name: 'any' })
 
-    const start = selection.getStartOffset()
-    const end = selection.getEndOffset()
-    const selectedText = currentBlock.getText().slice(start, end)
+    const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
+    const contentStateWithLink = Modifier.applyEntity(contentStateWithEntity, selection, entityKey)
 
+    const newSelection = Math.max(selection.anchorOffset, selection.focusOffset) + 1
+
+    const updateSelection = new SelectionState({
+      anchorKey: selection.anchorKey,
+      anchorOffset: newSelection,
+      focusKey: selection.anchorKey,
+      focusOffset: newSelection,
+      isBackward: false
+    })
+
+    const nextEditorState = EditorState.forceSelection(
+      mergeEntities(EditorState.push(this.state.editorState, contentStateWithLink, 'added-label')),
+      updateSelection
+    )
+
+    this.onChange(nextEditorState)
+  }
+
+  render() {
+    const selectedText = getSelectionText(this.state.editorState)
     let existingEntity = getSelectionFirstEntity(this.state.editorState)
-
     if (existingEntity) {
       existingEntity = this.state.editorState.getCurrentContent().getEntity(existingEntity)
     }
 
-    const tagSelected = () => {
-      const contentState = this.state.editorState.getCurrentContent()
-      const contentStateWithEntity = contentState.createEntity('LABEL', 'MUTABLE', { name: 'any' })
-
-      const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
-      const contentStateWithLink = Modifier.applyEntity(contentStateWithEntity, selection, entityKey)
-
-      const newSelection = Math.max(selection.anchorOffset, selection.focusOffset) + 1
-
-      const updateSelection = new SelectionState({
-        anchorKey: selection.anchorKey,
-        anchorOffset: newSelection,
-        focusKey: selection.anchorKey,
-        focusOffset: newSelection,
-        isBackward: false
-      })
-
-      const nextEditorState = EditorState.forceSelection(
-        mergeEntities(EditorState.push(this.state.editorState, contentStateWithLink, 'added-label')),
-        updateSelection
-      )
-
-      this.onChange(nextEditorState)
-    }
-
     let selectionDiv = <span>Select text to tag entities</span>
     if (selectedText.length) {
-      this.onEnterAction = tagSelected
+      this.onEnterAction = this.tagSelected
       if (existingEntity) {
         selectionDiv = (
-          <span onClick={tagSelected}>
+          <span onClick={this.tagSelected}>
             Tag "{selectedText}" with "{existingEntity.getType()}"
           </span>
         )
       } else {
-        selectionDiv = <span onClick={tagSelected}>Tag "{selectedText}" with entity</span>
+        selectionDiv = <span onClick={this.tagSelected}>Tag "{selectedText}" with entity</span>
       }
     }
 
@@ -191,6 +187,7 @@ export default class IntentEditor extends React.Component {
             keyBindingFn={myKeyBindingFn}
             editorState={this.state.editorState}
             onChange={this.onChange}
+            onBlur={this.onBlur}
           />
         </div>
         <div>{selectionDiv}</div>
