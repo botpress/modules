@@ -127,3 +127,5 @@ export function getSelectionFirstEntity(editorState) {
     }
   }
 }
+
+export { getSelectionText } from 'draftjs-utils'
