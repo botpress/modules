@@ -93,9 +93,11 @@ export default class IntentEditor extends React.Component {
   }
 
   domRef = null
+  wasConsumed = false
 
   state = {
-    editorState: getInitialContent(this.actions)
+    editorState: getInitialContent(this.actions),
+    hasFocus: false
   }
 
   onChange = editorState => {
@@ -103,8 +105,9 @@ export default class IntentEditor extends React.Component {
 
     this.setState({ editorState })
 
-    if (countChars(beforeState) === 0 && countChars(editorState) > 0) {
+    if (countChars(beforeState) === 0 && countChars(editorState) > 0 && !this.wasConsumed) {
       this.props.onInputConsumed && this.props.onInputConsumed()
+      this.wasConsumed = true
     }
   }
 
@@ -209,8 +212,26 @@ export default class IntentEditor extends React.Component {
       editor.setSelection(selectedText, selectedEntityId, this)
     }
 
+    const onFocus = e => {
+      this.setState({ hasFocus: true })
+    }
+
+    const onBlur = e => {
+      var currentTarget = e.currentTarget
+
+      setImmediate(() => {
+        if (!currentTarget.contains(document.activeElement)) {
+          this.setState({ hasFocus: false })
+        }
+      })
+    }
+
+    const className = classnames(style.editorContainer, {
+      [style.focus]: this.state.hasFocus
+    })
+
     return (
-      <div className={style.editorContainer}>
+      <div className={className} tabIndex={0} onBlur={onBlur} onFocus={onFocus}>
         <div className={style.editor}>
           <Editor
             handleBeforeInput={this.handleBeforeInput}
@@ -225,6 +246,9 @@ export default class IntentEditor extends React.Component {
             onDownArrow={this.onArrow('moveDown')}
             onTab={this.onArrow('moveDown')}
           />
+        </div>
+        <div className={style.controls}>
+          <span className={style.action} onClick={() => {}}>Delete Utterance</span>
         </div>
       </div>
     )

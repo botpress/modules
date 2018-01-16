@@ -2,8 +2,24 @@
   width: 100%;
   padding: 10px;
 
-  &:focus-within {
+  .controls {
+    display: none;
+    margin-top: 5px;
+    text-align: right;
+  }
+
+  .action {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  &.focus {
     background-color: #fff889;
+    outline: none;
+
+    .controls {
+      display: block;
+    }
   }
 }
 
