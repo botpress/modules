@@ -1,5 +1,7 @@
 import React from 'react'
 import { OverlayTrigger, Popover, Button } from 'react-bootstrap'
+import _ from 'lodash'
+import classnames from 'classnames'
 
 import {
   Editor,
@@ -11,9 +13,10 @@ import {
   SelectionState
 } from 'draft-js'
 
-import { mergeEntities, removeEntity, getSelectionFirstEntity, getSelectionText } from './extensions'
+import { mergeEntities, removeEntity, getSelectionFirstEntity, getSelectionText, countChars } from './extensions'
 
 import style from './style.scss'
+import colors from '../colors.scss'
 
 require('draft-js/dist/Draft.css')
 
@@ -38,7 +41,11 @@ function getEntityStrategy(type) {
   }
 }
 
-const TokenSpanFactory = ({ getEditorState, setEditorState }) => props => {
+const TokenSpanFactory = ({ getEditorState, setEditorState, getEntity }) => props => {
+  const entity = props.contentState.getEntity(props.entityKey)
+  const { entityId } = entity.getData()
+  const nluEntity = getEntity(entityId)
+
   const removeLabel = () => {
     const editorState = removeEntity(getEditorState(), props.entityKey)
     setEditorState(editorState)
@@ -47,16 +54,18 @@ const TokenSpanFactory = ({ getEditorState, setEditorState }) => props => {
   const popover = (
     <Popover id="popover-positioned-bottom" title="">
       <Button bsSize="xsmall" bsStyle="link" onClick={removeLabel}>
-        Remove label
+        Remove "{nluEntity.name}" label
       </Button>
     </Popover>
   )
 
-  const entity = props.contentState.getEntity(props.entityKey)
-  const className = `entity-${entity.getType().toLowerCase()}`
+  const className = classnames(
+    colors[`label-colors-${nluEntity.colors}`],
+    style[`entity-${entity.getType().toLowerCase()}`]
+  )
 
   return (
-    <span data-offset-key={props.offsetkey} className={style[className]}>
+    <span data-offset-key={props.offsetkey} className={className}>
       <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={popover}>
         <span>{props.children}</span>
       </OverlayTrigger>
@@ -79,33 +88,48 @@ function getInitialContent(actions) {
 export default class IntentEditor extends React.Component {
   actions = {
     getEditorState: () => this.state.editorState,
-    setEditorState: state => this.setState({ editorState: state })
+    setEditorState: state => this.setState({ editorState: state }),
+    getEntity: entityId => _.find(this.props.entities, { id: entityId })
   }
+
+  domRef = null
 
   state = {
     editorState: getInitialContent(this.actions)
   }
 
-  onEnterAction = null
-  onChange = editorState => this.setState({ editorState })
+  onChange = editorState => {
+    const beforeState = this.state.editorState
+
+    this.setState({ editorState })
+
+    if (countChars(beforeState) === 0 && countChars(editorState) > 0) {
+      this.props.onInputConsumed && this.props.onInputConsumed()
+    }
+  }
+
+  focus = () => {
+    if (this.domRef) {
+      this.domRef.focus()
+    }
+  }
 
   handleKeyCommand = command => {
-    if (command === 'myeditor-save') {
-      return 'handled'
-    } else if (command === 'prevent-enter') {
-      if (this.onEnterAction) {
-        console.log('ON ENTER ACTION TRIGGERED')
-        this.onEnterAction()
-        this.onEnterAction = null
+    if (command === 'prevent-enter') {
+      const selection = this.state.editorState.getSelection()
+
+      if (selection.isCollapsed()) {
+        this.props.onDone && this.props.onDone()
+      }
+
+      const editor = this.props.getEntitiesEditor()
+      if (editor) {
+        editor.executeRecommendedAction(this)
       }
 
       return 'handled'
     }
     return 'not-handled'
-  }
-
-  onBlur = () => {
-    this.onEnterAction = null
   }
 
   handleBeforeInput = chars => {
@@ -131,10 +155,10 @@ export default class IntentEditor extends React.Component {
     return 'not-handled'
   }
 
-  tagSelected = () => {
+  tagSelected = entityId => {
     let selection = this.state.editorState.getSelection()
     const contentState = this.state.editorState.getCurrentContent()
-    const contentStateWithEntity = contentState.createEntity('LABEL', 'MUTABLE', { name: 'any' })
+    const contentStateWithEntity = contentState.createEntity('LABEL', 'MUTABLE', { entityId: entityId })
 
     const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
     const contentStateWithLink = Modifier.applyEntity(contentStateWithEntity, selection, entityKey)
@@ -157,25 +181,32 @@ export default class IntentEditor extends React.Component {
     this.onChange(nextEditorState)
   }
 
+  onArrow = action => keyboardEvent => {
+    const editor = this.props.getEntitiesEditor()
+    let selection = this.state.editorState.getSelection()
+
+    console.log(selection, selection.isCollapsed())
+
+    if (editor) {
+      editor[action] && editor[action]()
+      keyboardEvent.preventDefault()
+    }
+  }
+
   render() {
     const selectedText = getSelectionText(this.state.editorState)
-    let existingEntity = getSelectionFirstEntity(this.state.editorState)
-    if (existingEntity) {
-      existingEntity = this.state.editorState.getCurrentContent().getEntity(existingEntity)
+    let selectedEntity = getSelectionFirstEntity(this.state.editorState)
+    let selectedEntityId = null
+
+    if (selectedEntity) {
+      const entity = this.state.editorState.getCurrentContent().getEntity(selectedEntity)
+      selectedEntityId = entity.getData().entityId
     }
 
-    let selectionDiv = <span>Select text to tag entities</span>
-    if (selectedText.length) {
-      this.onEnterAction = this.tagSelected
-      if (existingEntity) {
-        selectionDiv = (
-          <span onClick={this.tagSelected}>
-            Tag "{selectedText}" with "{existingEntity.getType()}"
-          </span>
-        )
-      } else {
-        selectionDiv = <span onClick={this.tagSelected}>Tag "{selectedText}" with entity</span>
-      }
+    const editor = this.props.getEntitiesEditor()
+
+    if (editor) {
+      editor.setSelection(selectedText, selectedEntityId, this)
     }
 
     return (
@@ -187,10 +218,14 @@ export default class IntentEditor extends React.Component {
             keyBindingFn={myKeyBindingFn}
             editorState={this.state.editorState}
             onChange={this.onChange}
+            placeholder="Type to create a new utterance"
             onBlur={this.onBlur}
+            ref={el => (this.domRef = el)}
+            onUpArrow={this.onArrow('moveUp')}
+            onDownArrow={this.onArrow('moveDown')}
+            onTab={this.onArrow('moveDown')}
           />
         </div>
-        <div>{selectionDiv}</div>
       </div>
     )
   }

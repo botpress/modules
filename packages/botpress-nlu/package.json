@@ -44,6 +44,7 @@
     "react-dom": "^15.3.2",
     "react-markdown": "^3.1.4",
     "react-monaco-editor": "^0.13.0",
+    "react-select": "^1.2.1",
     "react-splitter-layout": "^3.0.0",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
@@ -55,6 +56,7 @@
     "bluebird": "^3.5.1",
     "lodash": "^4.17.4",
     "markdown-it": "^8.4.0",
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.1",
+    "nanoid": "^1.0.1"
   }
 }
