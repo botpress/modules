@@ -39,7 +39,7 @@ export function mergeEntities(editorState) {
     end = i
 
     if (entity && entity.getType() === 'LABEL') {
-      const name = entity.getData().name
+      const name = entity.getData().entityId
 
       if (currentLabelEntityName !== name) {
         // Different label
@@ -126,6 +126,10 @@ export function getSelectionFirstEntity(editorState) {
       return currentEntity
     }
   }
+}
+
+export function countChars(editorState) {
+  return editorState.getCurrentContent().getPlainText('').length
 }
 
 export { getSelectionText } from 'draftjs-utils'

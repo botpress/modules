@@ -3,16 +3,42 @@ import { Badge } from 'react-bootstrap'
 
 import classnames from 'classnames'
 import SplitterLayout from 'react-splitter-layout'
+import nanoid from 'nanoid'
 
 import Editor from './draft/editor'
 
 import style from './style.scss'
+import EntitiesEditor from './entities/index'
 
 export default class IntentsEditor extends React.Component {
   state = {
     content: '',
-    initialContent: ''
+    initialContent: '',
+    entitiesEditor: null,
+    entities: [
+      {
+        id: '0',
+        colors: 1,
+        name: 'DepartureDate',
+        type: '@native.date'
+      },
+      {
+        id: '1',
+        colors: 3,
+        name: 'ArrivalDate',
+        type: '@native.date'
+      },
+      {
+        id: '2',
+        colors: 5,
+        name: 'PassengerCount',
+        type: '@native.number'
+      }
+    ],
+    utterances: []
   }
+
+  firstUtteranceRef = null
 
   componentDidMount() {
     this.initiateStateFromProps(this.props)
@@ -71,8 +97,39 @@ export default class IntentsEditor extends React.Component {
     return this.props.axios.get(`/api/botpress-nlu/entities`).then(res => res.data)
   }
 
+  focusFirstUtterance = () => {
+    if (this.firstUtteranceRef) {
+      this.firstUtteranceRef.focus()
+    }
+  }
+
   renderEditor() {
-    return <Editor />
+    const utterances = this.getUtterances()
+    const preprendNewUtterance = () => {
+      this.setState({ utterances: [{ id: nanoid(), text: '' }, ...utterances] })
+    }
+
+    return (
+      <ul className={style.utterances}>
+        {utterances.map((utterance, i) => {
+          return (
+            <li key={`uttr-${utterance.id}`}>
+              <Editor
+                getEntitiesEditor={() => this.entitiesEditor}
+                ref={el => {
+                  if (i === 0) {
+                    this.firstUtteranceRef = el
+                  }
+                }}
+                onDone={this.focusFirstUtterance}
+                onInputConsumed={preprendNewUtterance}
+                entities={this.state.entities}
+              />
+            </li>
+          )
+        })}
+      </ul>
+    )
   }
 
   renderNone() {
@@ -81,6 +138,21 @@ export default class IntentsEditor extends React.Component {
         <h1>No intent selected</h1>
       </div>
     )
+  }
+
+  onEntitiesChanged = entities => {
+    this.setState({ entities })
+  }
+
+  getUtterances = () => {
+    let utterances = this.state.utterances
+
+    if (!utterances.length) {
+      utterances = [{ id: nanoid(), text: '' }]
+      this.setState({ utterances })
+    }
+
+    return utterances
   }
 
   render() {
@@ -108,12 +180,17 @@ export default class IntentsEditor extends React.Component {
             <button onClick={this.deleteIntent}>Delete</button>
           </div>
         </div>
-        {/*<SplitterLayout>*/}
-        {this.renderEditor()}
-        {/*<div className={style.markdown}>*/}
-        {/*<ReactMarkdown source={this.state.content} />*/}
-        {/*</div>*/}
-        {/*</SplitterLayout>*/}
+        <SplitterLayout>
+          {this.renderEditor()}
+          <div className={style.entitiesPanel}>
+            <EntitiesEditor
+              axios={this.props.axios}
+              ref={el => (this.entitiesEditor = el)}
+              entities={this.state.entities}
+              onEntitiesChanged={this.onEntitiesChanged}
+            />
+          </div>
+        </SplitterLayout>
       </div>
     )
   }

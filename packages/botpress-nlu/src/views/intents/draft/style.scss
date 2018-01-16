@@ -1,21 +1,25 @@
 .editorContainer {
+  width: 100%;
+  padding: 10px;
 
+  &:focus-within {
+    background-color: #fff889;
+  }
 }
 
 .editor {
-  width: 400px;
-  border: 1px solid #aaa;
+  background-color: white;
+  width: 100%;
+  border: 1px solid #ececec;
+  font-size: 16px;
   padding: 5px;
-  margin: 10px;
   display: block;
+
+  &:hover {
+    border: 1px solid #cbcbcb;
+  }
 }
 
 .entity-label {
-  background-color: blue;
   cursor: pointer;
-  color: white;
-
-  &:hover {
-    background-color: #0559ff;
-  }
 }
