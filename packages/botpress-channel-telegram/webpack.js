@@ -1,4 +1,5 @@
 var webpack = require('webpack')
+const path = require('path')
 var nodeExternals = require('webpack-node-externals')
 var pkg = require('./package.json')
 
@@ -6,27 +7,29 @@ var nodeConfig = {
   devtool: 'source-map',
   entry: ['./src/index.js'],
   output: {
-    path: './bin',
+    path: path.resolve(__dirname, './bin'),
     filename: 'node.bundle.js',
     libraryTarget: 'commonjs2'
   },
   externals: [nodeExternals()],
   target: 'node',
   resolve: {
-    extensions: ['', '.js']
+    extensions: ['.js']
   },
   module: {
-    loaders: [{
+    rules: [{
       test: /\.js$/,
-      loader: 'babel-loader',
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['latest', 'stage-0'],
+          plugins: ['transform-object-rest-spread']
+        }
+      },
       exclude: /node_modules/,
-      query: {
-        presets: ['latest', 'stage-0'],
-        plugins: ['transform-object-rest-spread']
-      }
     }, {
       test: /\.json$/,
-      loader: 'json-loader'
+      use:  { loader: 'json-loader' }
     }]
   }
 }
@@ -35,36 +38,46 @@ var webConfig = {
   devtool: 'source-map',
   entry: ['./src/views/index.jsx'],
   output: {
-    path: './bin',
+    path: path.resolve(__dirname, './bin'),
     publicPath: '/js/modules/',
     filename: 'web.bundle.js',
     libraryTarget: 'assign',
     library: ['botpress', pkg.name]
   },
   resolve: {
-    extensions: ['', '.js', '.jsx']
+    extensions: ['.js', '.jsx']
   },
   module: {
-    loaders: [{
+    rules: [{
       test: /\.jsx?$/,
-      loader: 'babel-loader',
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['latest', 'stage-0', 'react'],
+          plugins: ['transform-object-rest-spread', 'transform-decorators-legacy']
+        }
+      },
       exclude: /node_modules/,
-      query: {
-        presets: ['latest', 'stage-0', 'react'],
-        plugins: ['transform-object-rest-spread', 'transform-decorators-legacy']
-      }
     }, {
       test: /\.scss$/,
-      loaders: ['style', 'css?modules&importLoaders=1&localIdentName=' + pkg.name + '__[name]__[local]___[hash:base64:5]', 'sass']
+      use: [
+        { loader: 'style-loader' },
+        {
+          loader: 'css-loader',
+          options: {
+            modules: true,
+            importLoaders: 1,
+            localIdentName: pkg.name + '__[name]__[local]___[hash:base64:5]'
+          }
+        },
+        { loader: 'sass-loader' }
+      ]
     }, {
       test: /\.css$/,
-      loaders: ['style', 'css']
+      use: [ { loader: 'style-loader' }, { loader: 'css-loader' }]
     }, {
       test: /\.woff|\.woff2|\.svg|.eot|\.ttf/,
-      loader: 'file?name=../fonts/[name].[ext]'
-    }, {
-      test: /\.json$/,
-      loader: 'json-loader'
+      use: { loader: 'file-loader', options: { name: '../fonts/[name].[ext]' } }
     }]
   }
 }
