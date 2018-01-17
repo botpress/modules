@@ -4,6 +4,7 @@ import { Badge } from 'react-bootstrap'
 import classnames from 'classnames'
 import SplitterLayout from 'react-splitter-layout'
 import nanoid from 'nanoid'
+import _ from 'lodash'
 
 import Editor from './draft/editor'
 
@@ -103,6 +104,11 @@ export default class IntentsEditor extends React.Component {
     }
   }
 
+  deleteUtterance = id => {
+    const utterances = this.getUtterances()
+    this.setState({ utterances: _.filter(utterances, u => u.id !== id) })
+  }
+
   renderEditor() {
     const utterances = this.getUtterances()
     const preprendNewUtterance = () => {
@@ -121,6 +127,8 @@ export default class IntentsEditor extends React.Component {
                     this.firstUtteranceRef = el
                   }
                 }}
+                utteranceId={utterance.id}
+                deleteUtterance={() => this.deleteUtterance(utterance.id)}
                 onDone={this.focusFirstUtterance}
                 onInputConsumed={preprendNewUtterance}
                 entities={this.state.entities}
