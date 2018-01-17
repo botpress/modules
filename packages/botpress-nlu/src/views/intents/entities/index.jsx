@@ -26,7 +26,7 @@ export default class EntitiesEditor extends React.Component {
       <div className={style.centerContainer}>
         <div className={style.centerElement}>
           <h1>This intent has no entities defined 😬</h1>
-          <Button bsSize="large" bsStyle="success">
+          <Button bsSize="large" bsStyle="success" onClick={this.showCreateEntityModal}>
             Define one
           </Button>
         </div>
@@ -47,7 +47,7 @@ export default class EntitiesEditor extends React.Component {
           <h3>
             Define a new entity in order to tag <span className={style.selectionText}>"{this.state.selectedText}"</span>
           </h3>
-          <Button bsSize="large" bsStyle="success">
+          <Button bsSize="large" bsStyle="success" onClick={this.showCreateEntityModal}>
             Define one
           </Button>
           <div className={style.buttonTip}>
