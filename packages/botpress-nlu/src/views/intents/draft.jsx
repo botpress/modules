@@ -114,6 +114,19 @@ export default class IntentsEditor extends React.Component {
     const preprendNewUtterance = () => {
       this.setState({ utterances: [{ id: nanoid(), text: '' }, ...utterances] })
     }
+    const canonicalValueChanged = (id, value) => {
+      this.setState({
+        utterances: utterances.map(utterance => {
+          if (utterance.id === id) {
+            return Object.assign({}, utterance, {
+              text: value
+            })
+          } else {
+            return utterance
+          }
+        })
+      })
+    }
 
     return (
       <ul className={style.utterances}>
@@ -131,6 +144,8 @@ export default class IntentsEditor extends React.Component {
                 deleteUtterance={() => this.deleteUtterance(utterance.id)}
                 onDone={this.focusFirstUtterance}
                 onInputConsumed={preprendNewUtterance}
+                canonicalValue={utterance.text}
+                canonicalValueChanged={value => canonicalValueChanged(utterance.id, value)}
                 entities={this.state.entities}
               />
             </li>

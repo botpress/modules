@@ -10,7 +10,8 @@ import {
   getDefaultKeyBinding,
   CompositeDecorator,
   Modifier,
-  SelectionState
+  SelectionState,
+  convertFromRaw
 } from 'draft-js'
 
 import { mergeEntities, removeEntity, getSelectionFirstEntity, getSelectionText, countChars } from './extensions'
@@ -39,6 +40,55 @@ function getEntityStrategy(type) {
       return contentState.getEntity(entityKey).getType() === type
     }, callback)
   }
+}
+
+function getCanonicalText(editorState, getEntity) {
+  let contentState = editorState.getCurrentContent()
+  const block = contentState.getFirstBlock()
+  const charList = block.getCharacterList()
+  const plainText = editorState.getCurrentContent().getPlainText('')
+
+  let currentLabelEntityId = null
+  let currentSegmentValue = ''
+
+  const segments = []
+
+  for (let i = 0; i < charList.size; i++) {
+    const label = charList.get(i).getEntity()
+    const entity = label && contentState.getEntity(label)
+    const entityId = entity && entity.getData().entityId
+
+    if (currentLabelEntityId !== entityId) {
+      // Different label
+      if (currentSegmentValue.length) {
+        segments.push({
+          entityId: currentLabelEntityId,
+          text: currentSegmentValue
+        })
+      }
+
+      currentLabelEntityId = entityId
+      currentSegmentValue = ''
+    }
+
+    currentSegmentValue += plainText[i]
+  }
+
+  if (currentSegmentValue.length) {
+    segments.push({
+      entityId: currentLabelEntityId,
+      text: currentSegmentValue
+    })
+  }
+
+  return segments.reduce((canonical, segment) => {
+    if (segment.entityId) {
+      const entityName = getEntity(segment.entityId).name
+      return `${canonical}(${segment.text}):${entityName}:`
+    } else {
+      return canonical + segment.text
+    }
+  }, '')
 }
 
 const TokenSpanFactory = ({ getEditorState, setEditorState, getEntity }) => props => {
@@ -81,15 +131,80 @@ const createDecorator = actions =>
     }
   ])
 
+function createEditorStateFromCanonicalValue(canonicalValue, actions) {
+  const segments = []
+  let plainText = ''
+
+  const regex = /\((.+?)\):(.+?):/g
+  let m
+  let i = 0
+
+  do {
+    m = regex.exec(canonicalValue)
+    if (m) {
+      plainText += canonicalValue.substr(i, m.index - i)
+      i = m.index + m[0].length
+      plainText += m[1]
+      segments.push({
+        start: plainText.length - m[1].length,
+        end: plainText.length,
+        entityName: m[2]
+      })
+    }
+  } while (m)
+
+  plainText += canonicalValue.substr(i, canonicalValue.length - i)
+
+  const entities = segments.map((segment, i) => {
+    return {
+      key: i,
+      length: segment.end - segment.start,
+      offset: segment.start
+    }
+  })
+
+  const rawData = {
+    blocks: [
+      {
+        data: {},
+        depth: 0,
+        entityRanges: entities,
+        inlineStyleRanges: [],
+        key: '789p9',
+        text: plainText,
+        type: 'unstyled'
+      }
+    ],
+    entityMap: _.keyBy(
+      entities.map((entity, i) => {
+        return {
+          key: entities[i].key,
+          type: 'LABEL',
+          mutability: 'MUTABLE',
+          data: {
+            entityId: actions.getEntityIdFromName(segments[i].entityName)
+          }
+        }
+      }),
+      'key'
+    )
+  }
+
+  const contentState = convertFromRaw(rawData)
+
+  return EditorState.createWithContent(contentState, createDecorator(actions))
+}
+
 function getInitialContent(actions) {
-  return EditorState.createEmpty(createDecorator(actions))
+  return createEditorStateFromCanonicalValue('', actions)
 }
 
 export default class IntentEditor extends React.Component {
   actions = {
     getEditorState: () => this.state.editorState,
     setEditorState: state => this.setState({ editorState: state }),
-    getEntity: entityId => _.find(this.props.entities, { id: entityId })
+    getEntity: entityId => _.find(this.props.entities, { id: entityId }),
+    getEntityIdFromName: name => _.get(_.find(this.props.entities, { name: name }), 'id')
   }
 
   domRef = null
@@ -98,6 +213,16 @@ export default class IntentEditor extends React.Component {
   state = {
     editorState: getInitialContent(this.actions),
     hasFocus: false
+  }
+
+  componentDidMount() {
+    this.setState({ editorState: createEditorStateFromCanonicalValue(this.props.canonicalValue, this.actions) })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.canonicalValue !== nextProps.canonicalValue) {
+      this.setState({ editorState: createEditorStateFromCanonicalValue(nextProps.canonicalValue, this.actions) })
+    }
   }
 
   onChange = editorState => {
@@ -196,6 +321,14 @@ export default class IntentEditor extends React.Component {
     }
   }
 
+  updateCanonicalValue = () => {
+    const canonical = getCanonicalText(this.state.editorState, this.actions.getEntity)
+
+    if (canonical !== this.props.canonicalValue) {
+      this.props.canonicalValueChanged && this.props.canonicalValueChanged(canonical)
+    }
+  }
+
   render() {
     const selectedText = getSelectionText(this.state.editorState)
     let selectedEntity = getSelectionFirstEntity(this.state.editorState)
@@ -221,6 +354,7 @@ export default class IntentEditor extends React.Component {
 
       setImmediate(() => {
         if (!currentTarget.contains(document.activeElement)) {
+          this.updateCanonicalValue()
           this.setState({ hasFocus: false })
         }
       })
@@ -248,7 +382,9 @@ export default class IntentEditor extends React.Component {
           />
         </div>
         <div className={style.controls}>
-          <span className={style.action} onClick={this.props.deleteUtterance}>Delete Utterance</span>
+          <span className={style.action} onClick={this.props.deleteUtterance}>
+            Delete Utterance
+          </span>
         </div>
       </div>
     )
