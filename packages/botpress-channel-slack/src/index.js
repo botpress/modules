@@ -72,6 +72,10 @@ module.exports = {
       return slack.getChannels()
     }
 
+    bp.slack['getDirectChannels'] = function() {
+      return slack.getDirectChannels()
+    }
+
     bp.slack['getTeam'] = function() {
       return slack.getTeam()
     }
@@ -124,7 +128,10 @@ module.exports = {
     })
 
     router.get('/users', (req, res) => {
-      res.json(slack.getUsers())
+      slack.getUsers()
+        .then(users => {
+          res.json(users)
+        })
     })
 
     router.get('/channels', (req, res) => {
