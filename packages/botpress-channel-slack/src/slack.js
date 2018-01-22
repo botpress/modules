@@ -1,7 +1,5 @@
 import { RtmClient, CLIENT_EVENTS, WebClient } from '@slack/client'
 import incoming from './incoming'
-
-import axios from 'axios'
 import Promise from 'bluebird'
 import _ from 'lodash'
 
@@ -29,33 +27,33 @@ class Slack {
 
   validateText(text) {
     const type = typeof(text)
-    if ( type !== 'string') {
+    if (type !== 'string') {
       throw new Error('Text format is not valid (actual: ' + type + ', required: string)')
     }
   }
 
   validateChannelId(channelId) {
     const type = typeof(channelId)
-    if ( type !== 'string') {
+    if (type !== 'string') {
       throw new Error('Channel id format is not valid (actual: ' + type + ', required: string)')
     }
   }
 
   validateAttachments(attachments) {
     const type = typeof(attachments)
-    if ( type !== 'object') {
+    if (type !== 'object') {
       throw new Error('Attachments format is not valid (actual: ' + type + ', required: object)')
     }
   }
 
   validateOptions(options) {
     const type = typeof(options)
-    if ( type !== 'object') {
+    if (type !== 'object') {
       throw new Error('Options format is not valid (actual: ' + type + ', required: object)')
     }
   }
 
-  validateBeforeReaction (options) {
+  validateBeforeReaction(options) {
     if (!(options.file || options.file_comment || options.channel || options.timestamp)) {
       throw new Error('You need to set at least a destination options (file, file_comment, channel, timestamp)...')
     }
@@ -96,7 +94,7 @@ class Slack {
   sendAttachments(channelId, attachments, options) {
     this.validateBeforeSending(channelId, options)
     this.validateAttachments(attachments)
-  
+
     return Promise.fromCallback(cb => {
       this.web.chat.postMessage(channelId, null, {
         attachments,
@@ -105,7 +103,7 @@ class Slack {
     })
   }
 
-  sendUpdateAttachments(ts, channelId, attachments, options ) {
+  sendUpdateAttachments(ts, channelId, attachments, options) {
     this.validateBeforeSending(channelId, options)
     this.validateAttachments(attachments)
 
@@ -143,27 +141,6 @@ class Slack {
     return this.data
   }
 
-  getUserProfile(userId) {
-    const user = _.find(this.getUsers(), _.matchesProperty('id', userId))
-
-    if (user !== 'undefined') return Promise.resolve(user)
-
-    const url = 'https://slack.com/api/users.list' +
-      '?token=' + this.config.apiToken
-
-    return axios.get(url)
-    .then(({data}) => {
-      if (!data.ok) {
-        throw new Error('Error getting user profile:' + userId )
-      }
-
-      this.data.users = data.members
-
-      return _.find(data.members, _.matchesProperty('id', userId))
-    })
-    .catch(err => console.log(`Error getting user profile: ${err}`))
-  } 
-
   connectRTM(bp, rtmToken) {
     if (this.rtm) {
       this.rtm.removeAllListeners()
@@ -179,11 +156,11 @@ class Slack {
 
     this.rtm.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, () => {
       bp.logger.info('slack connector is connected')
-      
+      bp.events.emit('slack.connected')
       if (!this.connected) {
         this.connected = true
         incoming(bp, this)
-      }  
+      }
     })
 
     this.rtm.start()
@@ -206,32 +183,48 @@ class Slack {
     return this.data && this.data.self.name
   }
 
-  getChannelsFromAPI() {
-    const url = 'https://slack.com/api/channels.list' + '?token=' + this.config.apiToken
-    return axios.get(url).then(({data}) => {
-
-      if (!data.ok) {
-        throw new Error('Error getting channels:' + data)
-      }
-
-      return data.channels
-    })
-  }
-
-  getChannels() {
-    if (!/channels:read/.test(this.config.scope)) {
-      return Promise.resolve(this.data.channels)
+  async getChannels(...args) {
+    const {web} = this
+    const {ok, error, channels} = await web.channels.list(...args)
+    if (!ok) {
+      throw new Error('Error getting channels:' + error)
     }
 
-    return this.getChannelsFromAPI()
+    return channels
+  }
+
+  async getDirectChannels(...args) {
+    const {web} = this
+    const {ok, error, ims} = await web.im.list(...args)
+    if (!ok) {
+      throw new Error('Error getting direct channels:' + error)
+    }
+
+    return ims
   }
 
   getTeam() {
     return this.data && this.data.team
   }
 
-  getUsers() {
-    return this.data && this.data.users
+  async getUsers() {
+    const {web, data} = this
+    const {ok, members, error} = await web.users.list()
+
+    if (!ok) {
+      throw new Error(`Error getting users: ${error}`)
+    }
+    data.users = members
+    return members
+  }
+
+  async getUserProfile(userId) {
+    const {data} = this
+    const user = _.find(data.users, _.matchesProperty('id', userId))
+
+    if (user !== 'undefined') return user
+
+    return _.find(await this.getUsers(), _.matchesProperty('id', userId))
   }
 
   connect(bp) {
