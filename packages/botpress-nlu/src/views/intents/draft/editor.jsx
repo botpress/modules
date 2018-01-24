@@ -84,7 +84,7 @@ function getCanonicalText(editorState, getEntity) {
   return segments.reduce((canonical, segment) => {
     if (segment.entityId) {
       const entityName = getEntity(segment.entityId).name
-      return `${canonical}(${segment.text}):${entityName}:`
+      return `${canonical}[${segment.text}](${entityName})`
     } else {
       return canonical + segment.text
     }
@@ -140,7 +140,7 @@ function createEditorStateFromCanonicalValue(canonicalValue, actions) {
   const segments = []
   let plainText = ''
 
-  const regex = /\((.+?)\):(.+?):/g
+  const regex = /\[(.+?)]\((.+?)\)/g
   let m
   let i = 0
 

@@ -194,7 +194,7 @@ export default class IntentsEditor extends React.Component {
     if (operation === 'deleted') {
       let utterances = this.getUtterances()
 
-      const regex = new RegExp(`\\(([^\\(\\)]+?)\\):${name}:`, 'gi')
+      const regex = new RegExp(`\\[([^\\[\\]\\(\\)]+?)\\]\\(${name}\\)`, 'gi')
       utterances = utterances.map(u => {
         const text = u.text.replace(regex, '$1')
         return Object.assign({}, u, { text: text })
@@ -204,9 +204,9 @@ export default class IntentsEditor extends React.Component {
     } else if (operation === 'modified') {
       let utterances = this.getUtterances()
 
-      const regex = new RegExp(`\\(([^\\(\\)]+?)\\):${oldName}:`, 'gi')
+      const regex = new RegExp(`\\[([^\\(\\)\\[\\]]+?)\\]\\(${oldName}\\)`, 'gi')
       utterances = utterances.map(u => {
-        const text = u.text.replace(regex, `($1):${name}:`)
+        const text = u.text.replace(regex, `[$1](${name})`)
         return Object.assign({}, u, { text: text })
       })
 
