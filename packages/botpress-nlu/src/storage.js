@@ -12,11 +12,12 @@ const formatFilename = name =>
     .replace('.utterances.txt', '')
 
 export default class Storage {
-  constructor({ bp, config }) {
+  constructor({ bp, config, provider }) {
     this.ghost = bp.ghostManager
     this.intentsDir = config.intentsDir
     this.entitiesDir = config.entitiesDir
     this.projectDir = bp.projectLocation
+    this.provider = provider
   }
 
   async initializeGhost() {
@@ -89,6 +90,30 @@ export default class Storage {
       filename: filename,
       utterances: utterances,
       ...properties
+    }
+  }
+
+  async getCustomEntities() {
+    const entities = await this.ghost.directoryListing(this.entitiesDir, '*.json')
+
+    return await Promise.mapSeries(entities, entity => this.getCustomEntity(entity))
+  }
+
+  async getCustomEntity(entity) {
+    entity = formatFilename(entity)
+
+    if (entity.length < 1) {
+      throw new Error('Invalid entity name, expected at least one character')
+    }
+
+    const filename = `${entity}.json`
+
+    const definitionContent = await this.ghost.readFile(this.entitiesDir, filename)
+    const definition = JSON.parse(definitionContent)
+
+    return {
+      name: entity,
+      definition: definition
     }
   }
 }

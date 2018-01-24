@@ -9,27 +9,20 @@ import Entities from './entities'
 const LUIS_APP_VERSION = '1.0' // Static, we're not using this as everything is source-controlled in your bot
 const LUIS_HASH_KVS_KEY = 'nlu/luis/updateMetadata'
 
-// TODO Check if in Sync + Sync if needed
-// TODO Add new Provider Entities (Guide, API Hooks)
-// TODO UI Sync Status + Sync Button
-// TODO Continuous learning backend
-// TODO Continuous learning frontend
-
 export default class LuisProvider extends Provider {
-  constructor(config, logger, storage, parser, kvs) {
-    super('luis', logger, storage, parser)
+  constructor(config) {
+    super({ ...config, name: 'luis', entityKey: '@luis' })
 
-    this.appId = config.luisAppId
-    this.programmaticKey = config.luisProgrammaticKey
-    this.appSecret = config.luisAppSecret
-    this.appRegion = config.luisAppRegion
-    this.kvs = kvs
+    this.appId = this.config.luisAppId
+    this.programmaticKey = this.config.luisProgrammaticKey
+    this.appSecret = this.config.luisAppSecret
+    this.appRegion = this.config.luisAppRegion
   }
 
   async getRemoteVersion() {
     try {
       const res = await axios.get(
-        `https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this.appId}/versions`,
+        `https://${this.appRegion}.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this.appId}/versions`,
         {
           headers: {
             'Ocp-Apim-Subscription-Key': this.programmaticKey
@@ -47,7 +40,8 @@ export default class LuisProvider extends Provider {
   async deleteVersion() {
     try {
       const del = await axios.delete(
-        `https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this.appId}/versions/${LUIS_APP_VERSION}/`,
+        `https://${this.appRegion}.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this
+          .appId}/versions/${LUIS_APP_VERSION}/`,
         {
           headers: {
             'Ocp-Apim-Subscription-Key': this.programmaticKey
@@ -65,11 +59,14 @@ export default class LuisProvider extends Provider {
 
   async getAppInfo() {
     try {
-      const response = await axios.get(`https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this.appId}`, {
-        headers: {
-          'Ocp-Apim-Subscription-Key': this.programmaticKey
+      const response = await axios.get(
+        `https://${this.appRegion}.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this.appId}`,
+        {
+          headers: {
+            'Ocp-Apim-Subscription-Key': this.programmaticKey
+          }
         }
-      })
+      )
       return response.data
     } catch (err) {
       throw new Error('[NLU::Luis] Could not find app ' + this.appId)
@@ -87,6 +84,12 @@ export default class LuisProvider extends Provider {
     return metadata && metadata.hash === intentsHash && metadata.time === remoteVersion.lastModifiedDateTime
   }
 
+  async checkSyncNeeded() {
+    const intents = await this.storage.getIntents()
+    const currentVersion = await this.getRemoteVersion()
+    return this.isInSync(intents, currentVersion)
+  }
+
   async onSyncSuccess(localIntents, remoteVersion) {
     const intentsHash = crypto
       .createHash('md5')
@@ -97,6 +100,39 @@ export default class LuisProvider extends Provider {
       hash: intentsHash,
       time: remoteVersion.lastModifiedDateTime
     })
+  }
+
+  async getCustomEntities() {
+    const { simples, composites, lists } = await this.getCustomLuisEntities()
+
+    const mapToType = (list, type) =>
+      list.map(x => ({
+        name: '@custom.' + x.name,
+        isFromProvider: false,
+        nameProvider: x.name,
+        providerType: type,
+        definition: x
+      }))
+
+    return [
+      ...mapToType(simples, 'entities'),
+      ...mapToType(composites, 'composites'),
+      ...mapToType(lists, 'closedLists')
+    ]
+  }
+
+  async getCustomLuisEntities() {
+    const entities = await this.storage.getCustomEntities()
+
+    const simplesDef = _.find(entities, e => e.name.toLowerCase() === 'luis_entities')
+    const compositesDef = _.find(entities, e => e.name.toLowerCase() === 'luis_composites')
+    const listsDef = _.find(entities, e => e.name.toLowerCase() === 'luis_closedlists')
+
+    const simples = (simplesDef && simplesDef.definition) || []
+    const composites = (compositesDef && compositesDef.definition) || []
+    const lists = (listsDef && listsDef.definition) || []
+
+    return { simples, composites, lists }
   }
 
   async sync() {
@@ -116,7 +152,13 @@ export default class LuisProvider extends Provider {
     }
 
     const utterances = []
+
     const builtinEntities = []
+    const simpleEntities = []
+    const compositeEntities = []
+    const listEntities = []
+
+    const availableEntities = await this.getAvailableEntities()
 
     intents.forEach(intent => {
       intent.utterances.forEach(utterance => {
@@ -124,24 +166,27 @@ export default class LuisProvider extends Provider {
         const entities = []
 
         extracted.labels.forEach(label => {
-          const entity = Entities[label.type]
+          const entity = _.find(availableEntities, { name: label.type })
 
-          if (!entity || !label.type.startsWith('@native.')) {
-            throw new Error(
-              '[NLU::Luis] Unknown entity: ' + label.type + '. Botpress NLU only supports native entities for now.'
-            )
+          if (!entity) {
+            throw new Error('[NLU::Luis] Unknown entity: ' + label.type)
           }
 
-          if (!entity['@luis']) {
-            throw new Error("[NLU::Luis] LUIS doesn't support entity of type " + label.type)
-          }
-
-          if (builtinEntities.indexOf(entity['@luis']) === -1) {
-            builtinEntities.push(entity['@luis'])
+          if (entity.isFromProvider && builtinEntities.indexOf(entity.nameProvider) === -1) {
+            builtinEntities.push(entity.nameProvider)
+          } else if (entity.providerType === 'entities' && !_.find(simpleEntities, { name: entity.nameProvider })) {
+            simpleEntities.push(entity.definition)
+          } else if (
+            entity.providerType === 'composites' &&
+            !_.find(compositeEntities, { name: entity.nameProvider })
+          ) {
+            compositeEntities.push(entity.definition)
+          } else if (entity.providerType === 'closedLists' && !_.find(listEntities, { name: entity.nameProvider })) {
+            listEntities.push(entity.definition)
           }
 
           entities.push({
-            entity: entity['@luis'],
+            entity: entity.nameProvider,
             startPos: label.start,
             endPos: label.end
           })
@@ -164,9 +209,9 @@ export default class LuisProvider extends Provider {
       desc: appInfo.description,
       culture: appInfo.culture,
       intents: intents.map(i => ({ name: i.name })),
-      entities: [],
-      composites: [],
-      closedLists: [],
+      entities: simpleEntities,
+      composites: compositeEntities,
+      closedLists: listEntities,
       bing_entities: builtinEntities,
       model_features: [],
       regex_features: [],
@@ -175,7 +220,7 @@ export default class LuisProvider extends Provider {
 
     try {
       const result = await axios.post(
-        `https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this
+        `https://${this.appRegion}.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this
           .appId}/versions/import?versionId=${LUIS_APP_VERSION}`,
         body,
         {
@@ -199,7 +244,8 @@ export default class LuisProvider extends Provider {
 
   async train() {
     let res = await axios.post(
-      `https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this.appId}/versions/${LUIS_APP_VERSION}/train`,
+      `https://${this.appRegion}.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this
+        .appId}/versions/${LUIS_APP_VERSION}/train`,
       {},
       {
         headers: {
@@ -214,7 +260,7 @@ export default class LuisProvider extends Provider {
 
     while (true) {
       res = await axios.get(
-        `https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this
+        `https://${this.appRegion}.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this
           .appId}/versions/${LUIS_APP_VERSION}/train`,
         {
           headers: {
@@ -246,11 +292,11 @@ export default class LuisProvider extends Provider {
     }
 
     await axios.post(
-      `https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this.appId}/publish`,
+      `https://${this.appRegion}.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this.appId}/publish`,
       {
         versionId: LUIS_APP_VERSION,
         isStaging: !this.isProduction,
-        region: 'westus'
+        region: this.appRegion
       },
       {
         headers: {
