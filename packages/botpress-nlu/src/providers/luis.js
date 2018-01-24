@@ -1,10 +1,13 @@
 import axios from 'axios'
 import _ from 'lodash'
+import crypto from 'crypto'
+import Promise from 'bluebird'
 
 import Provider from './base'
 import Entities from './entities'
 
-const LUIS_APP_VERSION = '1.1' // Fixed, we're not using this as everything is source-controlled in your bot
+const LUIS_APP_VERSION = '1.0' // Static, we're not using this as everything is source-controlled in your bot
+const LUIS_HASH_KVS_KEY = 'nlu/luis/updateMetadata'
 
 // TODO Check if in Sync + Sync if needed
 // TODO Add new Provider Entities (Guide, API Hooks)
@@ -13,13 +16,32 @@ const LUIS_APP_VERSION = '1.1' // Fixed, we're not using this as everything is s
 // TODO Continuous learning frontend
 
 export default class LuisProvider extends Provider {
-  constructor(config, logger, storage, parser) {
+  constructor(config, logger, storage, parser, kvs) {
     super('luis', logger, storage, parser)
 
     this.appId = config.luisAppId
     this.programmaticKey = config.luisProgrammaticKey
     this.appSecret = config.luisAppSecret
     this.appRegion = config.luisAppRegion
+    this.kvs = kvs
+  }
+
+  async getRemoteVersion() {
+    try {
+      const res = await axios.get(
+        `https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this.appId}/versions`,
+        {
+          headers: {
+            'Ocp-Apim-Subscription-Key': this.programmaticKey
+          }
+        }
+      )
+
+      return _.find(res.data, { version: LUIS_APP_VERSION })
+    } catch (err) {
+      this.logger.debug('[NLU::Luis] Could not fetch app versions')
+      return []
+    }
   }
 
   async deleteVersion() {
@@ -54,9 +76,44 @@ export default class LuisProvider extends Provider {
     }
   }
 
+  async isInSync(localIntents, remoteVersion) {
+    const intentsHash = crypto
+      .createHash('md5')
+      .update(JSON.stringify(localIntents))
+      .digest('hex')
+
+    const metadata = await this.kvs.get(LUIS_HASH_KVS_KEY)
+
+    return metadata && metadata.hash === intentsHash && metadata.time === remoteVersion.lastModifiedDateTime
+  }
+
+  async onSyncSuccess(localIntents, remoteVersion) {
+    const intentsHash = crypto
+      .createHash('md5')
+      .update(JSON.stringify(localIntents))
+      .digest('hex')
+
+    await this.kvs.set(LUIS_HASH_KVS_KEY, {
+      hash: intentsHash,
+      time: remoteVersion.lastModifiedDateTime
+    })
+  }
+
   async sync() {
-    await this.deleteVersion() // TODO Check if there was an old version before deleting it
     let intents = await this.storage.getIntents()
+    let currentVersion = await this.getRemoteVersion()
+
+    if (await this.isInSync(intents, currentVersion)) {
+      this.logger.debug('[NLU::Luis] Model is up to date')
+      return
+    } else {
+      this.logger.debug('[NLU::Luis] The model needs to be updated')
+    }
+
+    if (currentVersion) {
+      this.logger.debug('[NLU::Luis] Deleting old version of the model')
+      await this.deleteVersion()
+    }
 
     const utterances = []
     const builtinEntities = []
@@ -116,8 +173,6 @@ export default class LuisProvider extends Provider {
       utterances: utterances
     }
 
-    console.log(utterances[2])
-
     try {
       const result = await axios.post(
         `https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this
@@ -129,6 +184,12 @@ export default class LuisProvider extends Provider {
           }
         }
       )
+
+      await this.train()
+
+      currentVersion = await this.getRemoteVersion()
+      await this.onSyncSuccess(intents, currentVersion)
+
       this.logger.info('[NLU::Luis] Synced model [' + result.data + ']')
     } catch (err) {
       const detailedError = _.get(err, 'response.data.error.message')
@@ -136,11 +197,67 @@ export default class LuisProvider extends Provider {
     }
   }
 
-  async publish() {
-    return new Promise((resolve, reject) => {
-      this.resolvePublish = resolve
-      this.rejectPublish = reject
-    })
+  async train() {
+    let res = await axios.post(
+      `https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this.appId}/versions/${LUIS_APP_VERSION}/train`,
+      {},
+      {
+        headers: {
+          'Ocp-Apim-Subscription-Key': this.programmaticKey
+        }
+      }
+    )
+
+    if (res.data.status !== 'Queued') {
+      throw new Error('Expected training to be Queued but was: ' + res.data.status)
+    }
+
+    while (true) {
+      res = await axios.get(
+        `https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this
+          .appId}/versions/${LUIS_APP_VERSION}/train`,
+        {
+          headers: {
+            'Ocp-Apim-Subscription-Key': this.programmaticKey
+          }
+        }
+      )
+
+      const models = res.data
+
+      const percent = (models.length - _.filter(models, m => m.details.status === 'InProgress').length) / models.length
+
+      const error = _.find(models, { status: 'Fail' })
+
+      if (error) {
+        throw new Error(
+          `[NLU::Luis] Error training model "${error.modelId}", reason is "${error.details.failureReason}"`
+        )
+      }
+
+      if (percent >= 1) {
+        this.logger.debug('[NLU::Luis] Model trained (100%)')
+        break
+      } else {
+        this.logger.debug('[NLU::Luis] Training... ' + percent.toFixed(2) * 100 + '%')
+      }
+
+      await Promise.delay(1000)
+    }
+
+    await axios.post(
+      `https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this.appId}/publish`,
+      {
+        versionId: LUIS_APP_VERSION,
+        isStaging: !this.isProduction,
+        region: 'westus'
+      },
+      {
+        headers: {
+          'Ocp-Apim-Subscription-Key': this.programmaticKey
+        }
+      }
+    )
   }
 
   async extractEntities(incomingText) {}
