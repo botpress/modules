@@ -27,8 +27,7 @@ module.exports = {
 
     const luis = new LuisProvider(config, bp.logger, storage, new Parser())
 
-    setTimeout(() => {luis.sync()}, 3000)
-
+    setTimeout(() => {luis.sync()}, 3000) // TODO Change that
   },
 
   ready: async function(bp) {
@@ -40,7 +39,7 @@ module.exports = {
     })
 
     router.post('/intents/:intent', async (req, res) => {
-      await storage.saveIntent(req.params.intent, req.body && req.body.content)
+      await storage.saveIntent(req.params.intent, req.body && req.body)
       res.sendStatus(200)
     })
 
@@ -57,9 +56,5 @@ module.exports = {
       const allEntities = _.toPairs(Entities).filter(p => p[1][provider]).map(p => p[0])
       res.send(allEntities)
     })
-
-    // router.delete('/entities/:entity', async (req, res, next) => {
-    //   // TODO Implement
-    // })
   }
 }

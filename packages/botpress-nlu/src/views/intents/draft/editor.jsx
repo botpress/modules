@@ -96,6 +96,11 @@ const TokenSpanFactory = ({ getEditorState, setEditorState, getEntity }) => prop
   const { entityId } = entity.getData()
   const nluEntity = getEntity(entityId)
 
+  if (!nluEntity) {
+    console.log('entityId', entityId, entity, entity.getData())
+    return null
+  }
+
   const removeLabel = () => {
     const editorState = removeEntity(getEditorState(), props.entityKey)
     setEditorState(editorState)
@@ -200,28 +205,34 @@ function getInitialContent(actions) {
 }
 
 export default class IntentEditor extends React.Component {
-  actions = {
-    getEditorState: () => this.state.editorState,
-    setEditorState: state => this.setState({ editorState: state }),
-    getEntity: entityId => _.find(this.props.entities, { id: entityId }),
-    getEntityIdFromName: name => _.get(_.find(this.props.entities, { name: name }), 'id')
+  getActions = props => {
+    props = props || this.props
+
+    return {
+      getEditorState: () => this.state.editorState,
+      setEditorState: state => this.setState({ editorState: state }),
+      getEntity: entityId => _.find(props.entities, { id: entityId }),
+      getEntityIdFromName: name => _.get(_.find(props.entities, { name: name }), 'id')
+    }
   }
 
   domRef = null
   wasConsumed = false
 
   state = {
-    editorState: getInitialContent(this.actions),
+    editorState: getInitialContent(this.getActions()),
     hasFocus: false
   }
 
   componentDidMount() {
-    this.setState({ editorState: createEditorStateFromCanonicalValue(this.props.canonicalValue, this.actions) })
+    this.setState({ editorState: createEditorStateFromCanonicalValue(this.props.canonicalValue, this.getActions()) })
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.canonicalValue !== nextProps.canonicalValue) {
-      this.setState({ editorState: createEditorStateFromCanonicalValue(nextProps.canonicalValue, this.actions) })
+      this.setState({
+        editorState: createEditorStateFromCanonicalValue(nextProps.canonicalValue, this.getActions(nextProps))
+      })
     }
   }
 
@@ -322,7 +333,7 @@ export default class IntentEditor extends React.Component {
   }
 
   updateCanonicalValue = () => {
-    const canonical = getCanonicalText(this.state.editorState, this.actions.getEntity)
+    const canonical = getCanonicalText(this.state.editorState, this.getActions().getEntity)
 
     if (canonical !== this.props.canonicalValue) {
       this.props.canonicalValueChanged && this.props.canonicalValueChanged(canonical)

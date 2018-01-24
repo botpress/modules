@@ -68,32 +68,7 @@ footer {
   }
 
   .create {
-    width: 100%;
     padding: 10px 15px;
-
-    button {
-      width: 100%;
-      background: #19f;
-      color: white;
-      font-size: 14px;
-      border-radius: 2px;
-      line-height: 30px;
-      height: 32px;
-      padding: 0 14px;
-      border-color: #19f;
-      transition: all .15s ease-in-out;
-      outline: none;
-
-      &:hover {
-        background: #0b6cff;
-        border-color: #0b6cff;
-      }
-
-      &:active {
-        background: #0559ff;
-        border-color: #0559ff;
-      }
-    }
   }
 }
 

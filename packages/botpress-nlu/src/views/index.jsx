@@ -1,6 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
-import { Collapse } from 'react-bootstrap'
+import { Collapse, Button } from 'react-bootstrap'
 import _ from 'lodash'
 
 // TODO remove that
@@ -23,8 +23,7 @@ export default class Module extends React.Component {
   }
 
   fetchIntents = () => {
-    return this.props.bp.axios.get('/api/botpress-nlu/intents')
-    .then(res => {
+    return this.props.bp.axios.get('/api/botpress-nlu/intents').then(res => {
       const dataToSet = { intents: res.data }
 
       if (!this.state.currentIntent) {
@@ -57,6 +56,27 @@ export default class Module extends React.Component {
     }
   }
 
+  createNewIntent = () => {
+    const name = prompt('Enter the name of the new intent')
+
+    if (!name || !name.length) {
+      return
+    }
+
+    if (/[^a-z0-9-_.]/i.test(name)) {
+      alert('Invalid name, only alphanumerical characters, underscores and hypens are accepted')
+      return this.createNewIntent()
+    }
+
+    return this.props.bp.axios
+      .post(`/api/botpress-nlu/intents/${name}`, {
+        utterances: [],
+        entities: []
+      })
+      .then(this.fetchIntents)
+      .then(() => this.setCurrentIntent(name))
+  }
+
   renderCategory() {
     const intents = this.getIntents().filter(i => {
       if (this.state.filterValue.length) {
@@ -87,7 +107,7 @@ export default class Module extends React.Component {
           <ul>
             {intents.map(el => (
               <li className={getClassName(el)} onClick={() => this.setCurrentIntent(el.name)}>
-                {el.name}
+                {el.name}&nbsp;({_.get(el, 'utterances.length') || 0})
               </li>
             ))}
           </ul>
@@ -113,7 +133,9 @@ export default class Module extends React.Component {
               <div className={style.list}>{this.renderCategory()}</div>
 
               <div className={style.create}>
-                <button>Create new...</button>
+                <Button bsStyle="primary" block onClick={this.createNewIntent}>
+                  Create new intent
+                </Button>
               </div>
             </nav>
             <div className={style.childContent}>
@@ -126,7 +148,6 @@ export default class Module extends React.Component {
               />
             </div>
           </div>
-          {/*<footer>Hello, footer</footer>*/}
         </div>
       </div>
     )

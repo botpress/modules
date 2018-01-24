@@ -1,65 +1,37 @@
 import _ from 'lodash'
-import Markdown from 'markdown-it'
 
 export default class Parser {
-  constructor() {
-    this.md = new Markdown()
-  }
+  constructor() {}
 
-  parse(content) {
-    const tokens = this.md.parse(content, {})
+  extractLabelsFromCanonical(canonicalUtterance, intentEntities) {
 
-    const utterances = []
-    let current = []
-    let append = false
+    const labels = []
+    let plainText = ''
 
-    for (var i of tokens) {
-      if (i.type === 'list_item_open') {
-        current = []
-        append = true
-      } else if (i.type === 'list_item_close') {
-        append = false
-        if (current.length) {
-          utterances.push(current)
-        }
-      } else if (i.type === 'inline' && append) {
-        let entityCnt = 0
+    const regex = /\((.+?)\):(.+?):/g
+    let m
+    let i = 0
 
-        const re = /]\[(.*?)]/g
-        const labels = []
-
-        let match
-
-        do {
-          match = re.exec(i.content)
-          if (match) {
-            labels.push(match[1])
-          }
-        } while (match)
-
-        const count = (i.children && i.children.length) || 0
-
-        for (var index = 0; index < count; index++) {
-          const c = i.children[index]
-          const next = _.get(i.children, index + 1)
-
-          if (c.type === 'text') {
-            current.push(c.content)
-          } else if (c.type === 'link_open') {
-            index++
-
-            const label = i.content.includes(`[${next.content}][`) ? _.get(labels, entityCnt++) : null
-
-            current.push({
-              text: next.content,
-              label: label,
-              entity: c.attrs[0][1]
-            })
-          }
-        }
+    do {
+      m = regex.exec(canonicalUtterance)
+      if (m) {
+        plainText += canonicalUtterance.substr(i, m.index - i)
+        i = m.index + m[0].length
+        plainText += m[1]
+        labels.push({
+          start: plainText.length - m[1].length,
+          end: plainText.length - 1,
+          entityName: m[2],
+          type: _.get(_.find(intentEntities, { name: m[2] }), 'type')
+        })
       }
-    }
+    } while (m)
 
-    return utterances
+    plainText += canonicalUtterance.substr(i, canonicalUtterance.length - i)
+
+    return {
+      text: plainText,
+      labels: labels
+    }
   }
 }

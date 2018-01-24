@@ -6,8 +6,6 @@ import Entities from './entities'
 
 const LUIS_APP_VERSION = '1.1' // Fixed, we're not using this as everything is source-controlled in your bot
 
-// TODO Remake the UI for intents input & labelling
-  // TODO Make it easy to see if you have duplicates as well
 // TODO Check if in Sync + Sync if needed
 // TODO Add new Provider Entities (Guide, API Hooks)
 // TODO UI Sync Status + Sync Button
@@ -52,7 +50,6 @@ export default class LuisProvider extends Provider {
       })
       return response.data
     } catch (err) {
-      console.log(require('util').inspect(err))
       throw new Error('[NLU::Luis] Could not find app ' + this.appId)
     }
   }
@@ -64,48 +61,37 @@ export default class LuisProvider extends Provider {
     const utterances = []
     const builtinEntities = []
 
-    intents = intents.map(i => Object.assign({}, i, { utterances: this.parser.parse(i.content) }))
-
     intents.forEach(intent => {
-      intent.utterances.forEach(u => {
-        let text = ''
-        let position = 0
+      intent.utterances.forEach(utterance => {
+        const extracted = this.parser.extractLabelsFromCanonical(utterance, intent.entities)
         const entities = []
 
-        u.forEach(token => {
-          if (_.isString(token)) {
-            position += token.length
-            text += token
-          } else {
-            text += token.text
+        extracted.labels.forEach(label => {
+          const entity = Entities[label.type]
 
-            const entity = Entities[token.entity]
-
-            if (!entity || !token.entity.startsWith('@native.')) {
-              throw new Error(
-                '[NLU::Luis] Unknown entity: ' + token.entity + '. Botpress NLU only supports native entities for now.'
-              )
-            }
-
-            if (!entity['@luis']) {
-              throw new Error("[NLU::Luis] LUIS doesn't support entity of type " + token.entity)
-            }
-
-            if (builtinEntities.indexOf(entity['@luis']) === -1) {
-              builtinEntities.push(entity['@luis'])
-            }
-
-            entities.push({
-              entity: entity['@luis'],
-              startPos: position,
-              endPos: position + token.text.length
-            })
-            position += token.text.length
+          if (!entity || !label.type.startsWith('@native.')) {
+            throw new Error(
+              '[NLU::Luis] Unknown entity: ' + label.type + '. Botpress NLU only supports native entities for now.'
+            )
           }
+
+          if (!entity['@luis']) {
+            throw new Error("[NLU::Luis] LUIS doesn't support entity of type " + label.type)
+          }
+
+          if (builtinEntities.indexOf(entity['@luis']) === -1) {
+            builtinEntities.push(entity['@luis'])
+          }
+
+          entities.push({
+            entity: entity['@luis'],
+            startPos: label.start,
+            endPos: label.end
+          })
         })
 
         utterances.push({
-          text: text,
+          text: extracted.text,
           intent: intent.name,
           entities: entities
         })
@@ -130,6 +116,8 @@ export default class LuisProvider extends Provider {
       utterances: utterances
     }
 
+    console.log(utterances[2])
+
     try {
       const result = await axios.post(
         `https://westus.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this
@@ -143,7 +131,8 @@ export default class LuisProvider extends Provider {
       )
       this.logger.info('[NLU::Luis] Synced model [' + result.data + ']')
     } catch (err) {
-      this.logger.error('[NLU::Luis] Could not sync the model. Error = ' + err && err.message)
+      const detailedError = _.get(err, 'response.data.error.message')
+      this.logger.error('[NLU::Luis] Could not sync the model. Error = ' + detailedError || (err && err.message))
     }
   }
 

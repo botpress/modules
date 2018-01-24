@@ -51,8 +51,9 @@ h4 {
   }
 
   li {
-    height: 40px;
-    margin: 10px 0;
+    height: 60px;
+    padding: 10px 10px;
+    line-height: 40px;
   }
 
   li .type {
@@ -82,5 +83,22 @@ h4 {
   &.active {
     border-left: 4px solid black;
     color: black;
+  }
+}
+
+.entityItem {
+  a {
+    display: none;
+    margin-left: 10px;
+    color: #888;
+    text-decoration: underline;
+  }
+
+  &:hover {
+    background: #fff889;
+
+    a {
+      display: initial;
+    }
   }
 }

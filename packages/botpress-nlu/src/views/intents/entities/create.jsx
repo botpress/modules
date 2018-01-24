@@ -1,6 +1,7 @@
 import React from 'react'
 import Select from 'react-select'
 import { Button, Modal } from 'react-bootstrap'
+import _ from 'lodash'
 
 import style from './style.scss'
 
@@ -9,7 +10,9 @@ require('react-select/dist/react-select.css')
 export default class EntitiesEditor extends React.Component {
   initialState = {
     entityName: null,
-    entityType: null
+    entityType: null,
+    entityId: null,
+    entityColors: null
   }
 
   state = Object.assign(
@@ -38,6 +41,23 @@ export default class EntitiesEditor extends React.Component {
 
   componentDidMount() {
     this.fetchAvailableEntities()
+    this.initializeFromProps()
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.initializeFromProps(nextProps)
+  }
+
+  initializeFromProps(props) {
+    props = props || this.props
+    const editingEntity = props.existingEntity || {}
+
+    this.setState({
+      entityName: editingEntity.name,
+      entityType: { value: editingEntity.type, label: editingEntity.type },
+      entityId: editingEntity.id,
+      entityColors: editingEntity.colors
+    })
   }
 
   reset = () => {
@@ -49,6 +69,16 @@ export default class EntitiesEditor extends React.Component {
     const options = this.state.availableEntities && this.state.availableEntities.map(e => ({ value: e, label: e }))
 
     const isValid = entityType && entityType.length && this.state.entityName && this.state.entityName.length
+
+    const onSave = () => {
+      const props = {
+        name: this.state.entityName,
+        type: entityType,
+        id: this.state.entityId,
+        colors: this.state.entityColors
+      }
+      this.props.onCreate(props)
+    }
 
     return (
       <Modal show={this.props.show} bsSize="small" onHide={this.props.onHide} animation={false}>
@@ -76,12 +106,7 @@ export default class EntitiesEditor extends React.Component {
           />
         </Modal.Body>
         <Modal.Footer>
-          <Button
-            tabIndex="3"
-            bsStyle="primary"
-            disabled={!isValid}
-            onClick={() => this.props.onCreate(this.state.entityName, entityType)}
-          >
+          <Button tabIndex="3" bsStyle="primary" disabled={!isValid} onClick={onSave}>
             Create
           </Button>
         </Modal.Footer>
