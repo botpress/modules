@@ -8,7 +8,7 @@ export default class Parser {
     const labels = []
     let plainText = ''
 
-    const regex = /\((.+?)\):(.+?):/g
+    const regex = /\[(.+?)]\((.+?)\)/g
     let m
     let i = 0
 
