@@ -25,7 +25,7 @@ module.exports = {
     storage = new Storage({ bp, config })
     await storage.initializeGhost()
 
-    const luis = new LuisProvider(config, bp.logger, storage, new Parser())
+    const luis = new LuisProvider(config, bp.logger, storage, new Parser(), bp.db.kvs)
 
     setTimeout(() => {luis.sync()}, 3000) // TODO Change that
   },

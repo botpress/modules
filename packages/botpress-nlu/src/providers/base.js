@@ -6,6 +6,8 @@ export default class Provider {
     this.logger = logger
     this.storage = storage
     this.parser = parser
+    this.isProduction = ENVIRONEMENT === 'prod'
+    this.env = ENVIRONEMENT
   }
 
   async publish() {
