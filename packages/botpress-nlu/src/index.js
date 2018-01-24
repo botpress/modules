@@ -7,6 +7,7 @@ import Entities from './providers/entities'
 import LuisProvider from './providers/luis'
 
 let storage
+let provider
 
 module.exports = {
   config: {
@@ -25,9 +26,17 @@ module.exports = {
     storage = new Storage({ bp, config })
     await storage.initializeGhost()
 
-    const luis = new LuisProvider(config, bp.logger, storage, new Parser(), bp.db.kvs)
+    provider = new LuisProvider({
+      logger: bp.logger,
+      storage: storage,
+      parser: new Parser(),
+      kvs: bp.db.kvs,
+      config: config
+    })
 
-    setTimeout(() => {luis.sync()}, 3000) // TODO Change that
+    setTimeout(() => {
+      provider.sync()
+    }, 3000) // TODO Change that
   },
 
   ready: async function(bp) {
@@ -52,9 +61,7 @@ module.exports = {
     })
 
     router.get('/entities', async (req, res) => {
-      const provider = '@luis'
-      const allEntities = _.toPairs(Entities).filter(p => p[1][provider]).map(p => p[0])
-      res.send(allEntities)
+      res.send((await provider.getAvailableEntities()).map(x => x.name))
     })
   }
 }
