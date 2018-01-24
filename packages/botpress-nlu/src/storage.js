@@ -3,14 +3,13 @@ import path from 'path'
 import _ from 'lodash'
 import Promise from 'bluebird'
 
-import Parser from './parser'
-
 const formatFilename = name =>
   name
     .toLowerCase()
     .replace(/[^a-z0-9-_.]/gi, '_')
-    .replace('.intent.md', '')
-    .replace('.entity.md', '')
+    .replace('.entities.json', '')
+    .replace('.json', '')
+    .replace('.utterances.txt', '')
 
 export default class Storage {
   constructor({ bp, config }) {
@@ -18,14 +17,14 @@ export default class Storage {
     this.intentsDir = config.intentsDir
     this.entitiesDir = config.entitiesDir
     this.projectDir = bp.projectLocation
-    this.parser = new Parser()
   }
 
   async initializeGhost() {
     mkdirp.sync(path.resolve(this.projectDir, this.intentsDir))
     mkdirp.sync(path.resolve(this.projectDir, this.entitiesDir))
-    await this.ghost.addRootFolder(this.intentsDir, '**/*.intent.md')
-    await this.ghost.addRootFolder(this.entitiesDir, '**/*.entity.md')
+    await this.ghost.addRootFolder(this.intentsDir, '**/*.json')
+    await this.ghost.addRootFolder(this.intentsDir, '**/*.utterances.txt')
+    await this.ghost.addRootFolder(this.entitiesDir, '**/*.entity.json')
   }
 
   async saveIntent(intent, content) {
@@ -35,9 +34,19 @@ export default class Storage {
       throw new Error('Invalid intent name, expected at least one character')
     }
 
-    const filename = `${intent}.intent.md`
+    const utterancesFile = `${intent}.utterances.txt`
+    const propertiesFile = `${intent}.json`
 
-    await this.ghost.upsertFile(this.intentsDir, filename, content)
+    const utterances = content.utterances.join('\r\n') // \n To support windows as well
+
+    await this.ghost.upsertFile(this.intentsDir, utterancesFile, utterances)
+    await this.ghost.upsertFile(
+      this.intentsDir,
+      propertiesFile,
+      JSON.stringify({
+        entities: content.entities
+      })
+    )
   }
 
   async deleteIntent(intent) {
@@ -47,13 +56,15 @@ export default class Storage {
       throw new Error('Invalid intent name, expected at least one character')
     }
 
-    const filename = `${intent}.intent.md`
+    const utterancesFile = `${intent}.utterances.txt`
+    const propertiesFile = `${intent}.json`
 
-    await this.ghost.deleteFile(this.intentsDir, filename)
+    await this.ghost.deleteFile(this.intentsDir, utterancesFile)
+    await this.ghost.deleteFile(this.intentsDir, propertiesFile)
   }
 
   async getIntents() {
-    const intents = await this.ghost.directoryListing(this.intentsDir, '*.intent.md')
+    const intents = await this.ghost.directoryListing(this.intentsDir, '*.json')
 
     return await Promise.mapSeries(intents, intent => this.getIntent(intent))
   }
@@ -65,14 +76,19 @@ export default class Storage {
       throw new Error('Invalid intent name, expected at least one character')
     }
 
-    const filename = `${intent}.intent.md`
+    const filename = `${intent}.json`
 
-    const content = await this.ghost.readFile(this.intentsDir, filename)
+    const propertiesContent = await this.ghost.readFile(this.intentsDir, filename)
+    const utterancesContent = await this.ghost.readFile(this.intentsDir, filename.replace('.json', '.utterances.txt'))
+
+    const utterances = _.split(utterancesContent, /\r|\r\n|\n/i).filter(x => x.length)
+    const properties = JSON.parse(propertiesContent)
 
     return {
       name: intent,
       filename: filename,
-      content: content
+      utterances: utterances,
+      ...properties
     }
   }
 }

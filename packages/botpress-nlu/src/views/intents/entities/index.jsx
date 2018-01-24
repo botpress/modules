@@ -61,6 +61,20 @@ export default class EntitiesEditor extends React.Component {
   renderEntitiesNoSelection() {
     const entities = this.getEntities()
 
+    const onDeleteClicked = entity => event => {
+      event.preventDefault()
+      if (confirm('Are you sure you want to delete this entity from all utterances?')) {
+        this.onEntityDeleted(entity.name)
+      }
+      return false
+    }
+
+    const onEditClicked = entity => event => {
+      event.preventDefault()
+      this.showCreateEntityModal(entity)
+      return false
+    }
+
     return (
       <div className={style.normalContainer}>
         <h3>
@@ -71,9 +85,15 @@ export default class EntitiesEditor extends React.Component {
           {entities.map(entity => {
             const className = classnames(style.entityLabel, colors['label-colors-' + entity.colors])
             return (
-              <li>
+              <li className={style.entityItem}>
                 <span className={className}>{entity.name}</span>
                 <span className={style.type}>{entity.type}</span>
+                <a href onClick={onDeleteClicked(entity)}>
+                  Delete
+                </a>
+                <a href onClick={onEditClicked(entity)}>
+                  Edit
+                </a>
               </li>
             )
           })}
@@ -150,9 +170,10 @@ export default class EntitiesEditor extends React.Component {
     this.createEntityModal && this.createEntityModal.reset()
   }
 
-  showCreateEntityModal = () => {
+  showCreateEntityModal = (editingEntity = null) => {
     this.setState({
-      showCreateEntity: true
+      showCreateEntity: true,
+      editingEntity: editingEntity
     })
   }
 
@@ -196,20 +217,36 @@ export default class EntitiesEditor extends React.Component {
     }
   }
 
-  onEntityCreated = (name, type) => {
+  onEntityCreated = ({ name, type, id, colors }) => {
     this.hideCreateEntityModal()
+
+    let entities = _.clone(this.getEntities())
+
+    if (id) {
+      entities = entities.filter(x => x.id !== id)
+    }
 
     const newEntity = {
       name: name,
       type: type,
-      colors: _.random(1, 8),
-      id: nanoid()
+      colors: colors || _.random(1, 8),
+      id: id || nanoid()
     }
 
-    const entities = _.clone(this.getEntities())
     entities.push(newEntity)
 
-    this.props.onEntitiesChanged && this.props.onEntitiesChanged(entities)
+    const updateInfo = {
+      oldName: _.get(this.state, 'editingEntity.name'),
+      ...newEntity
+    }
+
+    this.props.onEntitiesChanged &&
+      this.props.onEntitiesChanged(entities, { operation: id ? 'modified' : 'added', ...updateInfo })
+  }
+
+  onEntityDeleted = name => {
+    const entities = _.clone(this.getEntities()).filter(e => e.name !== name)
+    this.props.onEntitiesChanged && this.props.onEntitiesChanged(entities, { operation: 'deleted', name: name })
   }
 
   render() {
@@ -227,6 +264,7 @@ export default class EntitiesEditor extends React.Component {
           ref={el => (this.createEntityModal = el)}
           axios={this.props.axios}
           show={this.state.showCreateEntity}
+          existingEntity={this.state.editingEntity}
           onCreate={this.onEntityCreated}
           onHide={this.hideCreateEntityModal}
         />

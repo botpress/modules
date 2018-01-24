@@ -1,7 +1,6 @@
 import React from 'react'
-import { Badge } from 'react-bootstrap'
+import { Badge, Button } from 'react-bootstrap'
 
-import classnames from 'classnames'
 import SplitterLayout from 'react-splitter-layout'
 import nanoid from 'nanoid'
 import _ from 'lodash'
@@ -13,28 +12,28 @@ import EntitiesEditor from './entities/index'
 
 export default class IntentsEditor extends React.Component {
   state = {
-    content: '',
-    initialContent: '',
+    initialUtterances: '',
     entitiesEditor: null,
+    isDirty: false,
     entities: [
-      {
-        id: '0',
-        colors: 1,
-        name: 'DepartureDate',
-        type: '@native.date'
-      },
-      {
-        id: '1',
-        colors: 3,
-        name: 'ArrivalDate',
-        type: '@native.date'
-      },
-      {
-        id: '2',
-        colors: 5,
-        name: 'PassengerCount',
-        type: '@native.number'
-      }
+      // {
+      //   id: '0',
+      //   colors: 1,
+      //   name: 'DepartureDate',
+      //   type: '@native.date'
+      // },
+      // {
+      //   id: '1',
+      //   colors: 3,
+      //   name: 'ArrivalDate',
+      //   type: '@native.date'
+      // },
+      // {
+      //   id: '2',
+      //   colors: 5,
+      //   name: 'PassengerCount',
+      //   type: '@native.number'
+      // }
     ],
     utterances: []
   }
@@ -62,8 +61,17 @@ export default class IntentsEditor extends React.Component {
   }
 
   initiateStateFromProps(props) {
-    const { content } = (props && props.intent) || { content: '' }
-    this.setState({ content: content, initialContent: content })
+    const { utterances, entities } = (props && props.intent) || { utterances: [], entities: [] }
+    const expanded = this.expandCanonicalUtterances(utterances)
+
+    if (!_.get(expanded, 'length') || _.get(expanded, '0.text.length')) {
+      expanded.unshift({ id: nanoid(), text: '' })
+    }
+
+    this.setState({ utterances: expanded, entities: entities, isDirty: false }, () => {
+      this.initialHash = this.computeHash()
+      this.forceUpdate()
+    })
   }
 
   deleteIntent = () => {
@@ -78,7 +86,10 @@ export default class IntentsEditor extends React.Component {
 
   saveIntent = () => {
     this.props.axios
-      .post(`/api/botpress-nlu/intents/${this.props.intent.name}`, { content: this.state.content })
+      .post(`/api/botpress-nlu/intents/${this.props.intent.name}`, {
+        utterances: this.getCanonicalUtterances(),
+        entities: this.state.entities
+      })
       .then(() => {
         this.props.reloadIntents && this.props.reloadIntents()
       })
@@ -92,7 +103,21 @@ export default class IntentsEditor extends React.Component {
     return true
   }
 
-  isDirty = () => this.state.content !== this.state.initialContent
+  getCanonicalUtterances = () => this.state.utterances.map(x => x.text).filter(x => x.length)
+
+  expandCanonicalUtterances = utterances =>
+    utterances.map(u => ({
+      id: nanoid(),
+      text: u
+    }))
+
+  computeHash = () =>
+    JSON.stringify({
+      utterances: this.getCanonicalUtterances(),
+      entities: this.state.entities
+    })
+
+  isDirty = () => this.initialHash && this.computeHash() !== this.initialHash
 
   fetchEntities = () => {
     return this.props.axios.get(`/api/botpress-nlu/entities`).then(res => res.data)
@@ -163,8 +188,32 @@ export default class IntentsEditor extends React.Component {
     )
   }
 
-  onEntitiesChanged = entities => {
-    this.setState({ entities })
+  onEntitiesChanged = (entities, { operation, name, oldName } = {}) => {
+    const replaceObj = { entities: entities }
+
+    if (operation === 'deleted') {
+      let utterances = this.getUtterances()
+
+      const regex = new RegExp(`\\(([^\\(\\)]+?)\\):${name}:`, 'gi')
+      utterances = utterances.map(u => {
+        const text = u.text.replace(regex, '$1')
+        return Object.assign({}, u, { text: text })
+      })
+
+      replaceObj.utterances = utterances
+    } else if (operation === 'modified') {
+      let utterances = this.getUtterances()
+
+      const regex = new RegExp(`\\(([^\\(\\)]+?)\\):${oldName}:`, 'gi')
+      utterances = utterances.map(u => {
+        const text = u.text.replace(regex, `($1):${name}:`)
+        return Object.assign({}, u, { text: text })
+      })
+
+      replaceObj.utterances = utterances
+    }
+
+    this.setState(replaceObj)
   }
 
   getUtterances = () => {
@@ -185,7 +234,7 @@ export default class IntentsEditor extends React.Component {
 
     const { name } = this.props.intent
 
-    const dirtyLabel = this.isDirty() ? <Badge>Unsaved changes</Badge> : null
+    const dirtyLabel = this.isDirty() ? <Badge bsClass={style.unsavedBadge}>Unsaved changes</Badge> : null
 
     return (
       <div className={style.container}>
@@ -197,13 +246,15 @@ export default class IntentsEditor extends React.Component {
             </h1>
           </div>
           <div className="pull-right">
-            <button onClick={this.saveIntent} disabled={!this.isDirty()}>
+            <Button onClick={this.saveIntent} disabled={!this.isDirty()} bsStyle="success" bsSize="small">
               Save
-            </button>
-            <button onClick={this.deleteIntent}>Delete</button>
+            </Button>
+            <Button onClick={this.deleteIntent} bsStyle="danger" bsSize="small">
+              Delete
+            </Button>
           </div>
         </div>
-        <SplitterLayout>
+        <SplitterLayout secondaryInitialSize={350} secondaryMinSize={200}>
           {this.renderEditor()}
           <div className={style.entitiesPanel}>
             <EntitiesEditor
