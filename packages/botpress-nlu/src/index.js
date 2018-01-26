@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import retry from 'bluebird-retry'
 
 import Storage from './storage'
 import Parser from './parser'
@@ -34,6 +35,44 @@ module.exports = {
       config: config
     })
 
+    const retryPolicy = {
+      interval: 100,
+      max_interval: 500,
+      timeout: 5000,
+      max_tries: 3
+    }
+
+    async function incomingMiddleware(event, next) {
+      try {
+        const metadata = await retry(() => provider.extract(event), retryPolicy)
+        if (metadata) {
+          Object.assign(event, { nlu: metadata })
+        }
+      } catch (err) {
+        bp.logger.warn('[NLU] Error extracting metadata for incoming text: ' + err.message)
+      }
+
+      _.merge(event, {
+        nlu: {
+          intent: {
+            is: intentName =>
+              (_.get(event, 'nlu.intent.name') || '').toLowerCase() === (intentName && intentName.toLowerCase())
+          }
+        }
+      })
+      next()
+    }
+
+    bp.middlewares.register({
+      name: 'nlu.incoming',
+      module: 'botpress-nlu',
+      type: 'incoming',
+      handler: incomingMiddleware,
+      order: 10,
+      description:
+        'Process natural language in the form of text. Structured data with an action and parameters for that action is injected in the incoming message event.'
+    })
+
     setTimeout(() => {
       provider.sync()
     }, 3000) // TODO Change that
@@ -62,6 +101,10 @@ module.exports = {
 
     router.get('/entities', async (req, res) => {
       res.send((await provider.getAvailableEntities()).map(x => x.name))
+    })
+
+    router.get('/sync/check', async (req, res) => {
+      res.send(await provider.checkSyncNeeded())
     })
   }
 }
