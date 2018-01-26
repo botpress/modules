@@ -21,14 +21,14 @@ With Botpress NLU,
 - _(soon)_ You can continously train your bot on misunderstood phrases
 - _(soon)_ You can share and import open-source, community-curated intents & entities
 
-## Installation
+# Installation
 
 ⚠️ **This module only works with the upcoming [Botpress X](https://github.com/botpress/botpress/tree/develop/x).**
 
 - Install the module `yarn add botpress-nlu`
 - Configure a provider (see below)
 
-## Standard NLU Object (`event.nlu`)
+# Standard NLU Object (`event.nlu`)
 
 Botpress NLU will instrument incoming events by providing a standardized object with the structure below.
 
@@ -48,7 +48,7 @@ Botpress NLU will instrument incoming events by providing a standardized object 
 
 ## LUIS
 
-### Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L14-L23)
+### LUIS Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L14-L23)
 
 | Key | Environment Variable | Required |
 | ------------- | -------- | ----- |
@@ -57,11 +57,11 @@ Botpress NLU will instrument incoming events by providing a standardized object 
 | luisAppSecret | `NLU_LUIS_APP_SECRET` | Yes |
 | luisAppRegion | `NLU_LUIS_APP_REGION` | No (default is `westus`) |
 
-### Caveats
+### LUIS Caveats
 
 There are some entities that LUIS doesn't support in some languages, make sure that the language you are using supports the entities you are using in Botpress (this module doesn't do this check for you).
 
-### FAQ
+### LUIS FAQ
 
 <details>
   <summary><strong>I get an error when syncing my model</strong> <i>(click to see)</i></summary>
@@ -70,3 +70,17 @@ There are some entities that LUIS doesn't support in some languages, make sure t
   - You have enough labels (min 2) for the intent
   - The entities you are using are supported by your app's language
 </details>
+
+# Contributing
+
+The best way to help right now is by helping with the exising issues here on GitHub and by reporting new issues!
+
+# License
+
+Botpress is dual-licensed under [AGPLv3](/licenses/LICENSE_AGPL3) and the [Botpress Proprietary License](/licenses/LICENSE_BOTPRESS).
+
+By default, any bot created with Botpress is licensed under AGPLv3, but you may change to the Botpress License from within your bot's web interface in a few clicks.
+
+For more information about how the dual-license works and why it works that way please see the <a href="https://botpress.io/faq">FAQS</a>.
+
+
