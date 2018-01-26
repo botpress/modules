@@ -24,11 +24,7 @@ export default class Provider {
     throw new Error('Not implemented')
   }
 
-  async extractEntities(incomingText) {
-    throw new Error('Not implemented')
-  }
-
-  async classifyIntent(incomingText) {
+  async extract(incomingText) {
     throw new Error('Not implemented')
   }
 

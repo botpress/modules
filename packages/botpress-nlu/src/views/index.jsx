@@ -3,10 +3,7 @@ import classnames from 'classnames'
 import { Collapse, Button } from 'react-bootstrap'
 import _ from 'lodash'
 
-// TODO remove that
-import mock from './mock'
-
-import IntentEditor from './intents/draft'
+import IntentEditor from './intents'
 
 import style from './style.scss'
 
@@ -15,11 +12,28 @@ export default class Module extends React.Component {
     showNavIntents: true,
     intents: [],
     currentIntent: null,
-    filterValue: ''
+    filterValue: '',
+    syncNeeded: false
   }
 
   componentDidMount() {
     this.fetchIntents()
+
+    this.syncInterval = setInterval(this.checkSync, 10000)
+    this.checkSync()
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.syncInterval)
+  }
+
+  checkSync = () => {
+    return this.props.bp.axios.get('/api/botpress-nlu/sync/check').then(res => {
+      if (this.state.syncNeeded !== res.data) {
+        console.log(res.data)
+        this.setState({ syncNeeded: res.data })
+      }
+    })
   }
 
   fetchIntents = () => {
@@ -136,6 +150,12 @@ export default class Module extends React.Component {
                 <Button bsStyle="primary" block onClick={this.createNewIntent}>
                   Create new intent
                 </Button>
+              </div>
+              <div className={style.sync}>
+                {this.state.syncNeeded && (
+                  <div className={style.out}>Model is out of sync. Restart the bot to sync it.</div>
+                )}
+                {!this.state.syncNeeded && <div className={style.in}>Model is up to date</div>}
               </div>
             </nav>
             <div className={style.childContent}>

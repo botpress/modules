@@ -87,7 +87,7 @@ export default class LuisProvider extends Provider {
   async checkSyncNeeded() {
     const intents = await this.storage.getIntents()
     const currentVersion = await this.getRemoteVersion()
-    return this.isInSync(intents, currentVersion)
+    return !await this.isInSync(intents, currentVersion)
   }
 
   async onSyncSuccess(localIntents, remoteVersion) {
@@ -135,7 +135,33 @@ export default class LuisProvider extends Provider {
     return { simples, composites, lists }
   }
 
+  validateCredentials() {
+    const missingPattern = name =>
+      '[NLU::LUIS] "' +
+      name +
+      '" is missing from the configuration, please have a look at botpress-nlu ' +
+      'documentation to learn how to setup the credentials.'
+
+    if (_.isEmpty(this.appId)) {
+      throw new Error(missingPattern('Application Id'))
+    }
+
+    if (_.isEmpty(this.programmaticKey)) {
+      throw new Error(missingPattern('Programmatic Key'))
+    }
+
+    if (_.isEmpty(this.appId)) {
+      throw new Error(missingPattern('Application Secret'))
+    }
+
+    if (_.isEmpty(this.appId)) {
+      throw new Error(missingPattern('Application Region'))
+    }
+  }
+
   async sync() {
+    this.validateCredentials()
+
     let intents = await this.storage.getIntents()
     let currentVersion = await this.getRemoteVersion()
 
@@ -237,8 +263,8 @@ export default class LuisProvider extends Provider {
 
       this.logger.info('[NLU::Luis] Synced model [' + result.data + ']')
     } catch (err) {
-      const detailedError = _.get(err, 'response.data.error.message')
-      this.logger.error('[NLU::Luis] Could not sync the model. Error = ' + detailedError || (err && err.message))
+      const detailedError = _.get(err, 'response.data.error.message') || (err && err.message) || err
+      this.logger.error('[NLU::Luis] Could not sync the model. Error = ' + detailedError)
     }
   }
 
@@ -273,7 +299,7 @@ export default class LuisProvider extends Provider {
 
       const percent = (models.length - _.filter(models, m => m.details.status === 'InProgress').length) / models.length
 
-      const error = _.find(models, { status: 'Fail' })
+      const error = _.find(models, m => m.details.status === 'Fail')
 
       if (error) {
         throw new Error(
@@ -291,6 +317,8 @@ export default class LuisProvider extends Provider {
       await Promise.delay(1000)
     }
 
+    await Promise.delay(1000)
+
     await axios.post(
       `https://${this.appRegion}.api.cognitive.microsoft.com/luis/api/v2.0/apps/${this.appId}/publish`,
       {
@@ -306,7 +334,47 @@ export default class LuisProvider extends Provider {
     )
   }
 
-  async extractEntities(incomingText) {}
+  async extract(incomingEvent) {
+    try {
+      this.validateCredentials()
+    } catch (err) {
+      this.logger.warn(
+        '[NLU::Luis] Did not extract NLU metadata for incoming text because Luis is not configured properly.'
+      )
+      return {}
+    }
 
-  async classifyIntent(incomingText) {}
+    const res = await axios.get(`https://${this.appRegion}.api.cognitive.microsoft.com/luis/v2.0/apps/${this.appId}`, {
+      params: {
+        q: incomingEvent.text,
+        verbose: false,
+        spellCheck: false,
+        staging: !this.isProduction
+      },
+      headers: {
+        'Ocp-Apim-Subscription-Key': this.appSecret
+      }
+    })
+
+    const intentName = _.get(res, 'data.topScoringIntent.intent') || 'None'
+    const confidence = _.get(res, 'data.topScoringIntent.score') || 0
+    const entities = _.get(res, 'data.entities') || []
+
+    return {
+      intent: {
+        name: intentName,
+        confidence: parseFloat(confidence),
+        provider: 'luis'
+      },
+      entities: entities.map(entity => ({
+        name: null,
+        type: entity.type,
+        value: entity.entity,
+        original: entity.entity,
+        confidence: entity.score,
+        position: entity.startIndex,
+        provider: 'luis'
+      }))
+    }
+  }
 }

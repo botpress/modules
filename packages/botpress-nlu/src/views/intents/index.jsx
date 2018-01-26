@@ -1,20 +1,44 @@
 import React from 'react'
-import { Badge } from 'react-bootstrap'
-import classnames from 'classnames'
+import { Badge, Button } from 'react-bootstrap'
+
 import SplitterLayout from 'react-splitter-layout'
-import MonacoEditor from 'react-monaco-editor'
-import ReactMarkdown from 'react-markdown'
+import nanoid from 'nanoid'
+import _ from 'lodash'
+
+import Editor from './draft/editor'
 
 import style from './style.scss'
+import EntitiesEditor from './entities/index'
 
 export default class IntentsEditor extends React.Component {
-
-  addedEntitiesToMonaco = false
-
   state = {
-    content: '',
-    initialContent: ''
+    initialUtterances: '',
+    entitiesEditor: null,
+    isDirty: false,
+    entities: [
+      // {
+      //   id: '0',
+      //   colors: 1,
+      //   name: 'DepartureDate',
+      //   type: '@native.date'
+      // },
+      // {
+      //   id: '1',
+      //   colors: 3,
+      //   name: 'ArrivalDate',
+      //   type: '@native.date'
+      // },
+      // {
+      //   id: '2',
+      //   colors: 5,
+      //   name: 'PassengerCount',
+      //   type: '@native.number'
+      // }
+    ],
+    utterances: []
   }
+
+  firstUtteranceRef = null
 
   componentDidMount() {
     this.initiateStateFromProps(this.props)
@@ -37,8 +61,17 @@ export default class IntentsEditor extends React.Component {
   }
 
   initiateStateFromProps(props) {
-    const { content } = (props && props.intent) || { content: '' }
-    this.setState({ content: content, initialContent: content })
+    const { utterances, entities } = (props && props.intent) || { utterances: [], entities: [] }
+    const expanded = this.expandCanonicalUtterances(utterances)
+
+    if (!_.get(expanded, 'length') || _.get(expanded, '0.text.length')) {
+      expanded.unshift({ id: nanoid(), text: '' })
+    }
+
+    this.setState({ utterances: expanded, entities: entities, isDirty: false }, () => {
+      this.initialHash = this.computeHash()
+      this.forceUpdate()
+    })
   }
 
   deleteIntent = () => {
@@ -53,7 +86,10 @@ export default class IntentsEditor extends React.Component {
 
   saveIntent = () => {
     this.props.axios
-      .post(`/api/botpress-nlu/intents/${this.props.intent.name}`, { content: this.state.content })
+      .post(`/api/botpress-nlu/intents/${this.props.intent.name}`, {
+        utterances: this.getCanonicalUtterances(),
+        entities: this.state.entities
+      })
       .then(() => {
         this.props.reloadIntents && this.props.reloadIntents()
       })
@@ -67,63 +103,80 @@ export default class IntentsEditor extends React.Component {
     return true
   }
 
-  onChange = newValue => {
-    this.setState({ content: newValue })
-  }
+  getCanonicalUtterances = () => this.state.utterances.map(x => x.text).filter(x => x.length)
 
-  isDirty = () => this.state.content !== this.state.initialContent
+  expandCanonicalUtterances = utterances =>
+    utterances.map(u => ({
+      id: nanoid(),
+      text: u
+    }))
+
+  computeHash = () =>
+    JSON.stringify({
+      utterances: this.getCanonicalUtterances(),
+      entities: this.state.entities
+    })
+
+  isDirty = () => this.initialHash && this.computeHash() !== this.initialHash
 
   fetchEntities = () => {
     return this.props.axios.get(`/api/botpress-nlu/entities`).then(res => res.data)
   }
 
-  editorWillMount = monaco => {
-    if (this.addedEntitiesToMonaco) {
-      return
-    } else {
-      this.addedEntitiesToMonaco = true
+  focusFirstUtterance = () => {
+    if (this.firstUtteranceRef) {
+      this.firstUtteranceRef.focus()
     }
+  }
 
-    this.fetchEntities()
-    .then(entities => entities.map(entity => entity.startsWith('@') ? entity.substr(1) : entity))
-    .then(entities => {
-      monaco.languages.registerCompletionItemProvider('markdown', {
-        provideCompletionItems: function() {
-          return entities.map(entity => ({
-            label: `${entity}`,
-            kind: monaco.languages.CompletionItemKind.Text,
-            insertText: entity
-          }))
-        }
-      })
-    })
+  deleteUtterance = id => {
+    const utterances = this.getUtterances()
+    this.setState({ utterances: _.filter(utterances, u => u.id !== id) })
   }
 
   renderEditor() {
-    const requireConfig = {
-      url: 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.1/require.min.js',
-      paths: {
-        vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.10.1/min/vs/'
-      }
+    const utterances = this.getUtterances()
+    const preprendNewUtterance = () => {
+      this.setState({ utterances: [{ id: nanoid(), text: '' }, ...utterances] })
+    }
+    const canonicalValueChanged = (id, value) => {
+      this.setState({
+        utterances: utterances.map(utterance => {
+          if (utterance.id === id) {
+            return Object.assign({}, utterance, {
+              text: value
+            })
+          } else {
+            return utterance
+          }
+        })
+      })
     }
 
     return (
-      <MonacoEditor
-        language="markdown"
-        theme="vs"
-        onChange={this.onChange}
-        height="95%"
-        width="100%"
-        editorWillMount={this.editorWillMount}
-        value={this.state.content}
-        options={{
-          scrollBar: {
-            vertical: 'visible'
-          },
-          quickSuggestions: { other: true, comments: true, strings: true }
-        }}
-        requireConfig={requireConfig}
-      />
+      <ul className={style.utterances}>
+        {utterances.map((utterance, i) => {
+          return (
+            <li key={`uttr-${utterance.id}`}>
+              <Editor
+                getEntitiesEditor={() => this.entitiesEditor}
+                ref={el => {
+                  if (i === 0) {
+                    this.firstUtteranceRef = el
+                  }
+                }}
+                utteranceId={utterance.id}
+                deleteUtterance={() => this.deleteUtterance(utterance.id)}
+                onDone={this.focusFirstUtterance}
+                onInputConsumed={preprendNewUtterance}
+                canonicalValue={utterance.text}
+                canonicalValueChanged={value => canonicalValueChanged(utterance.id, value)}
+                entities={this.state.entities}
+              />
+            </li>
+          )
+        })}
+      </ul>
     )
   }
 
@@ -135,6 +188,45 @@ export default class IntentsEditor extends React.Component {
     )
   }
 
+  onEntitiesChanged = (entities, { operation, name, oldName } = {}) => {
+    const replaceObj = { entities: entities }
+
+    if (operation === 'deleted') {
+      let utterances = this.getUtterances()
+
+      const regex = new RegExp(`\\[([^\\[\\]\\(\\)]+?)\\]\\(${name}\\)`, 'gi')
+      utterances = utterances.map(u => {
+        const text = u.text.replace(regex, '$1')
+        return Object.assign({}, u, { text: text })
+      })
+
+      replaceObj.utterances = utterances
+    } else if (operation === 'modified') {
+      let utterances = this.getUtterances()
+
+      const regex = new RegExp(`\\[([^\\(\\)\\[\\]]+?)\\]\\(${oldName}\\)`, 'gi')
+      utterances = utterances.map(u => {
+        const text = u.text.replace(regex, `[$1](${name})`)
+        return Object.assign({}, u, { text: text })
+      })
+
+      replaceObj.utterances = utterances
+    }
+
+    this.setState(replaceObj)
+  }
+
+  getUtterances = () => {
+    let utterances = this.state.utterances
+
+    if (!utterances.length) {
+      utterances = [{ id: nanoid(), text: '' }]
+      this.setState({ utterances })
+    }
+
+    return utterances
+  }
+
   render() {
     if (!this.props.intent) {
       return this.renderNone()
@@ -142,7 +234,7 @@ export default class IntentsEditor extends React.Component {
 
     const { name } = this.props.intent
 
-    const dirtyLabel = this.isDirty() ? <Badge>Unsaved changes</Badge> : null
+    const dirtyLabel = this.isDirty() ? <Badge bsClass={style.unsavedBadge}>Unsaved changes</Badge> : null
 
     return (
       <div className={style.container}>
@@ -154,16 +246,23 @@ export default class IntentsEditor extends React.Component {
             </h1>
           </div>
           <div className="pull-right">
-            <button onClick={this.saveIntent} disabled={!this.isDirty()}>
+            <Button onClick={this.saveIntent} disabled={!this.isDirty()} bsStyle="success" bsSize="small">
               Save
-            </button>
-            <button onClick={this.deleteIntent}>Delete</button>
+            </Button>
+            <Button onClick={this.deleteIntent} bsStyle="danger" bsSize="small">
+              Delete
+            </Button>
           </div>
         </div>
-        <SplitterLayout>
+        <SplitterLayout secondaryInitialSize={350} secondaryMinSize={200}>
           {this.renderEditor()}
-          <div className={style.markdown}>
-            <ReactMarkdown source={this.state.content} />
+          <div className={style.entitiesPanel}>
+            <EntitiesEditor
+              axios={this.props.axios}
+              ref={el => (this.entitiesEditor = el)}
+              entities={this.state.entities}
+              onEntitiesChanged={this.onEntitiesChanged}
+            />
           </div>
         </SplitterLayout>
       </div>
