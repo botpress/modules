@@ -46,7 +46,9 @@ Botpress NLU will instrument incoming events by providing a standardized object 
 | `nlu.sentiment` | TBD | - |
 | `nlu.language` | TBD | - |
 
-## LUIS Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L14-L23)
+## LUIS
+
+### Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L14-L23)
 
 | Key | Environment Variable | Required |
 | ------------- | -------- | ----- |
@@ -54,3 +56,17 @@ Botpress NLU will instrument incoming events by providing a standardized object 
 | [luisProgrammaticKey](https://docs.microsoft.com/en-us/azure/cognitive-services/luis/manage-keys) | `NLU_LUIS_PROGRAMMATIC_KEY` | Yes |
 | luisAppSecret | `NLU_LUIS_APP_SECRET` | Yes |
 | luisAppRegion | `NLU_LUIS_APP_REGION` | No (default is `westus`) |
+
+### Caveats
+
+There are some entities that LUIS doesn't support in some languages, make sure that the language you are using supports the entities you are using in Botpress (this module doesn't do this check for you).
+
+### FAQ
+
+<details>
+  <summary><strong>I get an error when syncing my model</strong> <i>(click to see)</i></summary>
+  Make sure that:
+  
+  - You have enough labels (min 2) for the intent
+  - The entities you are using are supported by your app's language
+</details>
