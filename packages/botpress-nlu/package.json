@@ -1,10 +1,10 @@
 {
   "name": "botpress-nlu",
-  "version": "1.0.0",
+  "version": "0.0.0-beta.1",
   "description": "Botpress NLU module",
   "main": "bin/node.bundle.js",
   "botpress": {
-    "menuText": "NLU",
+    "menuText": "NLU (Beta)",
     "menuIcon": "fiber_smart_record",
     "webBundle": "bin/web.bundle.js",
     "moduleView": {
@@ -52,6 +52,7 @@
   "dependencies": {
     "axios": "^0.17.1",
     "bluebird": "^3.5.1",
+    "bluebird-retry": "^0.11.0",
     "lodash": "^4.17.4",
     "mkdirp": "^0.5.1",
     "nanoid": "^1.0.1"
