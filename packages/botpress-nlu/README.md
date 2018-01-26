@@ -21,6 +21,13 @@ With Botpress NLU,
 - _(soon)_ You can continously train your bot on misunderstood phrases
 - _(soon)_ You can share and import open-source, community-curated intents & entities
 
+## Installation
+
+⚠️ **This module only works with the upcoming [Botpress X](https://github.com/botpress/botpress/tree/develop/x).**
+
+- Install the module `yarn add botpress-nlu`
+- Configure a provider (see below)
+
 ## Standard NLU Object (`event.nlu`)
 
 Botpress NLU will instrument incoming events by providing a standardized object with the structure below.
