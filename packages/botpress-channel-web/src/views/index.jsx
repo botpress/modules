@@ -144,34 +144,21 @@ export const UMMOutgoing = UMMComponent
 const INJECTION_ID = 'botpress-platform-webchat-injection'
 const INJECTION_URL = '/api/botpress-platform-webchat/inject.js'
 
-export class WebInjection extends React.Component {
-  // TODO: is it used?
-  componentWillMount() {
-    var node = window.document.createElement('script')
-    node.src = INJECTION_URL
-    window.document.body.appendChild(node)
-  }
-
-  render() {
-    return null
-  }
-}
-
 export class WebBotpressUIInjection extends React.Component {
   componentWillMount() {
     if (document.getElementById(INJECTION_ID)) return
 
-    const node = window.document.createElement('script')
-    node.src = INJECTION_URL
-    node.id = INJECTION_ID
-    node.dataset.optionsJson = JSON.stringify({ hideWidget: true })
+    const script = window.document.createElement('script')
+    script.src = INJECTION_URL
+    script.id = INJECTION_ID
+    script.onload = () => window.botpressWebChat.init({ hideWidget: true })
 
-    window.document.body.appendChild(node)
+    window.document.body.appendChild(script)
 
     const button = document.createElement('li')
     Object.assign(button, {
       role: 'presentation',
-      onclick: () => botpressChat('show'),
+      onclick: () => window.botpressWebChat.sendEvent({ type: 'show' }),
       innerHTML: `
         <a role="button" href="#">
           <span class="bp-full-screen">

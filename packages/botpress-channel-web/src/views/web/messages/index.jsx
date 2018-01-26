@@ -57,6 +57,7 @@ class MessageGroup extends Component {
                   isLastOfGroup={i >= this.props.messages.length - 1}
                   isLastGroup={this.props.isLastGroup}
                   data={data}
+                  onSendData={this.props.onSendData}
                 />
               )
             })}
@@ -176,6 +177,7 @@ export default class MessageList extends Component {
                 onLoginPromptSend={this.props.onLoginPromptSend}
                 isLastGroup={i >= groups.length - 1}
                 messages={group}
+                onSendData={this.props.onSendData}
               />
             </div>
           )
@@ -272,6 +274,18 @@ class Message extends Component {
 
   render_file() {
     return <FileMessage file={this.props.data.message_data} />
+  }
+
+  render_custom() {
+    const type = (this.props.data.message_raw.custom_type || '').substring(1)
+    const Plugin = ((window.botpress || {})[type] || {})['Plugin']
+    const data = this.props.data.message_raw.custom_data
+    return (
+      <div>
+        <p style={this.getAddStyle()}>{this.props.data.message_text}</p>
+        { Plugin ? <Plugin onSendData={this.props.onSendData} { ...data } /> : this.render_unsupported() }
+      </div>
+    )
   }
 
   render_unsupported() {
