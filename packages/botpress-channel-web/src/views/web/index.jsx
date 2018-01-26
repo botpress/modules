@@ -39,7 +39,7 @@ export default class Web extends React.Component {
     super(props)
 
     const { options } = queryString.parse(location.search)
-    const { hideWidget, config } = JSON.parse(decodeURIComponent(options))
+    const { hideWidget, config } = JSON.parse(decodeURIComponent(options || '{}'))
 
     this.state = {
       view: null,
