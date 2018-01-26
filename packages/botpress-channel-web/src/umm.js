@@ -91,6 +91,19 @@ function carousel(event, instruction, options) {
   })
 }
 
+function customEvent(event, instruction, options) {
+  const user = getUserId(event)
+  const raw = buildObjectRaw(event, instruction, options, user)
+
+  return PromisifyEvent({
+    platform: 'webchat',
+    type: 'custom',
+    user: { id: user },
+    raw: { ...raw, custom_type: instruction.type, custom_data: instruction.data },
+    text: instruction.text
+  })
+}
+
 function defaultText(event, instruction, options) {
   const user = getUserId(event)
   const raw = buildObjectRaw(event, instruction, options, user)
@@ -228,20 +241,18 @@ function processOutgoing({ event, blocName, instruction }) {
   /// Processing
   /////////
 
-  switch (instruction.type) {
-    case 'login_prompt':
-      return loginPrompt(event, instruction, options)
-      break
-    case 'file':
-      return uploadFile(event, instruction, options)
-      break
-    case 'carousel':
-      return carousel(event, instruction, options)
-    case 'location_picker': //TODO : SOON
-      // code_block
-      break
-    default:
-      return defaultText(event, instruction, options)
+  if (instruction.type === 'login_prompt') {
+    return loginPrompt(event, instruction, options)
+  } else if (instruction.type === 'file') {
+    return uploadFile(event, instruction, options)
+  } else if (instruction.type === 'carousel') {
+    return carousel(event, instruction, options)
+  } else if (instruction.type === 'location_picker') {
+    // TODO
+  } else if (instruction.type && instruction.type.startsWith('@')) {
+    return customEvent(event, instruction, options)
+  } else {
+    return defaultText(event, instruction, options)
   }
 
   ////////////

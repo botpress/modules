@@ -5,26 +5,25 @@ const injectDOMElement = (tagName, targetSelector, options = {}) => {
   return element
 }
 
-const hostName = window.botpressSettings && window.botpressSettings.hostname
-const host = hostName ? `https://${hostName}` : ''
-
 window.addEventListener('message', ({ data }) => {
   if (!data || !data.type || data.type !== 'setClass') return
   document.querySelector('#bp-widget').setAttribute('class', data.value)
 })
 
-if (!document.querySelector('#bp-web-widget')) {
-  const styleHref = `${host}/api/botpress-platform-webchat/inject.css`
-  const iframeHTML = `<iframe id='bp-widget'
-                              src='${host}/lite/?m=platform-webchat&v=embedded' />`
+const init = ({ host = '', hideWidget = false, ...config }) => {
+  const cssHref = `${host}/api/botpress-platform-webchat/inject.css`
+  injectDOMElement('link', 'head', { rel: 'stylesheet', href: cssHref })
 
-  injectDOMElement('link', 'head', { type: 'text/css', rel: 'stylesheet', href: styleHref })
+  const options = encodeURIComponent(JSON.stringify({ hideWidget, config }))
+  const iframeSrc = `${host}/lite/?m=platform-webchat&v=embedded&options=${options}`
+  const iframeHTML = `<iframe id='bp-widget' frameborder='0' src='${iframeSrc}' />`
   injectDOMElement('div', 'body', { id: 'bp-web-widget', innerHTML: iframeHTML })
 
   const iframeWindow = document.querySelector('#bp-web-widget > #bp-widget').contentWindow
-  const injectionScript = document.querySelector('#botpress-platform-webchat-injection')
-  const { optionsJson } = injectionScript ? injectionScript.dataset : { optionsJson: '{}' }
-  iframeWindow.botpressChatOptions = Object.assign({}, JSON.parse(optionsJson))
+  const configure = payload => iframeWindow.postMessage({ action: 'configure', payload }, '*')
+  const sendEvent = payload => iframeWindow.postMessage({ action: 'event', payload }, '*')
 
-  window.botpressChat = (action) => iframeWindow.postMessage(action, '*')
+  window.botpressWebChat = { ...window.botpressWebChat, configure, sendEvent }
 }
+
+window.botpressWebChat = { init }

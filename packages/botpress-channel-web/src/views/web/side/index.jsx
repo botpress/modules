@@ -202,7 +202,8 @@ export default class Side extends React.Component {
       onQuickReplySend: this.props.onQuickReplySend,
       onFormSend: this.props.onFormSend,
       onFileUploadSend: this.props.onFileUploadSend,
-      onLoginPromptSend: this.props.onLoginPromptSend
+      onLoginPromptSend: this.props.onLoginPromptSend,
+      onSendData: this.props.onSendData
     }
 
     return <div className={style.conversation}>

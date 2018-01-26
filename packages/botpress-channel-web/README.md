@@ -221,46 +221,43 @@ This **URL is public** (no authentication required) so you can share it we other
 
 ### Web View (Embedded on Websites)
 
-To embedded the web interface to a website, you simply need to add this script at the end of the `<body>` tag. Don't forget to set the `hostname` correctly to match the public hostname of your bot.
+To embedded the web interface to a website, you simply need to add this script at the end of the `<body>` tag. Don't forget to set the `host` correctly to match the public hostname of your bot.
 
 ```html
-<script>
-  window.botpressSettings = {
-    hostname: "botpress.pagekite.me" // <<-- Change this to your bot hostname
-  };
-</script>
-<script>
-  !function(){function t(){var t=n.createElement("script");t.type="text/javascript",t.async=!0,t.src="https://"+a.hostname+"/api/botpress-platform-webchat/inject.js";var e=n.getElementsByTagName("script")[0];e.parentNode.insertBefore(t,e)}var e=window,a=e.botpressSettings,n=document;e.attachEvent?e.attachEvent("onload",t):e.addEventListener("load",t,!1)}();
-</script>
+<script src="<host>/api/botpress-platform-webchat/inject.js"></script>
+<script>window.botpressWebChat.init({ host: '<host>' })</script>
 ```
 
 ## Customize the view
+You can customize look and feel of the web chat by passing additional keys to `init` method like this:
 
-A configuration file (`botpress-platform-webchat.config.yml`) has been created at the `root` of your bot when you installed the module. You can change these values to change the look and feel of the web chat.
-
-```yaml
-# DEFAULT SETTINGS
-botName: 'Bot' ## Name of your bot
-botAvatarUrl: null ## Default avatar url of the image (e.g. 'https://avatars3.githubusercontent.com/u/1315508?v=4&s=400' )
-botConvoTitle: 'Technical Support' ## Title of the first conversation with the bot
-botConvoDescription: 'This is a description'
-
-# POPUP CONVERSATION SETTINGS
-welcomeMsgEnable: true
-welcomeMsgDelay: 1000
-welcomeMsgText: | ## Welcome message that shows at on pop-up (multi-lines)
-  Hey guys!
-  Curious about our offer?
-  This is the default message...
-
-# COLOR SETTINGS
-backgroundColor: '#ffffff' ## Color of the background 
-textColorOnBackground: '#666666' ## Color of the text on the background
-foregroundColor: '#0176ff' ## Element background color (header, composer, button..)
-textColorOnForeground: '#ffffff'  ## Element text color (header, composer, button..)
+```javascript
+window.botpressWebChat.init({
+  host: '<host>',
+  botName: 'Bot',                     // Name of your bot
+  botAvatarUrl: null,                 // Default avatar url of the image (e.g. 'https://avatars3.githubusercontent.com/u/1315508?v=4&s=400' )
+  botConvoTitle: 'Technical Support', // Title of the first conversation with the bot
+  botConvoDescription: '',
+  backgroundColor: '#ffffff',         // Color of the background 
+  textColorOnBackground: '#666666',   // Color of the text on the background
+  foregroundColor: '#0176ff',         // Element background color (header, composer, button..)
+  textColorOnForeground: '#ffffff'    // Element text color (header, composer, button..)
+})
 ```
 
-You can open/close sidebar programmatically by calling `window.botpressChat('show')` or `window.botpressChat('hide')`
+You can also use `window.botpressWebChat.configure` method to modify web chat options after it's initialized.
+
+A configuration file (`botpress-platform-webchat.config.yml`) has been created at the `root` of your bot when you installed the module. You can change these values to set up S3 integration.
+
+```yaml
+uploadsUseS3: true
+#uploadsS3Bucket: bucket-name
+#uploadsS3Region: eu-west-1
+#uploadsS3AWSAccessKey: your-aws-key-name
+#uploadsS3AWSAccessSecret: secret-key
+```
+
+You can open/close sidebar programmatically by calling `window.botpressWebChat.sendEvent` with `{ type: 'show' }` or `{ type: 'hide' }`.
 
 > **Note**
 > 

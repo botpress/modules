@@ -4,9 +4,9 @@ import multer from 'multer'
 import multers3 from 'multer-s3'
 import aws from 'aws-sdk'
 
-import injectScript from 'raw!./inject.js'
-import injectStyle from 'raw!./inject.css'
-import notificationSound from 'raw!../static/notification.mp3'
+import injectScript from 'raw-loader!./inject.js'
+import injectStyle from 'raw-loader!./inject.css'
+import notificationSound from 'raw-loader!../static/notification.mp3'
 
 import serveStatic from 'serve-static'
 
@@ -256,9 +256,20 @@ module.exports = async (bp, config) => {
     }, payload.data))
   }
 
-  async function sendEvent(userId, event, data) {
-
-  }
+  router.post('/events/:userId', asyncApi(async (req, res) => {
+    const { type, payload } = (req.body || {})
+    const { userId } = req.params || {}
+    const user = await getOrCreateUser(userId)
+    bp.middlewares.sendIncoming({
+      platform: 'webchat',
+      type,
+      user,
+      text: payload.text,
+      raw: _.pick(payload, ['text', 'type', 'data']),
+      ...payload.data
+    })
+    res.status(200).send({})
+  }))
 
   return router
 }
