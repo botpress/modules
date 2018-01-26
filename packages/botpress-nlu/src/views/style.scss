@@ -70,6 +70,23 @@ footer {
   .create {
     padding: 10px 15px;
   }
+
+  .sync {
+    padding: 10px 15px;
+    text-align: center;
+
+    div {
+      font-weight: bold;
+      line-height: 20px;
+
+      &.out {
+        color: #ff3653;
+      }
+      &.in {
+        color: #00d129;
+      }
+    }
+  }
 }
 
 .childContent {
