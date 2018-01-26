@@ -12,7 +12,7 @@ Botpress NLU is a Botpress module that adds NLU capatibilities to your bot by co
 | [DialogFlow](https://dialogflow.com/) | Help needed |
 | [RASA](https://github.com/RasaHQ/rasa_nlu) | Help needed |
 
-We believe NLP/NLU is a commodity, so this package abstracts the provider by providing a standard, clean interface that allows you (and the non-technicals) to easily edit the NLU data within Botpress.
+We believe NLP/NLU is a commodity, so this package abstracts the provider by providing a standard, clean interface that allows you (and the non-technicals) to easily edit the NLU data within Botpress. We are building the **interface** for proper NLU, we are **NOT** involved in actually providing the NLU.
 
 With Botpress NLU,
 
