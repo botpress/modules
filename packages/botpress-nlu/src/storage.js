@@ -23,8 +23,8 @@ export default class Storage {
   async initializeGhost() {
     mkdirp.sync(path.resolve(this.projectDir, this.intentsDir))
     mkdirp.sync(path.resolve(this.projectDir, this.entitiesDir))
-    await this.ghost.addRootFolder(this.intentsDir, '**/*.json')
-    await this.ghost.addRootFolder(this.intentsDir, '**/*.utterances.txt')
+
+    await this.ghost.addRootFolder(this.intentsDir, '**/*.*')
     await this.ghost.addRootFolder(this.entitiesDir, '**/*.entity.json')
   }
 
@@ -65,8 +65,7 @@ export default class Storage {
   }
 
   async getIntents() {
-    const intents = await this.ghost.directoryListing(this.intentsDir, '*.json')
-
+    const intents = await this.ghost.directoryListing(this.intentsDir, '.json')
     return await Promise.mapSeries(intents, intent => this.getIntent(intent))
   }
 
@@ -94,7 +93,7 @@ export default class Storage {
   }
 
   async getCustomEntities() {
-    const entities = await this.ghost.directoryListing(this.entitiesDir, '*.json')
+    const entities = await this.ghost.directoryListing(this.entitiesDir, '.json')
 
     return await Promise.mapSeries(entities, entity => this.getCustomEntity(entity))
   }
