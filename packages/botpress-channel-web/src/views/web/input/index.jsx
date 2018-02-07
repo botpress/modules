@@ -27,7 +27,7 @@ export default class Send extends Component {
 
   render() {
     return <div tabIndex="-1" className={style.input}>
-        <textarea tabindex="1"
+        <textarea tabIndex="1"
           ref={(input) => { this.textInput = input; }}
           onBlur={() => this.handleFocus(false)}
           onFocus={() => this.handleFocus(true)}
