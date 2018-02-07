@@ -92,6 +92,7 @@ export default class Web extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener('message', this.handleIframeApi)
+    this.isUnmounted = true
   }
 
   handleIframeApi = ({ data: { action, payload } }) => {
@@ -225,7 +226,7 @@ export default class Web extends React.Component {
     const userId = this.userId
     const url = `${BOT_HOSTNAME}/api/botpress-platform-webchat/conversations/${userId}`
 
-    return axios.get(url).then(({ data }) => new Promise(resolve => this.setState({ conversations: data }, resolve)))
+    return axios.get(url).then(({ data }) => new Promise(resolve => !this.isUnmounted && this.setState({ conversations: data }, resolve)))
   }
 
   fetchCurrentConversation(convoId) {
@@ -430,7 +431,7 @@ export default class Web extends React.Component {
         <path
           d="M4.583 14.894l-3.256 3.78c-.7.813-1.26.598-1.25-.46a10689.413 10689.413 0 0 1 .035-4.775V4.816a3.89 3.89 0 0 1 3.88-3.89h12.064a3.885 3.885 0 0 1 3.882 3.89v6.185a3.89 3.89 0 0 1-3.882 3.89H4.583z"
           fill="#FFF"
-          fill-rule="evenodd"
+          fillRule="evenodd"
         />
       </svg>
     )
@@ -442,7 +443,7 @@ export default class Web extends React.Component {
         <path
           d="M16.726 15.402c.365.366.365.96 0 1.324-.178.178-.416.274-.663.274-.246 0-.484-.096-.663-.274L8.323 9.648h.353L1.6 16.726c-.177.178-.416.274-.663.274-.246 0-.484-.096-.663-.274-.365-.365-.365-.958 0-1.324L7.35 8.324v.35L.275 1.6C-.09 1.233-.09.64.274.274c.367-.365.96-.365 1.326 0l7.076 7.078h-.353L15.4.274c.366-.365.96-.365 1.326 0 .365.366.365.958 0 1.324L9.65 8.675v-.35l7.076 7.077z"
           fill="#FFF"
-          fill-rule="evenodd"
+          fillRule="evenodd"
         />
       </svg>
     )

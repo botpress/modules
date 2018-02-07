@@ -168,7 +168,7 @@ export default class MessageList extends Component {
             !groups[i - 1] || differenceInMinutes(new Date(groupDate), new Date(lastDate)) > TIME_BETWEEN_DATES
 
           return (
-            <div>
+            <div key={i}>
               {isDateNeeded ? this.renderDate(group[0].sent_on) : null}
               <MessageGroup
                 avatarUrl={this.props.avatarUrl}

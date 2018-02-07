@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import { hexToRGBA } from './misc'
 
 import style from './style.scss'
-import FileInput from 'react-file-input'
+import FileInput from '../file_input'
 
 class QuickReply extends Component {
   constructor(props) {
