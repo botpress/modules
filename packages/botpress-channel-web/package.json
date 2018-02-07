@@ -56,6 +56,7 @@
     "react-dom": "^15.3.2",
     "react-dropzone": "^3.13.1",
     "react-file-input": "^0.2.5",
+    "react-linkify": "^0.2.2",
     "react-resizable-box": "^2.0.4",
     "react-slick": "^0.15.4",
     "react-spinkit": "^3.0.0",

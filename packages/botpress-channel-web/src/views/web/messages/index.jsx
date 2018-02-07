@@ -3,6 +3,7 @@ import classnames from 'classnames'
 
 import format from 'date-fns/format'
 import differenceInMinutes from 'date-fns/difference_in_minutes'
+import Linkify from 'react-linkify'
 
 import BotAvatar from '../bot_avatar'
 import QuickReplies from './quick_replies'
@@ -203,16 +204,17 @@ export default class MessageList extends Component {
 }
 
 class Message extends Component {
-
   getAddStyle() {
     return this.props.data.message_raw && this.props.data.message_raw['web-style']
   }
 
   render_text() {
     return (
-      <div>
-        <p style={this.getAddStyle()}>{this.props.data.message_text}</p>
-      </div>
+      <Linkify>
+        <div>
+          <p style={this.getAddStyle()}>{this.props.data.message_text}</p>
+        </div>
+      </Linkify>
     )
   }
 
@@ -250,9 +252,7 @@ class Message extends Component {
   }
 
   render_carousel() {
-    return (
-      <CarouselMessage carousel={this.props.data.message_raw}/>
-    )
+    return <CarouselMessage carousel={this.props.data.message_raw} />
   }
 
   render_typing() {
@@ -281,10 +281,12 @@ class Message extends Component {
     const Plugin = ((window.botpress || {})[type] || {})['Plugin']
     const data = this.props.data.message_raw.custom_data
     return (
-      <div>
-        <p style={this.getAddStyle()}>{this.props.data.message_text}</p>
-        { Plugin ? <Plugin onSendData={this.props.onSendData} { ...data } /> : this.render_unsupported() }
-      </div>
+      <Linkify>
+        <div>
+          <p style={this.getAddStyle()}>{this.props.data.message_text}</p>
+          {Plugin ? <Plugin onSendData={this.props.onSendData} {...data} /> : this.render_unsupported()}
+        </div>
+      </Linkify>
     )
   }
 
