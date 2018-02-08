@@ -210,7 +210,7 @@ class Message extends Component {
 
   render_text() {
     return (
-      <Linkify>
+      <Linkify properties={{ target: '_blank' }}>
         <div>
           <p style={this.getAddStyle()}>{this.props.data.message_text}</p>
         </div>
