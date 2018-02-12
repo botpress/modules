@@ -45,6 +45,12 @@ var webConfig = {
     libraryTarget: 'assign',
     library: ['botpress', pkg.name]
   },
+  externals: {
+    'react': 'React',
+    'react-dom': 'ReactDOM',
+    'react-bootstrap': 'ReactBootstrap',
+    'prop-types': 'PropTypes'
+  },
   resolve: {
     extensions: ['.js', '.jsx']
   },
