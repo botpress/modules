@@ -1,12 +1,13 @@
 var webpack = require('webpack')
 var nodeExternals = require('webpack-node-externals')
+const path = require('path')
 var pkg = require('./package.json')
 
 var nodeConfig = {
   devtool: 'source-map',
   entry: ['./src/index.js'],
   output: {
-    path: './bin',
+    path: path.resolve(__dirname, './bin'),
     filename: 'node.bundle.js',
     libraryTarget: 'commonjs2',
     publicPath: __dirname
@@ -17,22 +18,20 @@ var nodeConfig = {
     __dirname: false
   },
   resolve: {
-    extensions: ['', '.js']
+    extensions: ['.js']
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
-        loader: 'babel-loader',
         exclude: /node_modules/,
-        query: {
-          presets: ['latest', 'stage-0'],
-          plugins: ['transform-object-rest-spread', 'transform-async-to-generator']
-        }
-      },
-      {
-        test: /\.json$/,
-        loader: 'json-loader'
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['latest', 'stage-0'],
+            plugins: ['transform-object-rest-spread', 'transform-async-to-generator']
+          }
+        },
       }
     ]
   }
@@ -42,49 +41,59 @@ var webConfig = {
   devtool: 'source-map',
   entry: ['./src/views/index.jsx'],
   output: {
-    path: './bin',
+    path: path.resolve(__dirname, './bin'),
     publicPath: '/js/modules/',
     filename: 'web.bundle.js',
     libraryTarget: 'assign',
     library: ['botpress', pkg.name]
   },
   resolve: {
-    extensions: ['', '.js', '.jsx']
+    extensions: ['.js', '.jsx']
   },
   externals: {
-    react: 'React',
-    'react-dom': 'ReactDOM'
+    'react': 'React',
+    'react-dom': 'ReactDOM',
+    'react-bootstrap': 'ReactBootstrap',
+    'prop-types': 'PropTypes'
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.jsx?$/,
-        loader: 'babel-loader',
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['latest', 'stage-0', 'react'],
+            plugins: ['transform-object-rest-spread', 'transform-decorators-legacy']
+          }
+        },
         exclude: /node_modules/,
-        query: {
-          presets: ['latest', 'stage-0', 'react'],
-          plugins: ['transform-object-rest-spread', 'transform-decorators-legacy']
-        }
       },
       {
         test: /\.scss$/,
-        loaders: [
-          'style',
-          'css?modules&importLoaders=1&localIdentName=' + pkg.name + '__[name]__[local]___[hash:base64:5]',
-          'sass'
+        use: [
+          { loader: 'style-loader' },
+          {
+            loader: 'css-loader',
+            options: {
+              modules: true,
+              importLoaders: 1,
+              localIdentName: pkg.name + '__[name]__[local]___[hash:base64:5]'
+            }
+          },
+          { loader: 'sass-loader' }
         ]
       },
       {
         test: /\.css$/,
-        loaders: ['style', 'css']
+        use: [
+          { loader: 'style-loader' },
+          { loader: 'css-loader' }
+        ]
       },
       {
         test: /\.woff|\.woff2|\.svg|.eot|\.ttf/,
-        loader: 'file?name=../fonts/[name].[ext]'
-      },
-      {
-        test: /\.json$/,
-        loader: 'json-loader'
+        use: [{ loader: 'file-loader', options: { name: '../fonts/[name].[ext]' }}]
       }
     ]
   }
@@ -96,7 +105,7 @@ const liteConfig = Object.assign({}, webConfig, {
     // example: './src/views/example.lite.jsx'
   },
   output: {
-    path: './bin/lite',
+    path: path.resolve(__dirname, './bin/lite'),
     publicPath: '/js/lite-modules/',
     filename: '[name].bundle.js',
     libraryTarget: 'assign',
@@ -104,7 +113,7 @@ const liteConfig = Object.assign({}, webConfig, {
   }
 })
 
-var compiler = webpack([nodeConfig, webConfig, liteConfig])
+var compiler = webpack([nodeConfig, webConfig, /*liteConfig*/])
 var postProcess = function(err, stats) {
   if (err) {
     throw err
@@ -121,5 +130,5 @@ if (process.argv.indexOf('--compile') !== -1) {
 module.exports = {
   web: webConfig,
   node: nodeConfig,
-  lite: liteConfig
+  // lite: liteConfig
 }
