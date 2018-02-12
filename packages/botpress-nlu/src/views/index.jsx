@@ -119,8 +119,8 @@ export default class Module extends React.Component {
         </div>
         <Collapse in={this.state.showNavIntents}>
           <ul>
-            {intents.map(el => (
-              <li className={getClassName(el)} onClick={() => this.setCurrentIntent(el.name)}>
+            {intents.map((el, i) => (
+              <li key={i} className={getClassName(el)} onClick={() => this.setCurrentIntent(el.name)}>
                 {el.name}&nbsp;({_.get(el, 'utterances.length') || 0})
               </li>
             ))}
