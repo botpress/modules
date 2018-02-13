@@ -173,12 +173,12 @@ export default class TemplateModule extends React.Component {
         <p>This skill allows you to make the user pick a choice.</p>
 
         <p>
-          <bold>Question / text</bold>
+          <b>Question / text</b>
         </p>
         <textarea onChange={this.onQuestionChange} value={this.state.questionValue} />
 
         <p>
-          <bold>Choices</bold>
+          <b>Choices</b>
         </p>
         <input
           className={style.newChoice}
