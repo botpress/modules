@@ -221,14 +221,16 @@ export default class TemplateModule extends React.Component {
           <Col md={8} mdOffset={2}>
             {this.renderMessageAlert()}
             <Panel className={style.panel} header="Settings">
-              {this.renderSaveButton()}
-              <div className={style.settings}>
-                {this.renderAccessToken()}
-                {this.renderMode()}
-              </div>
+              <Panel.Body>
+                {this.renderSaveButton()}
+                <div className={style.settings}>
+                  {this.renderAccessToken()}
+                  {this.renderMode()}
+                </div>
+              </Panel.Body>
             </Panel>
             <Panel header="Documentation">
-              {this.renderExplication()}
+              <Panel.Body>{this.renderExplication()}</Panel.Body>
             </Panel>
           </Col>
         </Row>
