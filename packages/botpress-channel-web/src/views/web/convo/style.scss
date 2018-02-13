@@ -24,7 +24,7 @@
     -webkit-box-direction: normal;
     -ms-flex-direction: column;
     flex-direction: column;
-    box-shadow: 0 4px 23px 0 rgba(0,0,0,.09);
+    box-shadow: 0 4px 23px 0 rgba(0, 0, 0, 0.09);
     border-radius: 5px;
 
     .header {
@@ -77,8 +77,8 @@
             height: 1.4em;
 
             .square {
-              -webkit-transform: translate(-10px,12px);
-              transform: translate(-10px,12px);
+              -webkit-transform: translate(-10px, 12px);
+              transform: translate(-10px, 12px);
               margin-right: 4px;
               position: relative;
               width: 70px;
@@ -101,7 +101,7 @@
                 flex-shrink: 0;
 
                 .picture {
-                  border-radius: 50%;
+                  border-radius: 4px; // 50%
                   background-size: cover;
                   background-position: 50%;
                   width: 100%;
@@ -113,10 +113,10 @@
 
           .name {
             font-weight: 500;
-            
+
             span {
               color: inherit;
-              opacity: .8;
+              opacity: 0.8;
             }
           }
         }
@@ -153,7 +153,6 @@
           }
         }
       }
-
     }
 
     .composer {
@@ -161,7 +160,6 @@
       padding: 8px;
       border-bottom-left-radius: inherit;
       border-bottom-right-radius: inherit;
-
 
       .flex-column {
         -webkit-box-orient: vertical;
@@ -182,7 +180,6 @@
   }
 }
 
-
 // ANIMATIONS
 .fadeIn {
   -webkit-animation-name: zoomIn;
@@ -196,8 +193,8 @@
 @-webkit-keyframes zoomIn {
   0% {
     opacity: 0;
-    -webkit-transform: scale3d(.3, .3, .3);
-    transform: scale3d(.3, .3, .3);
+    -webkit-transform: scale3d(0.3, 0.3, 0.3);
+    transform: scale3d(0.3, 0.3, 0.3);
   }
   50% {
     opacity: 1;
@@ -206,13 +203,13 @@
 @keyframes zoomIn {
   0% {
     opacity: 0;
-    -webkit-transform: scale3d(.3, .3, .3);
-    transform: scale3d(.3, .3, .3);
+    -webkit-transform: scale3d(0.3, 0.3, 0.3);
+    transform: scale3d(0.3, 0.3, 0.3);
   }
   50% {
     opacity: 1;
   }
-} 
+}
 
 .fadeOut {
   -webkit-animation-name: zoomOut;
@@ -229,8 +226,8 @@
   }
   50% {
     opacity: 0;
-    -webkit-transform: scale3d(.3, .3, .3);
-    transform: scale3d(.3, .3, .3);
+    -webkit-transform: scale3d(0.3, 0.3, 0.3);
+    transform: scale3d(0.3, 0.3, 0.3);
   }
   100% {
     opacity: 0;
@@ -243,8 +240,8 @@
   }
   50% {
     opacity: 0;
-    -webkit-transform: scale3d(.3, .3, .3);
-    transform: scale3d(.3, .3, .3);
+    -webkit-transform: scale3d(0.3, 0.3, 0.3);
+    transform: scale3d(0.3, 0.3, 0.3);
   }
   100% {
     opacity: 0;

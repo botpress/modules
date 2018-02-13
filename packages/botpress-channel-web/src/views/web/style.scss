@@ -6,6 +6,14 @@ body {
   overflow: hidden;
 }
 
+.defaultAvatar {
+  background-image: url('/api/botpress-platform-webchat/static/avatar_default.png');
+  background-size: 80%;
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+}
+
 .web {
   button {
     float: right;
@@ -21,8 +29,8 @@ body {
     width: 52px;
     height: 52px;
     cursor: pointer;
-    border-radius: 5px;
-    box-shadow: 0 2px 6px 0 rgba(0,0,0,.4);
+    border-radius: 0px;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.4);
     overflow: hidden;
 
     padding: 0;
@@ -32,7 +40,7 @@ body {
     transition: width 1s, height 1s;
 
     i {
-      transition: opacity .3s ease;
+      transition: opacity 0.3s ease;
       opacity: 1;
       fill: inherit;
       stroke: inherit;
@@ -53,7 +61,7 @@ body {
 
       color: #fff;
       background-color: #ff5d5d;
-      box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.4)
+      box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.4);
     }
   }
 }
@@ -80,7 +88,6 @@ body {
   }
 }
 
-
 // ANIMATIONS
 .fadeIn {
   -webkit-animation-name: zoomIn;
@@ -94,8 +101,8 @@ body {
 @-webkit-keyframes zoomIn {
   0% {
     opacity: 0;
-    -webkit-transform: scale3d(.3, .3, .3);
-    transform: scale3d(.3, .3, .3);
+    -webkit-transform: scale3d(0.3, 0.3, 0.3);
+    transform: scale3d(0.3, 0.3, 0.3);
   }
   50% {
     opacity: 1;
@@ -105,8 +112,8 @@ body {
 @keyframes zoomIn {
   0% {
     opacity: 0;
-    -webkit-transform: scale3d(.3, .3, .3);
-    transform: scale3d(.3, .3, .3);
+    -webkit-transform: scale3d(0.3, 0.3, 0.3);
+    transform: scale3d(0.3, 0.3, 0.3);
   }
   50% {
     opacity: 1;
@@ -129,8 +136,8 @@ body {
 
   50% {
     opacity: 0;
-    -webkit-transform: scale3d(.3, .3, .3);
-    transform: scale3d(.3, .3, .3);
+    -webkit-transform: scale3d(0.3, 0.3, 0.3);
+    transform: scale3d(0.3, 0.3, 0.3);
   }
   100% {
     opacity: 0;
@@ -143,10 +150,10 @@ body {
   }
   50% {
     opacity: 0;
-    -webkit-transform: scale3d(.3, .3, .3);
-    transform: scale3d(.3, .3, .3);
+    -webkit-transform: scale3d(0.3, 0.3, 0.3);
+    transform: scale3d(0.3, 0.3, 0.3);
   }
   100% {
     opacity: 0;
   }
-} 
+}
