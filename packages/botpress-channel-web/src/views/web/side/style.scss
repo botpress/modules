@@ -37,10 +37,9 @@
       align-items: center;
       -ms-flex-negative: 0;
       flex-shrink: 0;
-      height: 60px;
+      height: 52px;
       font-weight: 500;
       border-bottom: 1px solid #ccc;
-      box-shadow: 0 1px 0.8rem rgba(0,0,0,.05);
       padding: 0 1rem;
       overflow: hidden;
 
@@ -120,7 +119,7 @@
               overflow: hidden;
               white-space: nowrap;
               text-overflow: ellipsis;
-              font-size: .75rem;
+              font-size: 0.75rem;
               font-weight: 500;
               color: #9a9a9a;
               // text-transform: capitalize;
@@ -168,14 +167,26 @@
       flex-direction: column;
       min-height: 1px;
 
-      .bottom {
+      &:before {
+        content: ' ';
+        position: absolute;
+        top: 50px;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.1;
+        z-index: -1;
+        background: url(/api/botpress-platform-webchat/static/background_1.png);
+      }
 
+      .bottom {
         .composer {
           border-top-width: 1px;
           border-top-style: solid;
           border-top-color: #eee;
           position: relative;
-          padding: .5rem 0 0;
+          padding: 0.5rem 0 0;
+          background: rgba(255, 255, 255, 0.9);
 
           transition: border 0.3s ease;
 
@@ -195,8 +206,8 @@
               font-size: 1rem;
               resize: none;
               line-height: 1.2;
-              padding: .75rem 1rem;
-              margin-bottom: .5rem;
+              padding: 0.75rem 1rem;
+              margin-bottom: 0.5rem;
               background-color: transparent;
 
               font: inherit;
@@ -206,14 +217,14 @@
               display: -webkit-box;
               display: -ms-flexbox;
               display: flex;
-              padding: 0 1rem .75rem;
+              padding: 0 1rem 0.75rem;
               -webkit-box-pack: justify;
               -ms-flex-pack: justify;
               justify-content: space-between;
               -webkit-box-align: center;
               -ms-flex-align: center;
               align-items: center;
-              
+
               .elements {
                 display: -webkit-box;
                 display: -ms-flexbox;
@@ -229,7 +240,7 @@
 
                   a {
                     color: #ccc;
-                    
+
                     &:hover {
                       color: #aaa;
                     }
@@ -238,7 +249,7 @@
                       -webkit-box-align: center;
                       -ms-flex-align: center;
                       align-items: center;
-                      
+
                       svg {
                         fill: currentColor;
                       }
@@ -278,7 +289,7 @@
           position: relative;
 
           .avatar {
-            margin: 0 .8rem;
+            margin: 0 0.8rem;
             width: 3.125rem;
             height: 3.125rem;
             -ms-flex-negative: 0;
@@ -318,7 +329,7 @@
 
             .date {
               text-align: right;
-              font-size: .875rem;
+              font-size: 0.875rem;
               color: #9a9a9a;
               position: absolute;
               right: 0;
@@ -326,14 +337,13 @@
           }
 
           .text {
-            font-size: .875rem;
+            font-size: 0.875rem;
             color: #9a9a9a;
             max-width: 15rem;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
           }
-
         }
       }
     }
@@ -351,7 +361,7 @@
       align-items: stretch;
       overflow: hidden;
       max-height: 230px;
-      
+
       .inside {
         display: -webkit-box;
         display: -ms-flexbox;
@@ -360,8 +370,8 @@
         -ms-flex: 1 1 auto;
         flex: 1 1 auto;
         background: #f8f8f8;
-        box-shadow: inset 0 5px 9px -3px rgba(0,0,0,.3);
-      
+        box-shadow: inset 0 5px 9px -3px rgba(0, 0, 0, 0.3);
+
         :global(.emoji-mart) {
           width: 100% !important;
           border: none;

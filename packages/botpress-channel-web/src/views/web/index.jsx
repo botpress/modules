@@ -1,4 +1,3 @@
-
 /* global: window */
 
 import React from 'react'
@@ -16,7 +15,11 @@ import Side from './side'
 import style from './style.scss'
 
 if (!window.location.origin) {
-  window.location.origin = window.location.protocol + '//' + window.location.hostname + (window.location.port ? (':' + window.location.port) : '')
+  window.location.origin =
+    window.location.protocol +
+    '//' +
+    window.location.hostname +
+    (window.location.port ? ':' + window.location.port : '')
 }
 
 const BOT_HOSTNAME = window.location.origin
@@ -27,14 +30,13 @@ const MIN_TIME_BETWEEN_SOUNDS = 10000 // 10 seconds
 const defaultOptions = {
   locale: 'en-US',
   botName: 'Bot',
-  backgroundColor:'#fff',
-  textColorOnBackground: '#666',
-  foregroundColor: '#0176ff',
-  textColorOnForeground: '#fff'
+  backgroundColor: '#ffffff',
+  textColorOnBackground: '#666666',
+  foregroundColor: '#000000',
+  textColorOnForeground: '#ffffff'
 }
 
 export default class Web extends React.Component {
-
   constructor(props) {
     super(props)
 
@@ -62,31 +64,34 @@ export default class Web extends React.Component {
 
   componentDidMount() {
     this.setUserId()
-    .then(::this.fetchData)
-    .then(() => {
-      this.handleSwitchView('widget')
-      if(!this.state.isButtonHidden) this.showConvoPopUp()
+      .then(::this.fetchData)
+      .then(() => {
+        this.handleSwitchView('widget')
+        if (!this.state.isButtonHidden) this.showConvoPopUp()
 
-      this.setState({ loading: false })
-    })
+        this.setState({ loading: false })
+      })
 
     window.addEventListener('message', this.handleIframeApi)
 
-    this.props.bp.axios.interceptors.request.use((config) => {
-      if (/\/api\/botpress-platform-webchat\//i.test(config.url)) {
-        const prefix = config.url.indexOf('?') > 0 ? '&' : '?'
-        config.url += prefix + '__ts=' + new Date().getTime()
+    this.props.bp.axios.interceptors.request.use(
+      config => {
+        if (/\/api\/botpress-platform-webchat\//i.test(config.url)) {
+          const prefix = config.url.indexOf('?') > 0 ? '&' : '?'
+          config.url += prefix + '__ts=' + new Date().getTime()
+        }
+        return config
+      },
+      error => {
+        return Promise.reject(error)
       }
-      return config
-    }, (error) => {
-      return Promise.reject(error)
-    })
+    )
   }
 
   componentWillUnmount() {
     window.removeEventListener('message', this.handleIframeApi)
   }
-  
+
   handleIframeApi = ({ data: { action, payload } }) => {
     if (action === 'configure') {
       this.setState({ config: Object.assign({}, defaultOptions, payload) })
@@ -109,7 +114,6 @@ export default class Web extends React.Component {
 
   setUserId() {
     return new Promise((resolve, reject) => {
-
       const interval = setInterval(() => {
         if (window.__BP_VISITOR_ID) {
           clearInterval(interval)
@@ -122,7 +126,6 @@ export default class Web extends React.Component {
         clearInterval(interval)
         reject()
       }, 300000)
-
     })
   }
 
@@ -151,7 +154,6 @@ export default class Web extends React.Component {
           view: view
         })
       }, ANIM_DURATION + 10)
-
     }
 
     if (view === 'convo') {
@@ -221,9 +223,7 @@ export default class Web extends React.Component {
     const userId = this.userId
     const url = `${BOT_HOSTNAME}/api/botpress-platform-webchat/conversations/${userId}`
 
-    return axios
-      .get(url)
-      .then(({ data }) => new Promise(resolve => this.setState({ conversations: data }, resolve)))
+    return axios.get(url).then(({ data }) => new Promise(resolve => this.setState({ conversations: data }, resolve)))
   }
 
   fetchCurrentConversation(convoId) {
@@ -233,13 +233,12 @@ export default class Web extends React.Component {
     let conversationIdToFetch = convoId || this.state.currentConversationId
     if (this.state.conversations.length > 0 && !conversationIdToFetch) {
       conversationIdToFetch = this.state.conversations[0].id
-      this.setState({ currentConversationId:  conversationIdToFetch })
+      this.setState({ currentConversationId: conversationIdToFetch })
     }
 
     const url = `${BOT_HOSTNAME}/api/botpress-platform-webchat/conversations/${userId}/${conversationIdToFetch}`
 
-    return axios.get(url)
-    .then(({data}) => {
+    return axios.get(url).then(({ data }) => {
       // Possible race condition if the current conversation changed while fetching
       if (this.state.currentConversationId !== conversationIdToFetch) {
         // In which case we simply restart fetching
@@ -270,8 +269,7 @@ export default class Web extends React.Component {
   }
 
   expireTyping() {
-    const currentTypingUntil = this.state.currentConversation
-      && this.state.currentConversation.typingUntil
+    const currentTypingUntil = this.state.currentConversation && this.state.currentConversation.typingUntil
 
     const timerExpired = currentTypingUntil && isBefore(new Date(currentTypingUntil), new Date())
     if (timerExpired) {
@@ -284,9 +282,7 @@ export default class Web extends React.Component {
   safeUpdateCurrentConvo(convoId, addToUnread, updater) {
     // there's no conversation to update or our convo changed
     if (!this.state.currentConversation || this.state.currentConversationId !== convoId) {
-
-      this.fetchConversations()
-      .then(::this.fetchCurrentConversation)
+      this.fetchConversations().then(::this.fetchCurrentConversation)
 
       return
     }
@@ -310,7 +306,8 @@ export default class Web extends React.Component {
   }
 
   playSound() {
-    if (!this.state.played && this.state.view !== 'convo') { // TODO: Remove this condition (view !== 'convo') and fix transition sounds
+    if (!this.state.played && this.state.view !== 'convo') {
+      // TODO: Remove this condition (view !== 'convo') and fix transition sounds
       const audio = new Audio('/api/botpress-platform-webchat/static/notification.mp3')
       audio.play()
 
@@ -344,8 +341,7 @@ export default class Web extends React.Component {
     const userId = window.__BP_VISITOR_ID
     const config = { params: { conversationId: this.state.currentConversationId } }
 
-    return this.handleSendData({ type: 'text', text: this.state.textToSend })
-    .then(() => {
+    return this.handleSendData({ type: 'text', text: this.state.textToSend }).then(() => {
       this.handleSwitchView('side')
       this.setState({ textToSend: '' })
     })
@@ -372,12 +368,12 @@ export default class Web extends React.Component {
   }
 
   handleSendForm(fields, formId, repr) {
-      return this.handleSendData({
-          type: 'form',
-          formId: formId,
-          text: repr,
-          data: fields
-      })
+    return this.handleSendData({
+      type: 'form',
+      formId: formId,
+      text: repr,
+      data: fields
+    })
   }
 
   handleLoginPrompt(username, password) {
@@ -420,15 +416,27 @@ export default class Web extends React.Component {
   }
 
   renderOpenIcon() {
-    return <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4.583 14.894l-3.256 3.78c-.7.813-1.26.598-1.25-.46a10689.413 10689.413 0 0 1 .035-4.775V4.816a3.89 3.89 0 0 1 3.88-3.89h12.064a3.885 3.885 0 0 1 3.882 3.89v6.185a3.89 3.89 0 0 1-3.882 3.89H4.583z" fill="#FFF" fill-rule="evenodd"></path>
-    </svg>
+    return (
+      <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M4.583 14.894l-3.256 3.78c-.7.813-1.26.598-1.25-.46a10689.413 10689.413 0 0 1 .035-4.775V4.816a3.89 3.89 0 0 1 3.88-3.89h12.064a3.885 3.885 0 0 1 3.882 3.89v6.185a3.89 3.89 0 0 1-3.882 3.89H4.583z"
+          fill="#FFF"
+          fill-rule="evenodd"
+        />
+      </svg>
+    )
   }
 
   renderCloseIcon() {
-    return <svg width="17" height="17" viewBox="0 0 17 17" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16.726 15.402c.365.366.365.96 0 1.324-.178.178-.416.274-.663.274-.246 0-.484-.096-.663-.274L8.323 9.648h.353L1.6 16.726c-.177.178-.416.274-.663.274-.246 0-.484-.096-.663-.274-.365-.365-.365-.958 0-1.324L7.35 8.324v.35L.275 1.6C-.09 1.233-.09.64.274.274c.367-.365.96-.365 1.326 0l7.076 7.078h-.353L15.4.274c.366-.365.96-.365 1.326 0 .365.366.365.958 0 1.324L9.65 8.675v-.35l7.076 7.077z" fill="#FFF" fill-rule="evenodd"></path>
+    return (
+      <svg width="17" height="17" viewBox="0 0 17 17" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M16.726 15.402c.365.366.365.96 0 1.324-.178.178-.416.274-.663.274-.246 0-.484-.096-.663-.274L8.323 9.648h.353L1.6 16.726c-.177.178-.416.274-.663.274-.246 0-.484-.096-.663-.274-.365-.365-.365-.958 0-1.324L7.35 8.324v.35L.275 1.6C-.09 1.233-.09.64.274.274c.367-.365.96-.365 1.326 0l7.076 7.078h-.353L15.4.274c.366-.365.96-.365 1.326 0 .365.366.365.958 0 1.324L9.65 8.675v-.35l7.076 7.077z"
+          fill="#FFF"
+          fill-rule="evenodd"
+        />
       </svg>
+    )
   }
 
   renderUncountMessages() {
@@ -437,57 +445,61 @@ export default class Web extends React.Component {
 
   renderButton() {
     if (this.state.isButtonHidden) return null
-    return <button
-      className={style[this.state.widgetTransition]}
-      onClick={::this.handleButtonClicked}
-      style={{ backgroundColor: this.state.config.foregroundColor }}>
+    return (
+      <button
+        className={style[this.state.widgetTransition]}
+        onClick={::this.handleButtonClicked}
+        style={{ backgroundColor: this.state.config.foregroundColor }}
+      >
         <i>{this.state.view === 'convo' ? this.renderCloseIcon() : this.renderOpenIcon()}</i>
         {this.state.unreadCount > 0 ? this.renderUncountMessages() : null}
       </button>
+    )
   }
 
   renderWidget() {
-    return <div className={classnames(style['container'])}>
+    return (
+      <div className={classnames(style['container'])}>
         <div className={classnames(style['widget-container'])}>
           <span>
-            {this.state.view === 'convo'
-              ? <Convo
+            {this.state.view === 'convo' ? (
+              <Convo
                 transition={this.state.convoTransition}
                 change={::this.handleTextChanged}
                 send={::this.handleSendMessage}
                 config={this.state.config}
-                text={this.state.textToSend} />
-              : null}
+                text={this.state.textToSend}
+              />
+            ) : null}
             {this.renderButton()}
           </span>
         </div>
       </div>
+    )
   }
 
   renderSide() {
-    return <Side
-      config={this.state.config}
-      text={this.state.textToSend}
-
-      fullscreen={this.props.fullscreen}
-      transition={!this.props.fullscreen ? this.state.sideTransition : null}
-      unreadCount={this.state.unreadCount}
-
-      currentConversation={this.state.currentConversation}
-      conversations={this.state.conversations}
-
-      addEmojiToText={::this.handleAddEmoji}
-
-      onClose={!this.props.fullscreen ? ::this.handleClosePanel : null}
-      onSwitchConvo={::this.handleSwitchConvo}
-      onTextSend={::this.handleSendMessage}
-      onTextChanged={::this.handleTextChanged}
-      onQuickReplySend={::this.handleSendQuickReply}
-      onFormSend={::this.handleSendForm}
-      onFileUploadSend={::this.handleFileUploadSend}
-      onLoginPromptSend={::this.handleLoginPrompt}
-      onSendData={::this.handleSendData}
-    />
+    return (
+      <Side
+        config={this.state.config}
+        text={this.state.textToSend}
+        fullscreen={this.props.fullscreen}
+        transition={!this.props.fullscreen ? this.state.sideTransition : null}
+        unreadCount={this.state.unreadCount}
+        currentConversation={this.state.currentConversation}
+        conversations={this.state.conversations}
+        addEmojiToText={::this.handleAddEmoji}
+        onClose={!this.props.fullscreen ? ::this.handleClosePanel : null}
+        onSwitchConvo={::this.handleSwitchConvo}
+        onTextSend={::this.handleSendMessage}
+        onTextChanged={::this.handleTextChanged}
+        onQuickReplySend={::this.handleSendQuickReply}
+        onFormSend={::this.handleSendForm}
+        onFileUploadSend={::this.handleFileUploadSend}
+        onLoginPromptSend={::this.handleLoginPrompt}
+        onSendData={::this.handleSendData}
+      />
+    )
   }
 
   render() {
@@ -495,14 +507,15 @@ export default class Web extends React.Component {
       return null
     }
 
-    window.parent && window.parent.postMessage({ type: 'setClass', value: 'bp-widget-web bp-widget-' + this.state.view }, '*')
+    window.parent &&
+      window.parent.postMessage({ type: 'setClass', value: 'bp-widget-web bp-widget-' + this.state.view }, '*')
 
-    const view = this.state.view !== 'side' && !this.props.fullscreen
-      ? this.renderWidget()
-      : this.renderSide()
+    const view = this.state.view !== 'side' && !this.props.fullscreen ? this.renderWidget() : this.renderSide()
 
-    return <div className={style.web} onFocus={::this.handleResetUnreadCount}>
+    return (
+      <div className={style.web} onFocus={::this.handleResetUnreadCount}>
         {view}
       </div>
+    )
   }
 }

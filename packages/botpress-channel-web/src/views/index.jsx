@@ -3,55 +3,9 @@ import classnames from 'classnames'
 
 import Resizable from 'react-resizable-box'
 
-import Chat from './components/chat' // Deprecated
-import ChatSession from './components/chat-session' // Deprecated
-
 import WebComponent from './web'
-import UMMComponent from './UMM'
 
 import style from './style.scss'
-
-export default class UMMModule extends React.Component {
-  constructor(props) {
-    super()
-    this.session = new ChatSession({ events: props.bp.events })
-  }
-
-  render() {
-    const className = classnames(style.chatComponent, 'bp-modules-chat')
-    return (
-      <div>
-        <h3>There is nothing to see here, yet.</h3>
-        <p>
-          This module currently serves to show the Chat Emulator you see at the bottom of your screen. Uninstall this
-          module to get rid of it.
-        </p>
-        <p>
-          This module is a work in progress, it will also allow you to embed a chat window to your bot on any website
-          (no ETA yet, please contact us on Slack).
-        </p>
-      </div>
-    )
-  }
-}
-
-export class Embedded extends React.Component {
-  // Deprecated
-
-  constructor(props) {
-    super()
-    this.session = new ChatSession({ events: props.bp.events })
-  }
-
-  render() {
-    const className = classnames(style.chatComponent, 'bp-modules-chat')
-    return (
-      <div className={style.embedded}>
-        <Chat className={className} session={this.session} />
-      </div>
-    )
-  }
-}
 
 export class Emulator extends React.Component {
   // Deprecated
@@ -139,8 +93,6 @@ export class Emulator extends React.Component {
 
 export const Web = WebComponent
 
-export const UMMOutgoing = UMMComponent
-
 const INJECTION_ID = 'botpress-platform-webchat-injection'
 const INJECTION_URL = '/api/botpress-platform-webchat/inject.js'
 
@@ -151,7 +103,12 @@ export class WebBotpressUIInjection extends React.Component {
     const script = window.document.createElement('script')
     script.src = INJECTION_URL
     script.id = INJECTION_ID
-    script.onload = () => window.botpressWebChat.init({ hideWidget: true })
+    script.onload = () =>
+      window.botpressWebChat.init({
+        hideWidget: true,
+        botConvoTitle: 'Bot Emulator',
+        botConvoDescription: 'Test your bot live'
+      })
 
     window.document.body.appendChild(script)
 
