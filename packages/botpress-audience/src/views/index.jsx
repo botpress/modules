@@ -234,9 +234,11 @@ export default class AudienceModule extends React.Component {
   renderAllContent() {
     return <Col md={12} >
       <Panel>
-        {this.renderCount()}
-        {_.isEmpty(this.state.users) ? this.renderEmptyMessage() : this.renderTable()}
-        {this.renderPagination()}
+        <Panel.Body>
+          {this.renderCount()}
+          {_.isEmpty(this.state.users) ? this.renderEmptyMessage() : this.renderTable()}
+          {this.renderPagination()}
+        </Panel.Body>
       </Panel>
     </Col>
   }
