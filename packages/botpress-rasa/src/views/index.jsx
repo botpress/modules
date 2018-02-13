@@ -175,15 +175,19 @@ export default class RasaModule extends React.Component {
         <Row>
           <Col md={8} mdOffset={2}>
             {this.renderMessageAlert()}
-            <Panel className={style.panel} header="Settings">
-              {this.renderSaveButton()}
-              <div className={style.settings}>
-                {this.renderAddress()}
-                {this.renderProject()}
-              </div>
+            <Panel className={style.panel}>
+              <Panel.Heading>Settings</Panel.Heading>
+              <Panel.Body>
+                {this.renderSaveButton()}
+                <div className={style.settings}>
+                  {this.renderAddress()}
+                  {this.renderProject()}
+                </div>
+              </Panel.Body>
             </Panel>
-            <Panel header="Rasa NLU">
-              {this.renderExplication()}
+            <Panel>
+              <Panel.Heading>Rasa NLU</Panel.Heading>
+              <Panel.Body>{this.renderExplication()}</Panel.Body>
             </Panel>
           </Col>
         </Row>
