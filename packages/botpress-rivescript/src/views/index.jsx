@@ -235,7 +235,7 @@ export default class RiveScriptModule extends React.Component {
       
       <Row>
         <Panel>
-          {this.renderHeader()}
+          <Panel.Body>{this.renderHeader()}</Panel.Body>
         </Panel>
       </Row>
 
