@@ -85,16 +85,18 @@ export default class WebhookModule extends React.Component {
 
 
   renderSinglePlatform(ptfm) {
-
-    const header = <span>
-      Platform <strong>{ptfm}</strong>
-    </span>
-
-    const footer = <div className="pull-right">
-      <Button bsStyle="default" onClick={() => this.delete(ptfm)}>Delete</Button>
-    </div>
-
-    return <Panel collapsible={false} key={ptfm} header={header} footer={footer}></Panel>
+    return <Panel key={ptfm}>
+      <Panel.Heading>
+        <span>
+          Platform <strong>{ptfm}</strong>
+        </span>
+      </Panel.Heading>
+      <Panel.Footer>
+        <div className="pull-right">
+          <Button bsStyle="default" onClick={() => this.delete(ptfm)}>Delete</Button>
+        </div>
+      </Panel.Footer>
+    </Panel>
   }
 
   renderAllPlatforms() {
@@ -112,8 +114,9 @@ export default class WebhookModule extends React.Component {
   }
 
   renderError() {
-    return <Panel header='Error' bsStyle='danger'>
-      {this.state.error}
+    return <Panel bsStyle='danger'>
+      <Panel.Heading>Error</Panel.Heading>
+      <Panel.Body>{this.state.error}</Panel.Body>
     </Panel>
   }
 
