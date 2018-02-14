@@ -1,12 +1,13 @@
-var webpack = require('webpack')
-var nodeExternals = require('webpack-node-externals')
-var pkg = require('./package.json')
+const webpack = require('webpack')
+const path = require('path')
+const nodeExternals = require('webpack-node-externals')
+const pkg = require('./package.json')
 
 var nodeConfig = {
   devtool: 'source-map',
   entry: ['./src/index.js'],
   output: {
-    path: './bin',
+    path: path.resolve(__dirname, './bin'),
     filename: 'node.bundle.js',
     libraryTarget: 'commonjs2',
     publicPath: __dirname
@@ -17,20 +18,19 @@ var nodeConfig = {
     __dirname: false
   },
   resolve: {
-    extensions: ['', '.js']
+    extensions: ['.js']
   },
   module: {
-    loaders: [{
+    rules: [{
       test: /\.js$/,
-      loader: 'babel-loader',
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['latest', 'stage-0'],
+          plugins: ['transform-object-rest-spread', 'transform-async-to-generator']
+        }
+      },
       exclude: /node_modules/,
-      query: {
-        presets: ['latest', 'stage-0'],
-        plugins: ['transform-object-rest-spread']
-      }
-    }, {
-      test: /\.json$/,
-      loader: "json-loader"
     }]
   }
 }
@@ -39,7 +39,7 @@ var webConfig = {
   devtool: 'source-map',
   entry: ['./src/views/index.jsx'],
   output: {
-    path: './bin',
+    path: path.resolve(__dirname, './bin'),
     publicPath: '/js/modules/',
     filename: 'web.bundle.js',
     libraryTarget: 'assign',
@@ -47,32 +47,44 @@ var webConfig = {
   },
   externals: {
     'react': 'React',
-    'react-dom': 'ReactDOM'
+    'react-dom': 'ReactDOM',
+    'react-bootstrap': 'ReactBootstrap',
+    'prop-types': 'PropTypes'
   },
   resolve: {
-    extensions: ['', '.js', '.jsx']
+    extensions: ['.js', '.jsx']
   },
   module: {
-    loaders: [{
+    rules: [{
       test: /\.jsx?$/,
-      loader: 'babel-loader',
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['latest', 'stage-0', 'react'],
+          plugins: ['transform-object-rest-spread', 'transform-decorators-legacy']
+        }
+      },
       exclude: /node_modules/,
-      query: {
-        presets: ['latest', 'stage-0', 'react'],
-        plugins: ['transform-object-rest-spread', 'transform-decorators-legacy']
-      }
     }, {
       test: /\.scss$/,
-      loaders: ['style', 'css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]', 'sass']
+      use: [
+        { loader: 'style-loader' },
+        {
+          loader: 'css-loader',
+          options: {
+            modules: true,
+            importLoaders: 1,
+            localIdentName: pkg.name + '__[name]__[local]___[hash:base64:5]',
+          }
+        },
+        { loader: 'sass-loader' }
+      ]
     }, {
       test: /\.css$/,
-      loaders: ['style', 'css']
+      use: [{ loader: 'style-loader' }, { loader: 'css-loader' }]
     }, {
       test: /\.woff|\.woff2|\.svg|.eot|\.ttf/,
-      loader: 'file?name=../fonts/[name].[ext]'
-    }, {
-      test: /\.json$/,
-      loader: "json-loader"
+      use: { loader: 'file-loader', options: { name: '../fonts/[name].[ext]' } }
     }]
   }
 }
