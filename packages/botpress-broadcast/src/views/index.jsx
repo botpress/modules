@@ -371,8 +371,9 @@ constructor(props){
 
   renderBroadcastsPanel(title, broadcasts) {
     return (
-      <Panel header={title}>
-        {_.isEmpty(broadcasts) ? this.renderEmptyMessage() : this.renderTable(broadcasts)}
+      <Panel>
+        <Panel.Heading>{title}</Panel.Heading>
+        <Panel.Body>{_.isEmpty(broadcasts) ? this.renderEmptyMessage() : this.renderTable(broadcasts)}</Panel.Body>
       </Panel>
     )
   }
