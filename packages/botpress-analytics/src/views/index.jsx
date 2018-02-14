@@ -380,56 +380,64 @@ export default class AnalyticsModule extends React.Component {
 
   renderTotalNumberOfUsersPanel() {
     return (
-      <Panel header="Total number of users">
-        <div className={style.graphContainer}>{this.renderStackedLineChartForTotalUsers()}</div>
+      <Panel>
+        <Panel.Heading>Total number of users</Panel.Heading>
+        <Panel.Body><div className={style.graphContainer}>{this.renderStackedLineChartForTotalUsers()}</div></Panel.Body>
       </Panel>
     )
   }
 
   renderActiveUsersPanel() {
     return (
-      <Panel header="Active users in last 2 weeks">
-        <div className={style.graphContainerTwoColumn}>{this.renderActiveUsersSimpleLineChart()}</div>
+      <Panel>
+        <Panel.Heading>Active users in last 2 weeks</Panel.Heading>
+        <Panel.Body><div className={style.graphContainerTwoColumn}>{this.renderActiveUsersSimpleLineChart()}</div></Panel.Body>
       </Panel>
     )
   }
 
   renderGenderUsagePanel() {
     return (
-      <Panel header="Gender usage in last week">
-        <div className={style.graphContainerTwoColumn}>{this.renderGenderPercentAreaChart()}</div>
+      <Panel>
+        <Panel.Heading>Gender usage in last week</Panel.Heading>
+        <Panel.Body><div className={style.graphContainerTwoColumn}>{this.renderGenderPercentAreaChart()}</div></Panel.Body>
       </Panel>
     )
   }
 
   renderSpecificMetricForLastDaysPanel() {
     return (
-      <Panel header="Insights">
-        <div className={style.graphContainerTwoColumn}>{this.renderSpecificMetricForLastDaysValues()}</div>
+      <Panel>
+        <Panel.Heading>Insights</Panel.Heading>
+        <Panel.Heading>Busy hours for last 7 days</Panel.Heading>
+        <Panel.Body><div className={style.graphContainerTwoColumn}>{this.renderSpecificMetricForLastDaysValues()}</div></Panel.Body>
       </Panel>
     )
   }
 
   renderTypicalConversationInADayPanel() {
     return (
-      <Panel header="Average incoming interactions (last 2 weeks)">
-        <div className={style.graphContainerTwoColumn}>{this.renderTypicalConversationLengthInADayChart()}</div>
+      <Panel>
+        <Panel.Heading>Average incoming interactions (last 2 weeks)</Panel.Heading>
+        <Panel.Body><div className={style.graphContainerTwoColumn}>{this.renderTypicalConversationLengthInADayChart()}</div></Panel.Body>
       </Panel>
     )
   }
 
   renderRetentionHeatMapPanel() {
     return (
-      <Panel header="Rentention for last 7 days">
-        <div className={style.graphContainer}>{this.renderRetentionHeatMapChart()}</div>
+      <Panel>
+        <Panel.Heading>Rentention for last 7 days</Panel.Heading>
+        <Panel.Body><div className={style.graphContainer}>{this.renderRetentionHeatMapChart()}</div></Panel.Body>
       </Panel>
     )
   }
 
   renderBusyHoursHeatMapPanel() {
     return (
-      <Panel header="Busy hours for last 7 days">
-        <div className={style.graphContainer}>{this.renderBusyHoursHeatMapChart()}</div>
+      <Panel>
+        <Panel.Heading>Busy hours for last 7 days</Panel.Heading>
+        <Panel.Body><div className={style.graphContainer}>{this.renderBusyHoursHeatMapChart()}</div></Panel.Body>
       </Panel>
     )
   }
@@ -492,11 +500,14 @@ export default class AnalyticsModule extends React.Component {
       <Grid fluid>
         <Row>
           <Col md={12}>
-            <Panel header="Generating analytics data">
-              <div>
-                There are no analytics available yet. Generating analytics can take up to 5 minutes after receiving a
-                message.
-              </div>
+            <Panel>
+              <Panel.Heading>Generating analytics data</Panel.Heading>
+              <Panel.Body>
+                <div>
+                  There are no analytics available yet. Generating analytics can take up to 5 minutes after receiving a
+                  message.
+                </div>
+              </Panel.Body>
             </Panel>
           </Col>
         </Row>
