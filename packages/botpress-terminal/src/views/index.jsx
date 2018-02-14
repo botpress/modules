@@ -51,25 +51,33 @@ export default class TemplateModule extends React.Component {
   renderLogs() {
     if (!this.state.ended) {
       return <Panel>
-        {!this.state.executing && <h3>You haven't run anything yet.</h3>}
-        {this.state.executing && <h3>Running...</h3>}
+        <Panel.Body>
+          {!this.state.executing && <h3>You haven't run anything yet.</h3>}
+          {this.state.executing && <h3>Running...</h3>}
+        </Panel.Body>
       </Panel>
     }
 
     if (this.state.error) {
-      return <Panel bsStyle="danger" header="Execution error">
-        <p>{this.state.error}</p>
+      return <Panel bsStyle="danger">
+        <Panel.Heading>Execution error</Panel.Heading>
+        <Panel.Body>
+          <p>{this.state.error}</p>
+        </Panel.Body>
       </Panel>
     }
 
-    const logs = (this.state.logs && this.state.logs.map(this.renderLogItem))
+    const logs = (Array.isArray(this.state.logs) && this.state.logs.map(this.renderLogItem))
 
-    return <Panel bsStyle="success" header="Execution results" className={style.success}>
-      <ul className={style.logs}>{logs}</ul>
-      <div className={style.return}>
-        <div className={style['return-header']}>Returned</div>
-        <div className={style['return-body']}>{this.state.result || "No return value"}</div>
-      </div>
+    return <Panel bsStyle="success" className={style.success}>
+      <Panel.Heading>Execution results</Panel.Heading>
+      <Panel.Body>
+        <ul className={style.logs}>{logs}</ul>
+        <div className={style.return}>
+          <div className={style['return-header']}>Returned</div>
+          <div className={style['return-body']}>{this.state.result || "No return value"}</div>
+        </div>
+      </Panel.Body>
     </Panel>
   }
 
@@ -127,10 +135,13 @@ export default class TemplateModule extends React.Component {
     return <div className={style.container}>
       <Row>
         <Col sm={12}>
-          <Panel header="Terminal Scope">
-            <p>The terminal allows you to run backend code directly from the bot's interface.</p>
-            <p>The global <code>bp</code> variable is available and 
-            also an instance of the database is provided for convenience as <code>knex</code>.</p>
+          <Panel>
+            <Panel.Heading>Terminal Scope</Panel.Heading>
+            <Panel.Body>
+              <p>The terminal allows you to run backend code directly from the bot's interface.</p>
+              <p>The global <code>bp</code> variable is available and 
+              also an instance of the database is provided for convenience as <code>knex</code>.</p>
+            </Panel.Body>
           </Panel>
         </Col>
       </Row>
