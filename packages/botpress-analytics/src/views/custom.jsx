@@ -306,15 +306,14 @@ export default class CustomMetrics extends React.Component {
         </OverlayTrigger>
       </span>
     )
-
-    const header = (
-      <div>
-        <span className={style.metricName}>{metric.name}</span>
-        {tooltip}
-      </div>
-    )
     return (
-      <Panel header={header}>
+      <Panel>
+        <Panel.Heading>
+          <div>
+            <span className={style.metricName}>{metric.name}</span>
+            {tooltip}
+          </div>
+        </Panel.Heading>
         <div className={style.smallGraphContainer}>{renderer && renderer(metric)}</div>
       </Panel>
     )
