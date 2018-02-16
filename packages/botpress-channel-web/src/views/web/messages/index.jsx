@@ -290,6 +290,10 @@ class Message extends Component {
     )
   }
 
+  render_session_reset() {
+    return <div style={this.getAddStyle()}>{this.props.data.message_text}</div>
+  }
+
   render_unsupported() {
     return (
       <div style={this.getAddStyle()}>

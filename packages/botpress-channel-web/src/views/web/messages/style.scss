@@ -149,6 +149,15 @@
         margin: 10px 0;
       }
 
+      &.session_reset {
+        color: red !important;
+        background: none !important;
+        border: none;
+        border-top: 1px solid red;
+        border-bottom: 1px solid red;
+        margin: 10px 0;
+      }
+
       p {
         margin: 0;
       }

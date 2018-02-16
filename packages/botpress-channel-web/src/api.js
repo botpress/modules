@@ -13,36 +13,17 @@ import serveStatic from 'serve-static'
 import db from './db'
 import users from './users'
 
-const ERR_USER_ID_REQ = "`userId` is required and must be valid"
-const ERR_MSG_TYPE = "`type` is required and must be valid"
-const ERR_CONV_ID_REQ = "`conversationId` is required and must be valid"
-
-/*
-  Supported message types:
-
-  *** type: text ***
-      text: "string", up to 360 chars
-      raw: null
-      data: null
-
-  *** type: file ***
-      text: "text associated with the file", up to 360 chars
-      raw: {
-        file_name: "lol.png"
-        file_mime: "image/png"
-      }
-      data: BINARY_DATA // max size = 10 Mb
-
- */
+const ERR_USER_ID_REQ = '`userId` is required and must be valid'
+const ERR_MSG_TYPE = '`type` is required and must be valid'
+const ERR_CONV_ID_REQ = '`conversationId` is required and must be valid'
 
 module.exports = async (bp, config) => {
-
   const diskStorage = multer.diskStorage({
     limits: {
       files: 1,
       fileSize: 5242880 // 5MB
     },
-    filename: function (req, file, cb) {
+    filename: function(req, file, cb) {
       const userId = _.get(req, 'params.userId') || 'anonymous'
       const ext = path.extname(file.originalname)
 
@@ -80,7 +61,7 @@ module.exports = async (bp, config) => {
       contentType: multers3.AUTO_CONTENT_TYPE,
       cacheControl: 'max-age=31536000', // one year caching
       acl: 'public-read',
-      key: function (req, file, cb) {
+      key: function(req, file, cb) {
         const userId = _.get(req, 'params.userId') || 'anonymous'
         const ext = path.extname(file.originalname)
 
@@ -93,15 +74,12 @@ module.exports = async (bp, config) => {
 
   const knex = await bp.db.get()
 
-  const { listConversations, 
-    getConversation, 
-    appendUserMessage, 
-    getOrCreateRecentConversation } = db(knex, bp.botfile)
+  const { listConversations, getConversation, appendUserMessage, getOrCreateRecentConversation } = db(knex, bp.botfile)
 
   const { getOrCreateUser } = await users(bp, config)
 
   const router = bp.getRouter('botpress-platform-webchat', { auth: false })
-  
+
   const asyncApi = fn => async (req, res, next) => {
     try {
       await fn(req, res, next)
@@ -125,65 +103,73 @@ module.exports = async (bp, config) => {
   router.use('/static', serveStatic(staticFolder))
 
   // ?conversationId=xxx (optional)
-  router.post('/messages/:userId', asyncApi(async (req, res) => {
-    const { userId } = req.params || {}
+  router.post(
+    '/messages/:userId',
+    asyncApi(async (req, res) => {
+      const { userId } = req.params || {}
 
-    if (!validateUserId(userId)) {
-      return res.status(400).send(ERR_USER_ID_REQ)
-    }
+      if (!validateUserId(userId)) {
+        return res.status(400).send(ERR_USER_ID_REQ)
+      }
 
-    await getOrCreateUser(userId) // Just to create the user if it doesn't exist
+      await getOrCreateUser(userId) // Just to create the user if it doesn't exist
 
-    const payload = (req.body || {})
-    let { conversationId } = (req.query || {})
-    conversationId = conversationId && parseInt(conversationId)
+      const payload = req.body || {}
+      let { conversationId } = req.query || {}
+      conversationId = conversationId && parseInt(conversationId)
 
-    if (!_.includes(['text', 'quick_reply', 'form', 'login_prompt'], payload.type)) { // TODO: Support files
-      return res.status(400).send(ERR_MSG_TYPE)
-    }
+      if (!_.includes(['text', 'quick_reply', 'form', 'login_prompt'], payload.type)) {
+        // TODO: Support files
+        return res.status(400).send(ERR_MSG_TYPE)
+      }
 
-    if (!conversationId) {
-      conversationId = await getOrCreateRecentConversation(userId)
-    }
+      if (!conversationId) {
+        conversationId = await getOrCreateRecentConversation(userId)
+      }
 
-    await sendNewMessage(userId, conversationId, payload)
+      await sendNewMessage(userId, conversationId, payload)
 
-    return res.sendStatus(200)
-  }))
+      return res.sendStatus(200)
+    })
+  )
 
   // ?conversationId=xxx (required)
-  router.post('/messages/:userId/files', upload.single('file'), asyncApi(async (req, res) => {
-    const { userId } = req.params || {}
+  router.post(
+    '/messages/:userId/files',
+    upload.single('file'),
+    asyncApi(async (req, res) => {
+      const { userId } = req.params || {}
 
-    if (!validateUserId(userId)) {
-      return res.status(400).send(ERR_USER_ID_REQ)
-    }
-
-    await getOrCreateUser(userId) // Just to create the user if it doesn't exist
-
-    let { conversationId } = (req.query || {})
-    conversationId = conversationId && parseInt(conversationId)
-
-    if (!conversationId) {
-      return res.status(400).send(ERR_CONV_ID_REQ)
-    }
-
-    const payload = {
-      text: `Uploaded a file [${req.file.originalname}]`,
-      type: 'file',
-      data: {
-        storage: req.file.location ? 's3' : 'local',
-        url: req.file.location || null,
-        name: req.file.originalname,
-        mime: req.file.contentType || req.file.mimetype,
-        size: req.file.size
+      if (!validateUserId(userId)) {
+        return res.status(400).send(ERR_USER_ID_REQ)
       }
-    }
 
-    await sendNewMessage(userId, conversationId, payload)
+      await getOrCreateUser(userId) // Just to create the user if it doesn't exist
 
-    return res.sendStatus(200)
-  }))
+      let { conversationId } = req.query || {}
+      conversationId = conversationId && parseInt(conversationId)
+
+      if (!conversationId) {
+        return res.status(400).send(ERR_CONV_ID_REQ)
+      }
+
+      const payload = {
+        text: `Uploaded a file [${req.file.originalname}]`,
+        type: 'file',
+        data: {
+          storage: req.file.location ? 's3' : 'local',
+          url: req.file.location || null,
+          name: req.file.originalname,
+          mime: req.file.contentType || req.file.mimetype,
+          size: req.file.size
+        }
+      }
+
+      await sendNewMessage(userId, conversationId, payload)
+
+      return res.sendStatus(200)
+    })
+  )
 
   router.get('/conversations/:userId/:conversationId', async (req, res) => {
     const { userId, conversationId } = req.params || {}
@@ -196,7 +182,7 @@ module.exports = async (bp, config) => {
 
     return res.send(conversation)
   })
-  
+
   router.get('/conversations/:userId', async (req, res) => {
     const { userId } = req.params || {}
 
@@ -216,7 +202,6 @@ module.exports = async (bp, config) => {
   }
 
   async function sendNewMessage(userId, conversationId, payload) {
-
     if (!payload.text || !_.isString(payload.text) || payload.text.length > 360) {
       throw new Error('Text must be a valid string of less than 360 chars')
     }
@@ -231,9 +216,9 @@ module.exports = async (bp, config) => {
       persistedPayload.data = _.omit(persistedPayload.data, ['password'])
     }
 
-      if (payload.type === 'form') {
-          persistedPayload.data.formId = payload.formId;
-      }
+    if (payload.type === 'form') {
+      persistedPayload.data.formId = payload.formId
+    }
 
     const message = await appendUserMessage(userId, conversationId, persistedPayload)
 
@@ -245,31 +230,56 @@ module.exports = async (bp, config) => {
 
     const user = await getOrCreateUser(userId)
 
-    return bp.middlewares.sendIncoming(Object.assign({
-      platform: 'webchat',
-      type: payload.type,
-      user: user,
-      text: payload.text,
-      raw: Object.assign({}, sanitizedPayload, {
-        conversationId
-      })
-    }, payload.data))
+    return bp.middlewares.sendIncoming(
+      Object.assign(
+        {
+          platform: 'webchat',
+          type: payload.type,
+          user: user,
+          text: payload.text,
+          raw: Object.assign({}, sanitizedPayload, {
+            conversationId
+          })
+        },
+        payload.data
+      )
+    )
   }
 
-  router.post('/events/:userId', asyncApi(async (req, res) => {
-    const { type, payload } = (req.body || {})
-    const { userId } = req.params || {}
-    const user = await getOrCreateUser(userId)
-    bp.middlewares.sendIncoming({
-      platform: 'webchat',
-      type,
-      user,
-      text: payload.text,
-      raw: _.pick(payload, ['text', 'type', 'data']),
-      ...payload.data
+  router.post(
+    '/events/:userId',
+    asyncApi(async (req, res) => {
+      const { type, payload } = req.body || {}
+      const { userId } = req.params || {}
+      const user = await getOrCreateUser(userId)
+      bp.middlewares.sendIncoming({
+        platform: 'webchat',
+        type,
+        user,
+        text: payload.text,
+        raw: _.pick(payload, ['text', 'type', 'data']),
+        ...payload.data
+      })
+      res.status(200).send({})
     })
-    res.status(200).send({})
-  }))
+  )
+
+  router.post(
+    '/conversations/:userId/:conversationId/reset',
+    asyncApi(async (req, res) => {
+      const { userId, conversationId } = req.params
+      const user = await getOrCreateUser(userId)
+
+      const payload = {
+        text: `Reset the conversation`,
+        type: 'session_reset'
+      }
+
+      await sendNewMessage(userId, conversationId, payload)
+      await bp.dialogEngine.stateManager.deleteState(user.id)
+      res.status(200).send({})
+    })
+  )
 
   return router
 }
