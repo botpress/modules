@@ -33,7 +33,9 @@ const defaultOptions = {
   backgroundColor: '#ffffff',
   textColorOnBackground: '#666666',
   foregroundColor: '#000000',
-  textColorOnForeground: '#ffffff'
+  textColorOnForeground: '#ffffff',
+  enableReset: false,
+  botConvoTitle: 'Botpress Webchat'
 }
 
 export default class Web extends React.Component {
@@ -415,6 +417,13 @@ export default class Web extends React.Component {
     this.handleSwitchView('widget')
   }
 
+  handleSessionReset() {
+    const userId = window.__BP_VISITOR_ID
+    const url = `${BOT_HOSTNAME}/api/botpress-platform-webchat/conversations/${userId}/${this.state
+      .currentConversationId}/reset`
+    return this.props.bp.axios.post(url).then()
+  }
+
   renderOpenIcon() {
     return (
       <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -490,6 +499,7 @@ export default class Web extends React.Component {
         conversations={this.state.conversations}
         addEmojiToText={::this.handleAddEmoji}
         onClose={!this.props.fullscreen ? ::this.handleClosePanel : null}
+        onResetSession={::this.handleSessionReset}
         onSwitchConvo={::this.handleSwitchConvo}
         onTextSend={::this.handleSendMessage}
         onTextChanged={::this.handleTextChanged}
