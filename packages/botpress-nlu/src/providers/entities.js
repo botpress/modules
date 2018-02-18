@@ -69,6 +69,6 @@ export default {
   '@native.language': { '@dialogflow': 'language' },
 
   // Generic
-  '@native.any': { '@dialogflow': 'any' },
+  '@native.any': { '@dialogflow': 'any', '@rasa': 'any' },
   '@native.url': { '@luis': 'url', '@dialogflow': 'url' }
 }

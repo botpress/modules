@@ -10,7 +10,7 @@ Botpress NLU is a Botpress module that adds NLU capatibilities to your bot by co
 | ------------- | :--------: |
 | [LUIS](https://www.luis.ai) | ✅ |
 | [DialogFlow](https://dialogflow.com/) | Help needed |
-| [RASA](https://github.com/RasaHQ/rasa_nlu) | Help needed |
+| [RASA](https://github.com/RasaHQ/rasa_nlu) | ✅ |
 
 We believe NLP/NLU is a commodity, so this package abstracts the provider by providing a standard, clean interface that allows you (and the non-technicals) to easily edit the NLU data within Botpress. We are building the **interface** for proper NLU, we are **NOT** involved in actually providing the NLU.
 
@@ -27,6 +27,20 @@ With Botpress NLU,
 
 - Install the module `yarn add botpress-nlu`
 - Configure a provider (see below)
+
+# Usage
+
+1. You need to chose a Provider (currently `luis` or `rasa`)
+2. Set the `provider` config to either `luis` or `rasa`
+3. Configure the provider
+
+# Global Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L17-L22)
+
+| Key | Environment Variable | Required | Default |
+| ------------- | -------- | ----- |
+| provider | `NLU_PROVIDER` | Yes | `luis` |
+| intentsDir | `NLU_INTENTS_DIR` | Yes | `./intents` |
+| entitiesDir | `NLU_ENTITIES_DIR` | Yes | `./entities` |
 
 # Standard NLU Object (`event.nlu`)
 
@@ -48,7 +62,7 @@ Botpress NLU will instrument incoming events by providing a standardized object 
 
 ## LUIS
 
-### LUIS Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L14-L23)
+### LUIS Specific Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L23-L27)
 
 | Key | Environment Variable | Required |
 | ------------- | -------- | ----- |
@@ -71,6 +85,20 @@ There are some entities that LUIS doesn't support in some languages, make sure t
   - The entities you are using are supported by your app's language
 </details>
 
+## RASA
+
+Botpress NLU will create and train and maitain your projects and models automatically for you. 
+
+> **Note:** By default, Botpress creates separate projects for development and production environment, e.g. `dev__botpress__all` and `prod__botpress__all`.
+
+### RASA Specific Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L29-L32)
+
+| Key | Environment Variable | Required |
+| ------------- | -------- | ----- |
+| rasaEndpoint | `NLU_RASA_URL` | No (default is `http://localhost:5000/`) |
+| rasaToken | `NLU_RASA_TOKEN` | No (none by default) |
+| rasaProject | `NLU_RASA_PROJECT` | No (default is `botpress`) |
+
 # Contributing
 
 The best way to help right now is by helping with the exising issues here on GitHub and by reporting new issues!
@@ -82,5 +110,3 @@ Botpress is dual-licensed under [AGPLv3](/licenses/LICENSE_AGPL3) and the [Botpr
 By default, any bot created with Botpress is licensed under AGPLv3, but you may change to the Botpress License from within your bot's web interface in a few clicks.
 
 For more information about how the dual-license works and why it works that way please see the <a href="https://botpress.io/faq">FAQS</a>.
-
-
