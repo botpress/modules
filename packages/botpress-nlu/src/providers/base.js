@@ -16,6 +16,10 @@ export default class Provider {
     this.env = ENVIRONEMENT
   }
 
+  /*******
+  Public API
+  *******/
+
   async sync() {
     throw new Error('Not implemented')
   }
@@ -28,7 +32,23 @@ export default class Provider {
     throw new Error('Not implemented')
   }
 
-  async getProviderEntities() {
+  async getCustomEntities() {
+    throw new Error('Not implemented')
+  }
+
+  /*******
+  Shared API
+  *******/
+
+  async getAvailableEntities() {
+    return [...(await this.getCustomEntities()), ...(await this._getProviderEntities())]
+  }
+
+  /*******
+  Private Methods
+  *******/
+
+  async _getProviderEntities() {
     return _.toPairs(Entities)
       .filter(p => p[1][this.entityKey])
       .map(p => ({
@@ -36,13 +56,5 @@ export default class Provider {
         isFromProvider: true,
         nameProvider: p[1][this.entityKey]
       }))
-  }
-
-  async getCustomEntities() {
-    throw new Error('Not implemented')
-  }
-
-  async getAvailableEntities() {
-    return [...(await this.getCustomEntities()), ...(await this.getProviderEntities())]
   }
 }

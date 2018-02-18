@@ -5,7 +5,9 @@ import Storage from './storage'
 import Parser from './parser'
 
 import Entities from './providers/entities'
+
 import LuisProvider from './providers/luis'
+import RasaProvider from './providers/rasa'
 
 let storage
 let provider
@@ -15,11 +17,19 @@ module.exports = {
     intentsDir: { type: 'string', required: true, default: './intents', env: 'NLU_INTENTS_DIR' },
     entitiesDir: { type: 'string', required: true, default: './entities', env: 'NLU_ENTITIES_DIR' },
 
+    // Provider config
+    provider: { type: 'string', required: true, default: 'LUIS', env: 'NLU_PROVIDER' },
+
     // LUIS-specific config
     luisAppId: { type: 'string', required: false, default: '', env: 'NLU_LUIS_APP_ID' },
     luisProgrammaticKey: { type: 'string', required: false, default: '', env: 'NLU_LUIS_PROGRAMMATIC_KEY' },
     luisAppSecret: { type: 'string', required: false, default: '', env: 'NLU_LUIS_APP_SECRET' },
-    luisAppRegion: { type: 'string', required: false, default: 'westus', env: 'NLU_LUIS_APP_REGION' }
+    luisAppRegion: { type: 'string', required: false, default: 'westus', env: 'NLU_LUIS_APP_REGION' },
+
+    // RASA-specific config
+    rasaEndpoint: { type: 'string', required: false, default: 'http://localhost:5000', env: 'NLU_RASA_URL' },
+    rasaToken: { type: 'string', required: false, default: '', env: 'NLU_RASA_TOKEN' },
+    rasaProject: { type: 'string', required: false, default: 'botpress', env: 'NLU_RASA_PROJECT' }
   },
 
   init: async function(bp, configurator) {
@@ -27,7 +37,16 @@ module.exports = {
     storage = new Storage({ bp, config })
     await storage.initializeGhost()
 
-    provider = new LuisProvider({
+    const Provider = {
+      luis: LuisProvider,
+      rasa: RasaProvider
+    }[config.provider.toLowerCase()]
+
+    if (!Provider) {
+      throw new Error(`Unknown NLU provider "${config.provider}"`)
+    }
+
+    provider = new Provider({
       logger: bp.logger,
       storage: storage,
       parser: new Parser(),
@@ -75,7 +94,7 @@ module.exports = {
 
     setTimeout(() => {
       provider.sync()
-    }, 3000) // TODO Change that
+    }, 500) // TODO Change that
   },
 
   ready: async function(bp) {
