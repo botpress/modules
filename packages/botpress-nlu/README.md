@@ -37,7 +37,7 @@ With Botpress NLU,
 # Global Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L17-L22)
 
 | Key | Environment Variable | Required | Default |
-| ------------- | -------- | ----- |
+| ------------- | -------- | ----- | ---- |
 | provider | `NLU_PROVIDER` | Yes | `luis` |
 | intentsDir | `NLU_INTENTS_DIR` | Yes | `./intents` |
 | entitiesDir | `NLU_ENTITIES_DIR` | Yes | `./entities` |
@@ -48,15 +48,15 @@ Botpress NLU will instrument incoming events by providing a standardized object 
 
 | Path | Description | Supported by |
 | ---- | ----------- | ---- |
-| `nlu.intent.name` | The name of the classified intent | LUIS |
-| `nlu.intent.confidence` | Confidence of the classification, between `0` and `1`, higher the better | LUIS |
-| `nlu.intent.provider` | The provider that provided the classification | LUIS |
+| `nlu.intent.name` | The name of the classified intent | LUIS, RASA |
+| `nlu.intent.confidence` | Confidence of the classification, between `0` and `1`, higher the better | LUIS, RASA |
+| `nlu.intent.provider` | The provider that provided the classification | LUIS, RASA |
 | `nlu.entities[i].name` | The name of the extracted entitiy | - |
-| `nlu.entities[i].type` | The type of entity that was extracted | LUIS |
-| `nlu.entities[i].value` | The **normalized** value of the extracted entity | LUIS |
-| `nlu.entities[i].original` | The original (raw) value of the extracted entity | - |
-| `nlu.entities[i].confidence` | The provider that extracted the entity | LUIS |
-| `nlu.entities[i].position` | The position where it was found in the input string (start position) | LUIS |
+| `nlu.entities[i].type` | The type of entity that was extracted | LUIS, RASA |
+| `nlu.entities[i].value` | The **normalized** value of the extracted entity | LUIS, RASA |
+| `nlu.entities[i].original` | The original (raw) value of the extracted entity | RASA |
+| `nlu.entities[i].confidence` | The provider that extracted the entity | LUIS, RASA |
+| `nlu.entities[i].position` | The position where it was found in the input string (start position) | LUIS, RASA |
 | `nlu.sentiment` | TBD | - |
 | `nlu.language` | TBD | - |
 
