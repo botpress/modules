@@ -8,6 +8,7 @@ import Entities from './providers/entities'
 
 import LuisProvider from './providers/luis'
 import RasaProvider from './providers/rasa'
+import NativeProvider from './providers/native'
 
 let storage
 let provider
@@ -18,7 +19,7 @@ module.exports = {
     entitiesDir: { type: 'string', required: true, default: './entities', env: 'NLU_ENTITIES_DIR' },
 
     // Provider config
-    provider: { type: 'string', required: true, default: 'LUIS', env: 'NLU_PROVIDER' },
+    provider: { type: 'string', required: true, default: 'native', env: 'NLU_PROVIDER' },
 
     // LUIS-specific config
     luisAppId: { type: 'string', required: false, default: '', env: 'NLU_LUIS_APP_ID' },
@@ -39,7 +40,8 @@ module.exports = {
 
     const Provider = {
       luis: LuisProvider,
-      rasa: RasaProvider
+      rasa: RasaProvider,
+      native: NativeProvider
     }[config.provider.toLowerCase()]
 
     if (!Provider) {
