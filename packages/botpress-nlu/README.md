@@ -39,9 +39,11 @@ With Botpress NLU,
 
 | Key | Environment Variable | Required | Default |
 | ------------- | -------- | ----- | ---- |
-| provider | `NLU_PROVIDER` | Yes (`luis|rasa|native`) | `native` |
+| provider | `NLU_PROVIDER` | Yes* | `native` |
 | intentsDir | `NLU_INTENTS_DIR` | Yes | `./intents` |
 | entitiesDir | `NLU_ENTITIES_DIR` | Yes | `./entities` |
+
+> **'*'**: Provider is one of `rasa`, `luis` or `native`
 
 # Standard NLU Object (`event.nlu`)
 
