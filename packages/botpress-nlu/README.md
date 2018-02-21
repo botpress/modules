@@ -8,11 +8,12 @@ Botpress NLU is a Botpress module that adds NLU capatibilities to your bot by co
 
 | Provider | 🚩 Status |
 | ------------- | :--------: |
+| Native (built-in) | ✅ |
 | [LUIS](https://www.luis.ai) | ✅ |
 | [DialogFlow](https://dialogflow.com/) | Help needed |
 | [RASA](https://github.com/RasaHQ/rasa_nlu) | ✅ |
 
-We believe NLP/NLU is a commodity, so this package abstracts the provider by providing a standard, clean interface that allows you (and the non-technicals) to easily edit the NLU data within Botpress. We are building the **interface** for proper NLU, we are **NOT** involved in actually providing the NLU.
+We believe NLP/NLU is a commodity, so this package abstracts the provider by providing a standard, clean interface that allows you (and the non-technicals) to easily edit the NLU data within Botpress.
 
 With Botpress NLU,
 
@@ -30,7 +31,7 @@ With Botpress NLU,
 
 # Usage
 
-1. You need to chose a Provider (currently `luis` or `rasa`)
+1. You need to chose a Provider (currently `luis` or `rasa` or `native`)
 2. Set the `provider` config to either `luis` or `rasa`
 3. Configure the provider
 
@@ -38,7 +39,7 @@ With Botpress NLU,
 
 | Key | Environment Variable | Required | Default |
 | ------------- | -------- | ----- | ---- |
-| provider | `NLU_PROVIDER` | Yes | `luis` |
+| provider | `NLU_PROVIDER` | Yes (`luis|rasa|native`) | `native` |
 | intentsDir | `NLU_INTENTS_DIR` | Yes | `./intents` |
 | entitiesDir | `NLU_ENTITIES_DIR` | Yes | `./entities` |
 
@@ -59,6 +60,14 @@ Botpress NLU will instrument incoming events by providing a standardized object 
 | `nlu.entities[i].position` | The position where it was found in the input string (start position) | LUIS, RASA |
 | `nlu.sentiment` | TBD | - |
 | `nlu.language` | TBD | - |
+
+# Providers – Features Matrix
+
+| Provider | Intent Classification | Entity Exraction | Scopes (*coming soon*) |
+| ----- | :-----: | :-----: | :-----: |
+| LUIS | ✅ | ✅ | ❌ |
+| RASA | ✅ | ✅ | ❌ |
+| Native | ✅ | ❌ | ❌ |
 
 ## LUIS
 
