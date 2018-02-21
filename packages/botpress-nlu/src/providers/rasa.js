@@ -23,10 +23,6 @@ export default class RasaProvider extends Provider {
     })
   }
 
-  // sync() = Format data + Train API
-  // getStatus() = isTraining + checkSync(false)
-  // parse()
-
   async checkSyncNeeded() {
     const intents = await this.storage.getIntents()
     const remoteVersions = await this._getRemoteVersions()
@@ -226,7 +222,7 @@ export default class RasaProvider extends Provider {
       intent: {
         name: intentName,
         confidence: parseFloat(confidence),
-        provider: 'luis'
+        provider: 'rasa'
       },
       entities: entities.map(entity => ({
         name: null,
