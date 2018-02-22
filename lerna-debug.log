@@ -1,0 +1,16 @@
+0 silly input [ '../modules/botpress-channel-slack/' ]
+1 silly flags { _: [ 'import' ],
+1 silly flags   'reject-cycles': false,
+1 silly flags   rejectCycles: false,
+1 silly flags   flatten: true,
+1 silly flags   pathToRepo: '../modules/botpress-channel-slack/' }
+2 verbose rootPath /home/epaminond/private/projects/2015.08.08_keenethics/projects/botpress/modules_new
+3 info version 2.9.0
+4 silly isInitialized
+5 silly isInitialized true
+6 silly existsSync /home/epaminond/private/projects/2015.08.08_keenethics/projects/botpress/modules_new/VERSION
+7 silly initialize attempt
+8 silly statSync /home/epaminond/private/projects/2015.08.08_keenethics/projects/botpress/modules/botpress-channel-slack
+9 error initialize callback with error
+10 error Error: No repository found at "../modules/botpress-channel-slack/"
+10 error     at ImportCommand.initialize (/home/epaminond/.nvm/versions/node/v8.9.3/lib/node_modules/lerna/lib/commands/ImportCommand.js:121:27)
