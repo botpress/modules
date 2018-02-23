@@ -1,6 +1,6 @@
 {
   "name": "botpress-nlu",
-  "version": "0.0.2",
+  "version": "10.0.0",
   "description": "Botpress NLU module",
   "main": "bin/node.bundle.js",
   "botpress": {

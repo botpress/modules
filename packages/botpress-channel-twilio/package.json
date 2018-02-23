@@ -1,6 +1,6 @@
 {
   "name": "botpress-channel-twilio",
-  "version": "1.0.8",
+  "version": "10.0.0",
   "description": "Official Twilio module for Botpress",
   "main": "bin/node.bundle.js",
   "botpress": {
