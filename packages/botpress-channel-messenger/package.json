@@ -1,5 +1,5 @@
 {
-  "name": "botpress-messenger",
+  "name": "botpress-channel-messenger",
   "version": "2.2.9",
   "description": "Official Facebook Messenger connector for botpress",
   "main": "bin/node.bundle.js",
