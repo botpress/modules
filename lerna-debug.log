@@ -1,0 +1,26 @@
+0 silly input [ '../modules/botpress-analytics/' ]
+1 silly flags { _: [ 'import' ],
+1 silly flags   'reject-cycles': false,
+1 silly flags   rejectCycles: false,
+1 silly flags   flatten: true,
+1 silly flags   pathToRepo: '../modules/botpress-analytics/' }
+2 verbose rootPath /home/epaminond/private/projects/2015.08.08_keenethics/projects/botpress/modules_new
+3 info version 2.9.0
+4 silly isInitialized
+5 silly isInitialized true
+6 silly existsSync /home/epaminond/private/projects/2015.08.08_keenethics/projects/botpress/modules_new/VERSION
+7 silly initialize attempt
+8 silly statSync /home/epaminond/private/projects/2015.08.08_keenethics/projects/botpress/modules/botpress-analytics
+9 silly getWorkspaceRoot
+10 verbose getWorkspaceRoot /home/epaminond/private/projects/2015.08.08_keenethics/projects/botpress/modules_new
+11 silly existsSync /home/epaminond/private/projects/2015.08.08_keenethics/projects/botpress/modules_new/packages/botpress-analytics
+12 silly getCurrentSHA
+13 error initialize caught error
+14 error Error: fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.
+14 error Use '--' to separate paths from revisions, like this:
+14 error 'git <command> [<revision>...] -- [<file>...]'
+14 error
+14 error     at Function.module.exports.sync (/home/epaminond/.nvm/versions/node/v8.9.3/lib/node_modules/lerna/node_modules/execa/index.js:303:26)
+14 error     at Function.execSync (/home/epaminond/.nvm/versions/node/v8.9.3/lib/node_modules/lerna/lib/ChildProcessUtilities.js:59:30)
+14 error     at Function.getCurrentSHA (/home/epaminond/.nvm/versions/node/v8.9.3/lib/node_modules/lerna/lib/GitUtilities.js:213:49)
+14 error     at ImportCommand.initialize (/home/epaminond/.nvm/versions/node/v8.9.3/lib/node_modules/lerna/lib/commands/ImportCommand.js:155:51)
