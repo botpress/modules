@@ -26,10 +26,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/botpress/botpress-slack"
+    "url": "https://github.com/botpress/modules"
   },
   "author": "Botpress",
   "license": "AGPL-3.0",
+  "peerDependencies": {
+    "botpress": ">= 10.0.0"
+  },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
