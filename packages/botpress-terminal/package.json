@@ -1,6 +1,6 @@
 {
   "name": "@botpress/terminal",
-  "version": "1.0.3",
+  "version": "10.0.0",
   "description": "🖥   A command-line interface to run custom code on your bot while running",
   "main": "bin/node.bundle.js",
   "botpress": {
@@ -10,9 +10,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/botpress/botpress-terminal"
+    "url": "https://github.com/botpress/modules"
   },
-  "homepage": "https://github.com/botpress/botpress-terminal",
+  "homepage": "https://github.com/botpress/modules",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "node webpack.js --watch",
