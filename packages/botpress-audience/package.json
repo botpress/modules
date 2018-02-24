@@ -1,6 +1,6 @@
 {
   "name": "@botpress/audience",
-  "version": "10.0.0",
+  "version": "10.0.1",
   "description": "Official Audience viewer for botpress",
   "main": "bin/node.bundle.js",
   "homepage": "https://github.com/botpress/modules",
@@ -40,6 +40,9 @@
     "botpress-version-manager": "^1.0.4",
     "lodash": "^4.16.6",
     "moment": "^2.18.1"
+  },
+  "peerDependencies": {
+    "botpress": ">= 10.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
