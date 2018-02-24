@@ -1,8 +1,13 @@
 {
   "name": "@botpress/nlu",
-  "version": "0.0.3",
+  "version": "10.0.0",
   "description": "Botpress NLU module",
   "main": "bin/node.bundle.js",
+  "homepage": "https://github.com/botpress/modules",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/botpress/modules"
+  },
   "botpress": {
     "menuText": "NLU (Beta)",
     "menuIcon": "fiber_smart_record",
@@ -18,6 +23,9 @@
   },
   "author": "Botpress, Inc.",
   "license": "Botpress Proprietary License",
+  "peerDependencies": {
+    "botpress": ">= 10.0.0"
+  },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
