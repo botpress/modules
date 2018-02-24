@@ -1,6 +1,6 @@
 {
   "name": "@botpress/hitl",
-  "version": "10.0.0",
+  "version": "10.0.1",
   "description": "Official HITL (Human In The Loop) module for Botpress",
   "main": "bin/node.bundle.js",
   "botpress": {
@@ -31,6 +31,9 @@
   "homepage": "https://github.com/botpress/modules",
   "author": "Botpress",
   "license": "AGPL-3.0",
+  "peerDependencies": {
+    "botpress": ">= 10.0.0"
+  },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
