@@ -48,8 +48,7 @@ var webConfig = {
    externals: {
     'react': 'React',
     'react-dom': 'ReactDOM',
-    'react-bootstrap': 'ReactBootstrap',
-    'prop-types': 'PropTypes'
+    'react-bootstrap': 'ReactBootstrap'
   },
   resolve: {
     extensions: ['.js', '.jsx']
