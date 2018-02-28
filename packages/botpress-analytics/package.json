@@ -1,13 +1,10 @@
 {
-  "name": "@botpress/analytics",
-  "version": "10.0.1",
+  "name": "botpress-analytics",
+  "version": "2.2.6",
   "description": "Provides high level analytics about your bot usage.",
   "main": "bin/node.bundle.js",
-  "homepage": "https://github.com/botpress/modules",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/botpress/modules"
-  },
+  "homepage": "https://github.com/botpress/botpress-analytics",
+  "repository": "botpress/botpress-analytics",
   "botpress": {
     "menuText": "Analytics",
     "menuIcon": "timeline",
@@ -37,9 +34,6 @@
     "eventemitter2": "^2.1.3",
     "lodash": "^4.16.6",
     "moment": "^2.15.2"
-  },
-  "peerDependencies": {
-    "botpress": ">= 10.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

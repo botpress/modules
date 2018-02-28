@@ -263,9 +263,6 @@ export default class CustomMetrics extends React.Component {
       return { name: row.name, value: row.count }
     })
 
-    console.log(data.length != 0)
-    console.log(data)
-
     if (data.length != 0) {
       return (
         <ResponsiveContainer width="100%" height="100%">
