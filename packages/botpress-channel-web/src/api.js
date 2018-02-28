@@ -98,7 +98,7 @@ module.exports = async (bp, config) => {
     res.send(injectStyle)
   })
 
-  const modulePath = bp._loadedModules['botpress-platform-webchat'].root
+  const modulePath = bp._loadedModules['@botpress/channel-web'].root
   const staticFolder = path.join(modulePath, './static')
   router.use('/static', serveStatic(staticFolder))
 
