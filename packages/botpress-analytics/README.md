@@ -9,7 +9,7 @@ Analytics for Botpress provides an interface to view graphs and data of your cha
 ## Get started
 
 ```
-botpress install analytics
+npm install --save @botpress/analytics
 ```
 
 The analytics module should now be available in your bot UI, you can access all graphs and data directly in the UI.
