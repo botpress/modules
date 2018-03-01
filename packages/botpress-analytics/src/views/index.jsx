@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Bootstrap, { Col, Grid, Panel, Row, Table, Tooltip as BTooltip, OverlayTrigger, Button } from 'react-bootstrap'
+import { Col, Grid, Panel, Row, Table, Tooltip as BTooltip, OverlayTrigger, Button } from 'react-bootstrap'
 
 import {
   Area,
@@ -138,23 +138,18 @@ export default class AnalyticsModule extends React.Component {
     const sortedByKeys = _.sortBy(data, o => _.keys(o).length)
     const legend = sortedByKeys[sortedByKeys.length - 1]
 
-    const SimpleLineChart = React.createClass({
-      render() {
-        return (
-          <ResponsiveContainer>
-            <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <CartesianGrid strokeDasharray="3 3" />
-              <Tooltip />
-              <Legend />
-              {_.values(renderLine(legend))}
-            </LineChart>
-          </ResponsiveContainer>
-        )
-      }
-    })
-    return <SimpleLineChart />
+    return (
+      <ResponsiveContainer>
+        <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Legend />
+          {_.values(renderLine(legend))}
+        </LineChart>
+      </ResponsiveContainer>
+    )
   }
 
   renderStackedLineChartForTotalUsers() {
@@ -162,23 +157,18 @@ export default class AnalyticsModule extends React.Component {
     const sortedByKeys = _.sortBy(data, o => _.keys(o).length)
     const legend = sortedByKeys[sortedByKeys.length - 1]
 
-    const StackedAreaChart = React.createClass({
-      render() {
-        return (
-          <ResponsiveContainer>
-            <AreaChart data={data} margin={{ top: 20, right: 50, left: 0, bottom: 0 }}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <CartesianGrid strokeDasharray="3 3" />
-              <Tooltip />
-              <Legend />
-              {_.values(renderArea(data[0]))}
-            </AreaChart>
-          </ResponsiveContainer>
-        )
-      }
-    })
-    return <StackedAreaChart />
+    return (
+      <ResponsiveContainer>
+        <AreaChart data={data} margin={{ top: 20, right: 50, left: 0, bottom: 0 }}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Legend />
+          {_.values(renderArea(data[0]))}
+        </AreaChart>
+      </ResponsiveContainer>
+    )
   }
 
   renderGenderPercentAreaChart() {
@@ -186,44 +176,34 @@ export default class AnalyticsModule extends React.Component {
     const sortedByKeys = _.sortBy(data, o => _.keys(o).length)
     const legend = sortedByKeys[sortedByKeys.length - 1]
 
-    const StackedAreaChart = React.createClass({
-      render() {
-        return (
-          <ResponsiveContainer>
-            <AreaChart data={data} stackOffset="expand" margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <XAxis dataKey="name" />
-              <YAxis tickFormatter={toPercent} />
-              <CartesianGrid strokeDasharray="3 3" />
-              <Tooltip />
-              <Legend />
-              {_.values(renderArea(legend))}
-            </AreaChart>
-          </ResponsiveContainer>
-        )
-      }
-    })
-    return <StackedAreaChart />
+    return (
+      <ResponsiveContainer>
+        <AreaChart data={data} stackOffset="expand" margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+          <XAxis dataKey="name" />
+          <YAxis tickFormatter={toPercent} />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Legend />
+          {_.values(renderArea(legend))}
+        </AreaChart>
+      </ResponsiveContainer>
+    )
   }
 
   renderTypicalConversationLengthInADayChart() {
     const data = this.state.typicalConversationLengthInADay
 
-    const SimpleBarChart = React.createClass({
-      render() {
-        return (
-          <ResponsiveContainer>
-            <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <CartesianGrid strokeDasharray="3 3" />
-              <Tooltip />
-              <Bar dataKey="count" fill={color['conversation']} />
-            </BarChart>
-          </ResponsiveContainer>
-        )
-      }
-    })
-    return <SimpleBarChart />
+    return (
+      <ResponsiveContainer>
+        <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Bar dataKey="count" fill={color['conversation']} />
+        </BarChart>
+      </ResponsiveContainer>
+    )
   }
 
   renderSpecificMetricForLastDaysValues() {
@@ -382,7 +362,9 @@ export default class AnalyticsModule extends React.Component {
     return (
       <Panel>
         <Panel.Heading>Total number of users</Panel.Heading>
-        <Panel.Body><div className={style.graphContainer}>{this.renderStackedLineChartForTotalUsers()}</div></Panel.Body>
+        <Panel.Body>
+          <div className={style.graphContainer}>{this.renderStackedLineChartForTotalUsers()}</div>
+        </Panel.Body>
       </Panel>
     )
   }
@@ -391,7 +373,9 @@ export default class AnalyticsModule extends React.Component {
     return (
       <Panel>
         <Panel.Heading>Active users in last 2 weeks</Panel.Heading>
-        <Panel.Body><div className={style.graphContainerTwoColumn}>{this.renderActiveUsersSimpleLineChart()}</div></Panel.Body>
+        <Panel.Body>
+          <div className={style.graphContainerTwoColumn}>{this.renderActiveUsersSimpleLineChart()}</div>
+        </Panel.Body>
       </Panel>
     )
   }
@@ -400,7 +384,9 @@ export default class AnalyticsModule extends React.Component {
     return (
       <Panel>
         <Panel.Heading>Gender usage in last week</Panel.Heading>
-        <Panel.Body><div className={style.graphContainerTwoColumn}>{this.renderGenderPercentAreaChart()}</div></Panel.Body>
+        <Panel.Body>
+          <div className={style.graphContainerTwoColumn}>{this.renderGenderPercentAreaChart()}</div>
+        </Panel.Body>
       </Panel>
     )
   }
@@ -410,7 +396,9 @@ export default class AnalyticsModule extends React.Component {
       <Panel>
         <Panel.Heading>Insights</Panel.Heading>
         <Panel.Heading>Busy hours for last 7 days</Panel.Heading>
-        <Panel.Body><div className={style.graphContainerTwoColumn}>{this.renderSpecificMetricForLastDaysValues()}</div></Panel.Body>
+        <Panel.Body>
+          <div className={style.graphContainerTwoColumn}>{this.renderSpecificMetricForLastDaysValues()}</div>
+        </Panel.Body>
       </Panel>
     )
   }
@@ -419,7 +407,9 @@ export default class AnalyticsModule extends React.Component {
     return (
       <Panel>
         <Panel.Heading>Average incoming interactions (last 2 weeks)</Panel.Heading>
-        <Panel.Body><div className={style.graphContainerTwoColumn}>{this.renderTypicalConversationLengthInADayChart()}</div></Panel.Body>
+        <Panel.Body>
+          <div className={style.graphContainerTwoColumn}>{this.renderTypicalConversationLengthInADayChart()}</div>
+        </Panel.Body>
       </Panel>
     )
   }
@@ -428,7 +418,9 @@ export default class AnalyticsModule extends React.Component {
     return (
       <Panel>
         <Panel.Heading>Rentention for last 7 days</Panel.Heading>
-        <Panel.Body><div className={style.graphContainer}>{this.renderRetentionHeatMapChart()}</div></Panel.Body>
+        <Panel.Body>
+          <div className={style.graphContainer}>{this.renderRetentionHeatMapChart()}</div>
+        </Panel.Body>
       </Panel>
     )
   }
@@ -437,7 +429,9 @@ export default class AnalyticsModule extends React.Component {
     return (
       <Panel>
         <Panel.Heading>Busy hours for last 7 days</Panel.Heading>
-        <Panel.Body><div className={style.graphContainer}>{this.renderBusyHoursHeatMapChart()}</div></Panel.Body>
+        <Panel.Body>
+          <div className={style.graphContainer}>{this.renderBusyHoursHeatMapChart()}</div>
+        </Panel.Body>
       </Panel>
     )
   }
