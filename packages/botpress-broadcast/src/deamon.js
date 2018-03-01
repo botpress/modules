@@ -147,25 +147,7 @@ const _sendBroadcast = Promise.method(row => {
       bp.logger.debug('[broadcast] Drop sending #' + row.scheduleId + ' to user: ' + row.userId + '. Reason = Filters')
       return
     }
-
-    console.log(row)
-    if (row.type === 'text') {
-      bp.middlewares.sendOutgoing({
-        platform: row.platform,
-        type: 'text',
-        text: row.text,
-        raw: {
-          to: row.userId,
-          message: row.text
-        },
-        user: {
-          id: row.userId
-        }
-      })
-    } else {
-      const fn = new Function('bp', 'userId', 'platform', row.text)
-      return fn(bp, row.userId, row.platform)
-    }
+    return bp.renderers.sendToUser(row.userId, '#!' + row.text)
   })
 })
 

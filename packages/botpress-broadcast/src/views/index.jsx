@@ -18,6 +18,7 @@ import {
   Form,
   FormGroup,
   FormControl,
+  InputGroup,
   Checkbox,
   Col,
   Row,
@@ -37,20 +38,12 @@ import classnames from 'classnames'
 
 import _ from 'lodash'
 
+import DismissableAlert from './alert'
+
 import style from './style.scss'
 
-const broadcastTypes = {
-  text: '',
-  javascript: '',
-  'facebook-text-quick-replies': `bp.messenger.sendText(userId, '<YOUR TEXT HERE>', {
-  quick_replies: ['<QUICK_REPLY1>', '<QUICK_REPLY2>']
-})`,
-  'facebook-attachment': `bp.messenger.sendAttachment(userId, 'image', '<URL>')`
-}
-
 export default class BroadcastModule extends React.Component {
-
-constructor(props){
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -64,7 +57,6 @@ constructor(props){
     this.handleRemoveBroadcast = this.handleRemoveBroadcast.bind(this)
     this.handleOpenModalForm = this.handleOpenModalForm.bind(this)
     this.handleCloseModalForm = this.handleCloseModalForm.bind(this)
-    this.handleSelectChange = this.handleSelectChange.bind(this)
     this.handleContentChange = this.handleContentChange.bind(this)
     this.handleDateChange = this.handleDateChange.bind(this)
     this.handleTimeChange = this.handleTimeChange.bind(this)
@@ -83,34 +75,37 @@ constructor(props){
     return this.props.bp.axios
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.fetchAllBroadcasts()
     this.props.bp.events.on('broadcast.changed', this.fetchAllBroadcasts)
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
     this.props.bp.events.off('broadcast.changed', this.fetchAllBroadcasts)
   }
 
   fetchAllBroadcasts() {
     this.setState({ loading: true })
 
-    return this.getAxios().get("/api/botpress-broadcast/broadcasts")
-    .then((res) => {
-      this.setState({
-        loading: false,
-        broadcasts: _.orderBy(res.data, ['date', 'time'])
+    return this.getAxios()
+      .get('/api/botpress-broadcast/broadcasts')
+      .then(res => {
+        this.setState({
+          loading: false,
+          broadcasts: _.orderBy(res.data, ['date', 'time'])
+        })
       })
-    })
   }
 
   extractBroadcastFromModal() {
-    const { type, content, date, userTimezone, time, filteringConditions } = this.state.broadcast
+    const { content, date, userTimezone, time, filteringConditions } = this.state.broadcast
     return {
       date: moment(date).format('YYYY-MM-DD'),
-      time: moment().startOf('day').add(time, 'seconds').format('HH:mm'),
+      time: moment()
+        .startOf('day')
+        .add(time, 'seconds')
+        .format('HH:mm'),
       content: content,
-      type: type,
       timezone: userTimezone ? null : moment().format('Z'),
       filters: filteringConditions
     }
@@ -137,25 +132,28 @@ constructor(props){
 
   handleAddBroadcast() {
     const broadcast = this.extractBroadcastFromModal()
-    this.getAxios().put("/api/botpress-broadcast/broadcasts", broadcast)
-    .then(this.fetchAllBroadcasts)
-    .then(this.closeModal)
-    .catch(this.handleRequestError)
+    this.getAxios()
+      .put('/api/botpress-broadcast/broadcasts', broadcast)
+      .then(this.fetchAllBroadcasts)
+      .then(this.closeModal)
+      .catch(this.handleRequestError)
   }
 
   handleModifyBroadcast() {
     const broadcast = this.extractBroadcastFromModal()
     const { broadcastId: id } = this.state
-    this.getAxios().post("/api/botpress-broadcast/broadcasts", { id, ...broadcast })
-    .then(this.fetchAllBroadcasts)
-    .then(this.closeModal)
-    .catch(this.handleRequestError)
+    this.getAxios()
+      .post('/api/botpress-broadcast/broadcasts', { id, ...broadcast })
+      .then(this.fetchAllBroadcasts)
+      .then(this.closeModal)
+      .catch(this.handleRequestError)
   }
 
   handleRemoveBroadcast(id) {
-    this.getAxios().delete("/api/botpress-broadcast/broadcasts/" + id)
-    .then(this.fetchAllBroadcasts)
-    .catch(this.handleRequestError)
+    this.getAxios()
+      .delete('/api/botpress-broadcast/broadcasts/' + id)
+      .then(this.fetchAllBroadcasts)
+      .catch(this.handleRequestError)
   }
 
   handleCloseModalForm() {
@@ -163,19 +161,18 @@ constructor(props){
   }
 
   handleOpenModalForm(broadcast, id) {
-    if(!id) {
+    if (!id) {
       id = null
     }
 
-    if(!broadcast) {
+    if (!broadcast) {
       broadcast = {
-        type: 'text',
         content: '',
         date: new Date().toISOString(),
         time: 0,
         progress: 0,
         userTimezone: true,
-        filteringConditions:[]
+        filteringConditions: []
       }
     }
 
@@ -185,35 +182,19 @@ constructor(props){
 
       broadcastId: id,
       broadcast: {
-        type: broadcast.type,
         content: broadcast.content,
         userTimezone: broadcast.userTimezone,
         date: broadcast.date,
         time: broadcast.time,
-        filteringConditions : broadcast.filteringConditions,
+        filteringConditions: broadcast.filteringConditions,
         progress: broadcast.progress
       }
     })
   }
 
-  handleSelectChange(event) {
+  handleContentChange(element) {
     var newBroadcast = this.state.broadcast
-    const oldTypeContent = broadcastTypes[newBroadcast.type] || ''
-
-    newBroadcast.type = event.target.value
-
-    if (newBroadcast.content === oldTypeContent) {
-      newBroadcast.content = broadcastTypes[newBroadcast.type]
-    }
-
-    this.setState({
-      broadcast: newBroadcast
-    })
-  }
-
-  handleContentChange(event) {
-    var newBroadcast = this.state.broadcast
-    newBroadcast.content = event.target.value
+    newBroadcast.content = element.id
     this.setState({
       broadcast: newBroadcast
     })
@@ -233,7 +214,7 @@ constructor(props){
 
     this.setState({
       broadcast: newBroadcast
-    });
+    })
   }
 
   handleUserTimezoneChange() {
@@ -272,7 +253,6 @@ constructor(props){
         <tr>
           <th>#</th>
           <th>Date</th>
-          <th>Type</th>
           <th>Content</th>
           <th>Filters</th>
           <th>Progress</th>
@@ -291,58 +271,70 @@ constructor(props){
     const formatProgress = (progress, outboxed, errored) => {
       let color = '#90a9f4'
       let text = (progress * 100).toFixed(2) + '%'
-      if(progress === 0) {
+      if (progress === 0) {
         text = outboxed ? 'Processing' : 'Not started'
         color = outboxed ? '#90a9f4' : '#e4e4e4'
       }
-      if(progress === 1) {
+      if (progress === 1) {
         text = 'Done'
         color = '#6ee681'
       }
-      if(errored){
+      if (errored) {
         text = 'Error'
         color = '#eb6f6f'
       }
-      return <div><div className={style.dot} style={{backgroundColor:color}}></div>{text}</div>
+      return (
+        <div>
+          <div className={style.dot} style={{ backgroundColor: color }} />
+          {text}
+        </div>
+      )
     }
 
-    const renderModificationButton = (value) => {
+    const renderModificationButton = value => {
       return (
-        <button className={classnames('bp-button', style.smallButton)}
-          onClick={() => this.handleOpenModalForm(value, value.id)}>
-          <Glyphicon glyph='file' />
+        <button
+          className={classnames('bp-button', style.smallButton)}
+          onClick={() => this.handleOpenModalForm(value, value.id)}
+        >
+          <Glyphicon glyph="file" />
         </button>
       )
     }
 
-    const renderFilteringCondition = (filters) => {
+    const renderFilteringCondition = filters => {
       if (_.isEmpty(filters)) {
         return 'No filter'
       }
 
-      return <Label bsStyle="primary">
-        {filters.length + ' filters'}
-      </Label>
+      return <Label bsStyle="primary">{filters.length + ' filters'}</Label>
     }
 
-    return _.mapValues(broadcasts, (value) => {
+    return _.mapValues(broadcasts, value => {
       return (
         <tr key={value.id}>
-          <td style={{width:'5%'}}>{value.id}</td>
-          <td style={{width:'22%'}} className={style.scheduledDate}>{getDateFormatted(value.time, value.date, value.userTimezone)}</td>
-          <td style={{width:'6%'}}>{value.type}</td>
-          <td style={{maxWidth:'32%'}}>{value.content}</td>
-          <td style={{width: '7%'}}>{renderFilteringCondition(value.filteringConditions)}</td>
-          <td style={{width:'12%'}} className={style.progress}>{formatProgress(value.progress, value.outboxed, value.errored) }</td>
-          <td style={{width:'12%'}}>
+          <td style={{ width: '5%' }}>{value.id}</td>
+          <td style={{ width: '22%' }} className={style.scheduledDate}>
+            {getDateFormatted(value.time, value.date, value.userTimezone)}
+          </td>
+          <td style={{ maxWidth: '38%' }}>{value.content}</td>
+          <td style={{ width: '7%' }}>{renderFilteringCondition(value.filteringConditions)}</td>
+          <td style={{ width: '12%' }} className={style.progress}>
+            {formatProgress(value.progress, value.outboxed, value.errored)}
+          </td>
+          <td style={{ width: '12%' }}>
             {!value.outboxed ? renderModificationButton(value) : null}
-            <button className={classnames('bp-button', style.smallButton)}
-            onClick={() => this.handleOpenModalForm(value)}>
-              <Glyphicon glyph='copy' />
+            <button
+              className={classnames('bp-button', style.smallButton)}
+              onClick={() => this.handleOpenModalForm(value)}
+            >
+              <Glyphicon glyph="copy" />
             </button>
-            <button className={classnames('bp-button', style.smallButton)}
-            onClick={() => this.handleRemoveBroadcast(value.id)}>
-              <Glyphicon glyph='trash' />
+            <button
+              className={classnames('bp-button', style.smallButton)}
+              onClick={() => this.handleRemoveBroadcast(value.id)}
+            >
+              <Glyphicon glyph="trash" />
             </button>
           </td>
         </tr>
@@ -354,9 +346,7 @@ constructor(props){
     return (
       <Table striped bordered condensed hover className={style.scheduledTable}>
         {this.renderTableHeader()}
-        <tbody>
-          {_.values(this.renderBroadcasts(broadcasts))}
-        </tbody>
+        <tbody>{_.values(this.renderBroadcasts(broadcasts))}</tbody>
       </Table>
     )
   }
@@ -380,43 +370,37 @@ constructor(props){
 
   renderTypeList() {
     return _.mapValues(broadcastTypes, (value, key) => {
-      return <option key={key} value={key}>{key}</option>
+      return (
+        <option key={key} value={key}>
+          {key}
+        </option>
+      )
     })
   }
 
-  renderFormType() {
-    return (
-      <FormGroup controlId="formType">
-        <Col componentClass={ControlLabel} sm={2}>
-          Type
-        </Col>
-        <Col sm={10}>
-          <FormControl componentClass="select" onChange={this.handleSelectChange} value={this.state.broadcast.type}>
-            {_.values(this.renderTypeList())}
-          </FormControl>
-        </Col>
-      </FormGroup>
-    )
-  }
-
   renderFormContent() {
+    const pickContent = () => window.botpress.pickContent({}, this.handleContentChange)
+
     return (
       <FormGroup controlId="formContent">
         <Col componentClass={ControlLabel} sm={2}>
           Content
         </Col>
         <Col sm={10}>
-          <FormControl componentClass="textarea"
-            value={this.state.broadcast.content}
-            onChange={this.handleContentChange}/>
+          <InputGroup>
+            <InputGroup.Button>
+              <Button onClick={pickContent}>Pick Content</Button>
+            </InputGroup.Button>
+            <FormControl type="text" readOnly value={this.state.broadcast.content} />
+          </InputGroup>
         </Col>
       </FormGroup>
     )
   }
 
   renderFormDate() {
-    const getISODate = (date) => {
-      if(date) {
+    const getISODate = date => {
+      if (date) {
         return new Date(date).toISOString()
       }
       return new Date().toISOString()
@@ -428,9 +412,7 @@ constructor(props){
           Date
         </Col>
         <Col sm={10}>
-        <DatePicker
-          value={getISODate(this.state.broadcast.date)}
-          onChange={this.handleDateChange}/>
+          <DatePicker value={getISODate(this.state.broadcast.date)} onChange={this.handleDateChange} />
         </Col>
       </FormGroup>
     )
@@ -443,7 +425,7 @@ constructor(props){
           Time
         </Col>
         <Col sm={10}>
-          <TimePicker step={30} onChange={this.handleTimeChange} value={this.state.broadcast.time}/>
+          <TimePicker step={30} onChange={this.handleTimeChange} value={this.state.broadcast.time} />
         </Col>
       </FormGroup>
     )
@@ -456,8 +438,11 @@ constructor(props){
           User time zone
         </Col>
         <Col sm={10}>
-          <Checkbox name='userTimezone' checked={this.state.broadcast.userTimezone}
-            onChange={this.handleUserTimezoneChange} />
+          <Checkbox
+            name="userTimezone"
+            checked={this.state.broadcast.userTimezone}
+            onChange={this.handleUserTimezoneChange}
+          />
         </Col>
       </FormGroup>
     )
@@ -466,12 +451,13 @@ constructor(props){
   renderFilteringConditionElement(filter) {
     const removeHandler = () => this.handleRemoveFromFilteringConditions(filter)
 
-    return <ListGroupItem key={filter}>
-      {filter}
-      <Glyphicon className="pull-right" glyph="remove" onClick={removeHandler} />
-    </ListGroupItem>
+    return (
+      <ListGroupItem key={filter}>
+        {filter}
+        <Glyphicon className="pull-right" glyph="remove" onClick={removeHandler} />
+      </ListGroupItem>
+    )
   }
-
 
   renderFiltering() {
     let filteringConditionElements = <ControlLabel>No filtering condition</ControlLabel>
@@ -481,31 +467,30 @@ constructor(props){
       filteringConditionElements = this.state.broadcast.filteringConditions.map(this.renderFilteringConditionElement)
     }
 
-    return <div>
-      <FormGroup controlId="filtering">
-        <Col componentClass={ControlLabel} sm={2}>
-          Filtering conditions
-        </Col>
-        <Col sm={10}>
-          {filteringConditionElements}
-        </Col>
-      </FormGroup>
-      <FormGroup>
-        <Col smOffset={2} sm={10}>
-          <ControlLabel>Add a new filter:</ControlLabel>
-          <FormControl ref={(input) => this.filterInput = input} type="text"/>
-          <Button className='bp-button' onClick={() => this.handleAddToFilteringConditions()}>
-            Add
-          </Button>
-        </Col>
-      </FormGroup>
-    </div>
+    return (
+      <div>
+        <FormGroup controlId="filtering">
+          <Col componentClass={ControlLabel} sm={2}>
+            Filtering conditions
+          </Col>
+          <Col sm={10}>{filteringConditionElements}</Col>
+        </FormGroup>
+        <FormGroup>
+          <Col smOffset={2} sm={10}>
+            <ControlLabel>Add a new filter:</ControlLabel>
+            <FormControl ref={input => (this.filterInput = input)} type="text" />
+            <Button className="bp-button" onClick={() => this.handleAddToFilteringConditions()}>
+              Add
+            </Button>
+          </Col>
+        </FormGroup>
+      </div>
+    )
   }
 
   renderForm() {
     return (
       <Form horizontal>
-        {this.renderFormType()}
         {this.renderFormContent()}
         {this.renderFormDate()}
         {this.renderFormTime()}
@@ -519,23 +504,29 @@ constructor(props){
     const onClickAction = this.state.modifyBroadcast ? this.handleModifyBroadcast : this.handleAddBroadcast
     const buttonName = this.state.modifyBroadcast ? 'Modify' : 'Create'
 
-    return <button className='bp-button' action='' onClick={onClickAction}>{buttonName}</button>
+    return (
+      <button className="bp-button" action="" onClick={onClickAction}>
+        {buttonName}
+      </button>
+    )
   }
 
-  renderModalForm () {
+  renderModalForm() {
     return (
-      <Modal container={document.getElementById('app')}
+      <Modal
+        container={document.getElementById('app')}
         show={this.state.showModalForm}
-        onHide={this.handleCloseModalForm}>
+        onHide={this.handleCloseModalForm}
+      >
         <Modal.Header closeButton>
           <Modal.Title>{this.state.modifyBroadcast ? 'Modify broadcast...' : 'Create new broadcast...'}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          {this.renderForm()}
-          </Modal.Body>
+        <Modal.Body>{this.renderForm()}</Modal.Body>
         <Modal.Footer>
           {this.renderActionButton()}
-          <button className='bp-button bp-button-danger' onClick={this.handleCloseModalForm}>Cancel</button>
+          <button className="bp-button bp-button-danger" onClick={this.handleCloseModalForm}>
+            Cancel
+          </button>
         </Modal.Footer>
       </Modal>
     )
@@ -547,9 +538,11 @@ constructor(props){
         <Navbar.Collapse>
           <Nav pullRight>
             <NavItem>
-              <button className={classnames('pull-right', 'bp-button', style.smallButton)}
-                onClick={() => this.handleOpenModalForm()}>
-                <Glyphicon glyph='plus'></Glyphicon>
+              <button
+                className={classnames('pull-right', 'bp-button', style.smallButton)}
+                onClick={() => this.handleOpenModalForm()}
+              >
+                <Glyphicon glyph="plus" />
               </button>
             </NavItem>
           </Nav>
@@ -559,45 +552,8 @@ constructor(props){
   }
 
   renderErrorBox() {
-
-    const AlertDismissable = React.createClass({
-      getInitialState() {
-        return {
-          alertVisible: true
-        };
-      },
-
-      render() {
-        if (this.state.alertVisible) {
-          return (
-            <Alert bsStyle="danger" onDismiss={this.handleAlertDismiss}>
-              <h4>An error occured in some broadcasts</h4>
-              <p>If you want to know what happen exactly, take a look to your logs. All details of the errors have been printed in it...</p>
-              <p>
-                <Button href="../logs">Look to logs</Button>
-                <span> or </span>
-                <Button onClick={this.handleAlertDismiss}>Hide Alert</Button>
-              </p>
-            </Alert>
-          )
-        }
-        return null
-      },
-
-      handleAlertDismiss() {
-        this.setState({alertVisible: false});
-      },
-
-      handleAlertShow() {
-        this.setState({alertVisible: true});
-      }
-    });
-
-    return (
-      <AlertDismissable />
-    )
+    return <DismissableAlert />
   }
-
 
   render() {
     if (this.state.loading) {
@@ -609,14 +565,12 @@ constructor(props){
 
     const upcomingBroadcasts = _.remove(allBroadcasts, function(value) {
       const datetime = moment(value.date + ' ' + value.time, 'YYYY-MM-DD HH:mm')
-      return datetime.isBefore(moment().add(3, 'days')) &&
-        datetime.isAfter(moment())
+      return datetime.isBefore(moment().add(3, 'days')) && datetime.isAfter(moment())
     })
 
     const pastBroadcasts = _.remove(allBroadcasts, function(value) {
       const datetime = moment(value.date + ' ' + value.time, 'YYYY-MM-DD HH:mm')
-      return datetime.isBefore(moment()) &&
-        datetime.isAfter(moment().subtract(3, 'days'))
+      return datetime.isBefore(moment()) && datetime.isAfter(moment().subtract(3, 'days'))
     })
 
     return (
