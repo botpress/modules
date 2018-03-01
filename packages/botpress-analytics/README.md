@@ -2,7 +2,7 @@
 
 Analytics for Botpress provides an interface to view graphs and data of your chatbot typical usage. By using this module, you can have a look to your total users, retention, daily active users, busy hours and a lot more...
 
-<img src='./assets/analytics-screenshot.png' height='300px'>
+<img src='./assets/preview.png' width='300px'>
 
 ## Installation
 
