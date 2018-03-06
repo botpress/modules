@@ -1,4 +1,4 @@
-# botpress-slack
+# @botpress/channel-slack
 
 <img src="https://cdn.rawgit.com/botpress/botpress/7e007114/assets/supports_UMM.png" height="60px" />
 
