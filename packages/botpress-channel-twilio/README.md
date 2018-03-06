@@ -1,4 +1,4 @@
-# botpress-twilio
+# @botpress/channel-twilio
 
 <img src="https://cdn.rawgit.com/botpress/botpress/7e007114/assets/supports_UMM.png" height="60px" />
 
