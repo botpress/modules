@@ -4,6 +4,7 @@ import { Collapse, Button } from 'react-bootstrap'
 import _ from 'lodash'
 
 import IntentEditor from './intents'
+import SyncConfirmModal from './sync'
 
 import style from './style.scss'
 
@@ -13,7 +14,8 @@ export default class Module extends React.Component {
     intents: [],
     currentIntent: null,
     filterValue: '',
-    syncNeeded: false
+    syncNeeded: false,
+    showSyncConfirm: false
   }
 
   componentDidMount() {
@@ -30,10 +32,13 @@ export default class Module extends React.Component {
   checkSync = () => {
     return this.props.bp.axios.get('/api/botpress-nlu/sync/check').then(res => {
       if (this.state.syncNeeded !== res.data) {
-        console.log(res.data)
         this.setState({ syncNeeded: res.data })
       }
     })
+  }
+
+  onSyncReturn = syncNeeded => {
+    this.setState({ showSyncConfirm: false, syncNeeded })
   }
 
   fetchIntents = () => {
@@ -136,6 +141,32 @@ export default class Module extends React.Component {
         <div>
           <div className={style.main}>
             <nav className={style.navigationBar}>
+              <div className={style.create}>
+                <Button bsStyle="primary" block onClick={this.createNewIntent}>
+                  Create new intent
+                </Button>
+              </div>
+              <div className={style.sync}>
+                {this.state.syncNeeded ?
+                  (
+                    <div className={style.out}>
+                      <p>Model is out of sync</p>
+                      <SyncConfirmModal
+                        axios={this.props.bp.axios}
+                        show={this.state.showSyncConfirm}
+                        onHide={this.toggleProp('showSyncConfirm')}
+                        onSync={this.onSyncReturn}
+                      />
+                      <Button bsStyle="primary" block disabled={!this.state.syncNeeded} onClick={this.toggleProp('showSyncConfirm')}>
+                        Sync
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className={style.in}>Model is up to date</div>
+                  )
+                }
+              </div>
+
               <div className={style.filter}>
                 <input
                   type="text"
@@ -145,18 +176,6 @@ export default class Module extends React.Component {
                 />
               </div>
               <div className={style.list}>{this.renderCategory()}</div>
-
-              <div className={style.create}>
-                <Button bsStyle="primary" block onClick={this.createNewIntent}>
-                  Create new intent
-                </Button>
-              </div>
-              <div className={style.sync}>
-                {this.state.syncNeeded && (
-                  <div className={style.out}>Model is out of sync. Restart the bot to sync it.</div>
-                )}
-                {!this.state.syncNeeded && <div className={style.in}>Model is up to date</div>}
-              </div>
             </nav>
             <div className={style.childContent}>
               <IntentEditor
