@@ -93,10 +93,6 @@ module.exports = {
       description:
         'Process natural language in the form of text. Structured data with an action and parameters for that action is injected in the incoming message event.'
     })
-
-    setTimeout(() => {
-      provider.sync()
-    }, 500) // TODO Change that
   },
 
   ready: async function(bp) {
@@ -126,6 +122,15 @@ module.exports = {
 
     router.get('/sync/check', async (req, res) => {
       res.send(await provider.checkSyncNeeded())
+    })
+
+    router.get('/sync', async (req, res) => {
+      try {
+        await provider.sync()
+        res.sendStatus(200)
+      } catch (e) {
+        res.status(500).send(`${e.name} : ${e.message}`)
+      }
     })
   }
 }
