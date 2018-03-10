@@ -20,6 +20,9 @@ export default class Provider {
   Public API
   *******/
 
+  async init() {
+  }
+
   async sync() {
     throw new Error('Not implemented')
   }

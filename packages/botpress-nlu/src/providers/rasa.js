@@ -23,6 +23,9 @@ export default class RasaProvider extends Provider {
     })
   }
 
+  async init() {
+  }
+
   async checkSyncNeeded() {
     const intents = await this.storage.getIntents()
     const remoteVersions = await this._getRemoteVersions()
