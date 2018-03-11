@@ -6,6 +6,7 @@ import Parser from './parser'
 
 import Entities from './providers/entities'
 
+import DialogflowProvider from './providers/dialogflow'
 import LuisProvider from './providers/luis'
 import RasaProvider from './providers/rasa'
 import NativeProvider from './providers/native'
@@ -20,6 +21,9 @@ module.exports = {
 
     // Provider config
     provider: { type: 'string', required: true, default: 'native', env: 'NLU_PROVIDER' },
+
+    // DIALOGFLOW-specific config
+    googleProjectId: { type: 'string', required: false, default: '', env: 'NLU_GOOGLE_PROJECT_ID' },
 
     // LUIS-specific config
     luisAppId: { type: 'string', required: false, default: '', env: 'NLU_LUIS_APP_ID' },
@@ -39,6 +43,7 @@ module.exports = {
     await storage.initializeGhost()
 
     const Provider = {
+      dialogflow: DialogflowProvider,
       luis: LuisProvider,
       rasa: RasaProvider,
       native: NativeProvider
@@ -55,6 +60,7 @@ module.exports = {
       kvs: bp.db.kvs,
       config: config
     })
+    await provider.init()
 
     const retryPolicy = {
       interval: 100,

@@ -15,6 +15,9 @@ export default class NativeProvider extends Provider {
     this.classifier = null
   }
 
+  async init() {
+  }
+
   async checkSyncNeeded() {
     const intents = await this.storage.getIntents()
     return !await this._isInSync(intents)
