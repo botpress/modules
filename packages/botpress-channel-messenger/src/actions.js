@@ -11,13 +11,16 @@ const create = obj => {
   })
 
   const messageId = new Date().toISOString() + Math.random()
-  
-  const newEvent = Object.assign({
-    _promise: promise,
-    _resolve: resolve,
-    _reject: reject,
-    __id: messageId
-  }, obj)
+
+  const newEvent = Object.assign(
+    {
+      _promise: promise,
+      _resolve: resolve,
+      _reject: reject,
+      __id: messageId
+    },
+    obj
+  )
 
   outgoing.pending[messageId] = {
     event: newEvent,
@@ -28,19 +31,19 @@ const create = obj => {
   return newEvent
 }
 
-const validateUserId = (userId) => {
+const validateUserId = userId => {
   if (!/[0-9]+/.test(userId)) {
     throw new Error('Invalid userId')
   }
 }
 
-const validateText = (text) => {
-  if (typeof(text) !== 'string' || text.length > 640) {
+const validateText = text => {
+  if (typeof text !== 'string' || text.length > 640) {
     throw new Error('Text must be a string less than 640 chars.')
   }
 }
 
-const validateQuickReplies = (quick_replies) => {
+const validateQuickReplies = quick_replies => {
   if (!_.isArray(quick_replies)) {
     throw new Error('quick_replies must be an array')
   }
@@ -48,23 +51,29 @@ const validateQuickReplies = (quick_replies) => {
   _.forEach(quick_replies, validateQuickReply)
 }
 
-const validateQuickReply = (quick_reply) => {
-  if (typeof(quick_reply) !== 'string') {
-    if (!quick_reply || typeof(quick_reply.title) !== 'string') {
-      throw new Error('Expected quick_reply to be a string or an object' +
-        'with a title.')
+const validateQuickReply = quick_reply => {
+  if (typeof quick_reply !== 'string') {
+    if (
+      !quick_reply ||
+      (typeof quick_reply.title !== 'string' &&
+        !_.includes(['location', 'user_email', 'user_phone_number'], quick_reply.content_type))
+    ) {
+      throw new Error(
+        'Expected quick_reply to be a string or an object' +
+          'with a title or one of these content_types: location, user_email, user_phone_number'
+      )
     }
   }
 }
 
-const validateTyping = (typing) => {
+const validateTyping = typing => {
   if (!_.isBoolean(typing) && !_.isNumber(typing)) {
     throw new Error('Expected typing to be a boolean of a number')
   }
 }
 
-const validateAttachmentType = (type) => {
-  if (typeof(type) !== 'string') {
+const validateAttachmentType = type => {
+  if (typeof type !== 'string') {
     throw new Error('Expected attachment type to be a text')
   }
 
@@ -73,28 +82,28 @@ const validateAttachmentType = (type) => {
   }
 }
 
-const validateUrl = (url) => {
-  if (typeof(url) !== 'string') {
+const validateUrl = url => {
+  if (typeof url !== 'string') {
     throw new Error('Expected URL to be a string')
   }
 }
 
-const validateTemplatePayload = (payload) => {
+const validateTemplatePayload = payload => {
   if (!_.isPlainObject(payload)) {
     throw new Error('Template payload must be a plain object')
   }
 
-  if (typeof(payload.template_type) !== 'string') {
+  if (typeof payload.template_type !== 'string') {
     throw new Error('"template_type" must be set')
   }
 }
 
-const validatePersistentMenu = (elements) => {
+const validatePersistentMenu = elements => {
   if (!_.isArray(elements)) {
     throw new Error('Expected elements to be an array')
   }
 
-  _.forEach(elements, (element) => {
+  _.forEach(elements, element => {
     if (!_.isPlainObject(element)) {
       throw new Error('Expected element to be a plain object')
     }
@@ -120,7 +129,7 @@ const createText = (userId, text, options) => {
     raw: {
       to: userId,
       message: text,
-      typing: (options && options.typing),
+      typing: options && options.typing,
       quick_replies: options && options.quick_replies,
       waitRead: options && options.waitRead,
       waitDelivery: options && options.waitDelivery
@@ -131,14 +140,12 @@ const createText = (userId, text, options) => {
 const createAttachment = (userId, type, url, options) => {
   validateUserId(userId)
   validateAttachmentType(type)
-  
-  if ( _.isNull(url) && !(options && options.attachmentId) ) {
+
+  if (_.isNull(url) && !(options && options.attachmentId)) {
     throw new Error('If URL is null, you must pass an attachment_id on options object')
-  }
-  else if ( options && options.attachmentId ) {
+  } else if (options && options.attachmentId) {
     validateText(options.attachmentId)
-  }
-  else {
+  } else {
     validateUrl(url)
   }
 
@@ -158,9 +165,9 @@ const createAttachment = (userId, type, url, options) => {
       to: userId,
       type: type,
       url: url,
-      isReusable: (options && options.isReusable),
-      attachmentId: (options && options.attachmentId),
-      typing: (options && options.typing),
+      isReusable: options && options.isReusable,
+      attachmentId: options && options.attachmentId,
+      typing: options && options.typing,
       quick_replies: options && options.quick_replies,
       waitRead: options && options.waitRead,
       waitDelivery: options && options.waitDelivery
@@ -183,7 +190,7 @@ const createTemplate = (userId, payload, options) => {
     raw: {
       to: userId,
       payload: payload,
-      typing: (options && options.typing),
+      typing: options && options.typing,
       waitRead: options && options.waitRead,
       waitDelivery: options && options.waitDelivery
     }
@@ -205,7 +212,7 @@ const createTyping = (userId, typing) => {
   })
 }
 
-const createSeen = (userId) => {
+const createSeen = userId => {
   validateUserId(userId)
 
   return create({
@@ -218,7 +225,7 @@ const createSeen = (userId) => {
   })
 }
 
-const createPersistentMenu = (elements) => {
+const createPersistentMenu = elements => {
   if (!elements) {
     return create({
       platform: 'facebook',
@@ -242,7 +249,7 @@ const createPersistentMenu = (elements) => {
   })
 }
 
-const createGreetingText = (text) => {
+const createGreetingText = text => {
   if (text && text.length > 160) {
     throw new Error('Greeting text must be less than 160 chars')
   }
@@ -257,7 +264,7 @@ const createGreetingText = (text) => {
   })
 }
 
-const createGetStarted = (postback) => {
+const createGetStarted = postback => {
   return create({
     platform: 'facebook',
     type: 'get_started',
@@ -269,7 +276,7 @@ const createGetStarted = (postback) => {
   })
 }
 
-const createWhitelistedDomains = (domains) => {
+const createWhitelistedDomains = domains => {
   if (domains && !_.every(domains, _.isString)) {
     throw new Error('Expected domains to be a list of string')
   }
