@@ -19,6 +19,9 @@ export default class LuisProvider extends Provider {
     this.appRegion = this.config.luisAppRegion
   }
 
+  async init() {
+  }
+
   async getRemoteVersion() {
     try {
       const res = await axios.get(

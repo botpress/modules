@@ -35,7 +35,7 @@ With Botpress NLU,
 2. Set the `provider` config to either `luis` or `rasa`
 3. Configure the provider
 
-# Global Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L17-L22)
+# Global Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L19-L23)
 
 | Key | Environment Variable | Required | Default |
 | ------------- | -------- | ----- | ---- |
@@ -43,7 +43,7 @@ With Botpress NLU,
 | intentsDir | `NLU_INTENTS_DIR` | Yes | `./intents` |
 | entitiesDir | `NLU_ENTITIES_DIR` | Yes | `./entities` |
 
-> **'*'**: Provider is one of `rasa`, `luis` or `native`
+> **'*'**: Provider is one of `dialogflow`, `rasa`, `luis` or `native`
 
 # Standard NLU Object (`event.nlu`)
 
@@ -51,12 +51,12 @@ Botpress NLU will instrument incoming events by providing a standardized object 
 
 | Path | Description | Supported by |
 | ---- | ----------- | ---- |
-| `nlu.intent.name` | The name of the classified intent | LUIS, RASA |
-| `nlu.intent.confidence` | Confidence of the classification, between `0` and `1`, higher the better | LUIS, RASA |
-| `nlu.intent.provider` | The provider that provided the classification | LUIS, RASA |
-| `nlu.entities[i].name` | The name of the extracted entitiy | - |
+| `nlu.intent.name` | The name of the classified intent | DIALOGFLOW, LUIS, RASA |
+| `nlu.intent.confidence` | Confidence of the classification, between `0` and `1`, higher the better | DIALOGFLOW, LUIS, RASA |
+| `nlu.intent.provider` | The provider that provided the classification | DIALOGFLOW, LUIS, RASA |
+| `nlu.entities[i].name` | The name of the extracted entitiy | DIALOGFLOW |
 | `nlu.entities[i].type` | The type of entity that was extracted | LUIS, RASA |
-| `nlu.entities[i].value` | The **normalized** value of the extracted entity | LUIS, RASA |
+| `nlu.entities[i].value` | The **normalized** value of the extracted entity | DIALOGFLOW, LUIS, RASA |
 | `nlu.entities[i].original` | The original (raw) value of the extracted entity | RASA |
 | `nlu.entities[i].confidence` | The provider that extracted the entity | LUIS, RASA |
 | `nlu.entities[i].position` | The position where it was found in the input string (start position) | LUIS, RASA |
@@ -65,15 +65,27 @@ Botpress NLU will instrument incoming events by providing a standardized object 
 
 # Providers – Features Matrix
 
-| Provider | Intent Classification | Entity Exraction | Scopes (*coming soon*) |
-| ----- | :-----: | :-----: | :-----: |
-| LUIS | ✅ | ✅ | ❌ |
-| RASA | ✅ | ✅ | ❌ |
-| Native | ✅ | ❌ | ❌ |
+| Provider | Synchronization | Intent Classification | Entity Extraction | Scopes (*coming soon*) |
+| ----- | :-----: | :-----: | :-----: | :-----: |
+| DIALOGFLOW | ❌ | ✅ | ✅ | ❌ |
+| LUIS | ✅ | ✅ | ✅ | ❌ |
+| RASA | ✅ | ✅ | ✅ | ❌ |
+| Native | ✅ | ✅ | ❌ | ❌ |
+
+## DIALOGFLOW
+
+Botpress NLU use the V2 API of Dialogflow, checkout this [link](https://dialogflow.com/docs/reference/v2-agent-setup) for more information.
+
+### DIALOGFLOW Specific Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L25-26)
+
+| Key | Environment Variable | Required |
+| ------------- | -------- | ----- |
+| googleProjectId | `GOOGLE_PROJECT_ID` | Yes |
+| (https://cloud.google.com/docs/authentication/getting-started) | `GOOGLE_APPLICATION_CREDENTIALS` | Yes |
 
 ## LUIS
 
-### LUIS Specific Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L23-L27)
+### LUIS Specific Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L28-L32)
 
 | Key | Environment Variable | Required |
 | ------------- | -------- | ----- |
@@ -98,11 +110,11 @@ There are some entities that LUIS doesn't support in some languages, make sure t
 
 ## RASA
 
-Botpress NLU will create and train and maitain your projects and models automatically for you. 
+Botpress NLU will create and train and maintain your projects and models automatically for you. 
 
 > **Note:** By default, Botpress creates separate projects for development and production environment, e.g. `dev__botpress__all` and `prod__botpress__all`.
 
-### RASA Specific Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L29-L32)
+### RASA Specific Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L34-L37)
 
 | Key | Environment Variable | Required |
 | ------------- | -------- | ----- |
