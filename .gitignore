@@ -1,3 +1,9 @@
+channels/node_modules/
+channels/yarn.lock
 packages/node_modules/
 packages/yarn.lock
+modules/node_modules/
+modules/yarn.lock
+skills/node_modules/
+skills/yarn.lock
 .DS_Store
