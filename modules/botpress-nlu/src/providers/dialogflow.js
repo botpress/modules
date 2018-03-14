@@ -22,6 +22,20 @@ export default class DialogflowProvider extends Provider {
     return shortUserId
   }
 
+  _resolveEntity(field) {
+    const entity = field[field.kind]
+
+    if (field.kind === 'stringValue' || field.kind === 'numberValue') {
+      return entity
+    } else if (field.kind === 'listValue') {
+      return entity.values.map(v => this._resolveEntity(v))
+    } else if (field.kind === 'structValue') {
+      return _.mapValues(entity.fields, f => this._resolveEntity(f))
+    } else {
+      throw new Error('Not supported')
+    }
+  }
+
   /*******
   Public API
   *******/
@@ -51,7 +65,7 @@ export default class DialogflowProvider extends Provider {
     }
     const detection = await this.sessionClient.detectIntent(request)
     const {queryResult} = detection[0]
-    const entities = _.map(queryResult.parameters.fields, (v, k) => ({name: k, value: v.stringValue}))
+    const entities = _.map(queryResult.parameters.fields, (v, k) => ({name: k, value: this._resolveEntity(v)}))
 
     return {
       intent: {
