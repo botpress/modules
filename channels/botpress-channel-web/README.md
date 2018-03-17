@@ -1,84 +1,59 @@
-# botpress-platform-webchat (BETA)
+# Botpress Webchat
 
-[<img src="https://cdn.rawgit.com/botpress/botpress/7e007114/assets/supports_UMM.png" height="60px" />](https://botpress.io/docs/foundamentals/umm.html)
-
-<img src="https://rawgit.com/botpress/botpress-platform-webchat/master/assets/webview_convo.png" height="200px" />
-
-Official Webchat connector module for [Botpress](http://github.com/botpress/botpress). This module allows you to embed your chatbot on any website and also allows you to serve it as a full-screen web app.
+This channel is a customizable web chat that can be:
+- **Embedded** on any website
+- Used as a **Standalone** full-screen chat
 
 ## Installation
 
-### Using NPM
-
 ```
-npm install botpress-platform-webchat
+yarn add @botpress/channel-web
 ```
 
-### Using Yarn 
+## Supported messages (Work in progress)
 
-```bash
-yarn add botpress-platform-webchat
+[**⭐ See the full list of supported messages**](https://github.com/botpress/modules/blob/master/channels/botpress-channel-web/src/umm.js)
+
+### Text
+
+```js
+'#text': data => [
+    {
+      on: 'webchat',
+      typing: true,
+      text: data.text
+    }
+]
 ```
-### Using Botpress
+#### `typing` (optional)
 
-```bash
-botpress install botpress-platform-webchat
-```
+Can be `true` to use natural typing speed (based on characters length) or can also be a natural time string (parsed by [`ms module`](https://www.npmjs.com/package/ms)).
 
-## How to use it
+#### `web-style` (optional)
 
-[TODO] More instructions coming.
+`web-style` (optional) will pass the arguments as [DOM style](https://www.w3schools.com/jsref/dom_obj_style.asp) properties. This allows you to customize how specific messages look.
 
-- [UMM](https://botpress.io/docs/en/docs/foundamentals/umm)
-- [Flows](https://botpress.io/docs/en/docs/foundamentals/flow).
-
-> **Note on Views**
-> 
-> You can talk to it and use it in different views (mobile, web, embedded), see section below to have the detail.
-
-### Supported messages
-
-<img src="https://rawgit.com/botpress/botpress-platform-webchat/master/assets/quick_replies.png" height="200px" /><img src="https://rawgit.com/botpress/botpress-platform-webchat/master/assets/mobile_view.png" height="200px" />
-
-#### Sending Text
-
-##### `content.yml`
-
-```yaml
-welcome:
-  - Hello, world!
-  - This is a message on Messenger!
-  - text: this works too!
-    typing: 2s
-  - |
-    This is a multi-line
-    message :).
-  - text: Hello
-    web-style:
-      padding: 10px
-      color: red
+```js
+web-style: {
+  color: "rgb(24, 1, 187)",
+  borderLeft: "2px solid rgb(11, 8, 162)",
+  padding: "10px",
+  fontWeight: "600",
+  fontSize: "20px",
+  fontFamily: "'Lato', sans-serif" }
 ```
 
-##### web-style
+#### `quick_replies` (optional)
 
-`web-style` (optional) will pass the arguments as []DOM style](https://www.w3schools.com/jsref/dom_obj_style.asp) properties. This allows you to customize how specific messages look.
+Array of string, with the `<PAYLOAD> Text` format.
 
-##### Quick replies
-
-##### `content.yml`
-
-```yaml
-welcome:
-  - text: Hello, world!
-    typing: 250ms
-    quick_replies:
-      - <QR_YES> Yes
-      - <QR_NO> No
+```js
+quick_replies: data.choices.map(choice => `<${choice.payload}> ${choice.text}`)
 ```
 
-##### Web form
+### Form (documentation coming soon)
 
-##### `content.yml`
+<!-- ##### `content.yml`
 
 ```yaml
 welcome:
@@ -175,60 +150,75 @@ Example:
           value: "burrito"
 ```
 
-#### Carousel (soon)
+-->
 
-Example
+### Carousel
 
-```yaml
-suggestions-carousel:
-  - type: carousel
-    text: Here are some suggestions for you
-    elements:
-      - title: "First Minute Capital joins $5.8M seed for AR treasure hunt game Snatch"
-        picture: "http://cdn-image.travelandleisure.com/sites/default/files/styles/1600x1000/public/1444253482/DG2015-san-francisco.jpg?itok=MdRJm2Zo"
-        subtitle: "techcrunch.com"
-        buttons:
-          - url: "http://localhost:3000/api/botpress-smart-knowledge/files/0c16accacb6443ef16f0917fc9091a4e"
-            title: View document
-      - title: "First Minute Capital joins $5.8M seed for AR treasure hunt game Snatch"
-        picture: "http://cdn-image.travelandleisure.com/sites/default/files/styles/1600x1000/public/1444253482/DG2015-san-francisco.jpg?itok=MdRJm2Zo"
-        subtitle: "techcrunch.com"
-        buttons:
-          - url: "http://localhost:3000/api/botpress-smart-knowledge/files/0c16accacb6443ef16f0917fc9091a4e"
-            title: View document
+#### `elements` (required)
+
+Array of `element` objects
+
+#### `element.title` (required)
+
+String
+
+#### `element.picture` (optional)
+
+String (URL)
+
+#### `element.subtitle` (optional)
+
+String
+
+#### `element.buttons` (optional)
+
+Object | `{ url: 'string', title: 'string' }`
+
+#### `settings` (optional)
+
+Settings to pass the [`react-slick`](https://github.com/akiran/react-slick) component
+
+### Custom React components (documentation coming soon)
+
+---
+
+## Using it as Standalone (full-screen)
+
+In your `index.js` file, add this:
+
+```js
+  const config = {
+    botName: '<<REPLACE>>',
+    botAvatarUrl: '<<REPLACE BY URL>>',
+    botConvoTitle: '<<REPLACE>>',
+    botConvoDescription: "<<REPLACE>>",
+    backgroundColor: '#ffffff',
+    textColorOnBackground: '#666666',
+    foregroundColor: '#000000',
+    textColorOnForeground: '#ffffff'
+  }
+
+  bp.createShortlink('chat', '/lite', {
+    m: 'channel-web',
+    v: 'fullscreen',
+    options: JSON.stringify({ config: config })
+  })
 ```
 
-#### Other type of messages
-
-We are still working on other type of messages to increase the power of this module. Botpress is a community effort, so **Pull Requests are welcomed**.
-
-- Caroussel **(soon)**
-- Image **(soon)**
-- Video **(soon)**
-- Audio **(soon)**
-- Location Picker **(soon)**
-- Web Widgets **(soon)**
-
-## Supported views
-
-### Mobile View (Fullscreen)
-
-When your bot is running, you can have access to a mobile view at `${HOSTNAME}/lite/?m=platform-webchat&v=fullscreen` *(e.g `http://localhost:3000/lite/?m=platform-webchat&v=fullscreen`)*.
+**Now your bot is available at the following url: `<BOT_URL>/s/chat`, e.g. `http://localhost:3000/s/chat`.**
 
 This **URL is public** (no authentication required) so you can share it we other people.
 
-<img src="https://rawgit.com/botpress/botpress-platform-webchat/master/assets/mobile_view.png" height="200px" />
-
-### Web View (Embedded on Websites)
+## Using it as Embedded (on website)
 
 To embedded the web interface to a website, you simply need to add this script at the end of the `<body>` tag. Don't forget to set the `host` correctly to match the public hostname of your bot.
 
 ```html
-<script src="<host>/api/botpress-platform-webchat/inject.js"></script>
+<script src="<host>/api/channel-web/inject.js"></script>
 <script>window.botpressWebChat.init({ host: '<host>' })</script>
 ```
 
-## Customize the view
+## Customize the look and feel
 You can customize look and feel of the web chat by passing additional keys to `init` method like this:
 
 ```javascript
@@ -247,6 +237,12 @@ window.botpressWebChat.init({
 
 You can also use `window.botpressWebChat.configure` method to modify web chat options after it's initialized.
 
+### Page –> Bot interractions
+
+You can open/close sidebar programmatically by calling `window.botpressWebChat.sendEvent` with `{ type: 'show' }` or `{ type: 'hide' }`.
+
+## Configuring file uploads
+
 A configuration file (`botpress-platform-webchat.config.yml`) has been created at the `root` of your bot when you installed the module. You can change these values to set up S3 integration.
 
 ```yaml
@@ -256,19 +252,3 @@ uploadsUseS3: true
 #uploadsS3AWSAccessKey: your-aws-key-name
 #uploadsS3AWSAccessSecret: secret-key
 ```
-
-You can open/close sidebar programmatically by calling `window.botpressWebChat.sendEvent` with `{ type: 'show' }` or `{ type: 'hide' }`.
-
-> **Note**
-> 
-> You need to restart your bot by running `bp start` again for new settings to be effective.
-
-### Community
-
-There's a [Slack community](https://slack.botpress.io) where you are welcome to join us, ask any question and even help others.
-
-Get an invite and join us now! 👉 [https://slack.botpress.io](https://slack.botpress.io)
-
-### License
-
-Licensed under AGPL-3.0
