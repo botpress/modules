@@ -14,7 +14,14 @@ yarn add @botpress/channel-web
 
 [**⭐ See the full list of supported messages**](https://github.com/botpress/modules/blob/master/channels/botpress-channel-web/src/umm.js)
 
-### Text
+---
+
+## Content Renderers
+
+<details>
+    <summary><b>Text</b></summary>
+
+### Example
 
 ```js
 '#text': data => [
@@ -50,10 +57,13 @@ Array of string, with the `<PAYLOAD> Text` format.
 ```js
 quick_replies: data.choices.map(choice => `<${choice.payload}> ${choice.text}`)
 ```
+</details>
 
-### Form (documentation coming soon)
 
-<!-- ##### `content.yml`
+<details>
+    <summary><b>Form</b> (documentation for Botpress X coming soon)</summary>
+
+##### `content.yml`
 
 ```yaml
 welcome:
@@ -150,9 +160,12 @@ Example:
           value: "burrito"
 ```
 
--->
+</details>
 
-### Carousel
+
+<details>
+    <summary><b>Carousel</b></summary>
+    
 
 #### `elements` (required)
 
@@ -178,7 +191,7 @@ Object | `{ url: 'string', title: 'string' }`
 
 Settings to pass the [`react-slick`](https://github.com/akiran/react-slick) component
 
-### Custom React components (documentation coming soon)
+</details>
 
 ---
 
