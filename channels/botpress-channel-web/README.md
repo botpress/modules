@@ -14,10 +14,6 @@ yarn add @botpress/channel-web
 
 [**⭐ See the full list of supported messages**](https://github.com/botpress/modules/blob/master/channels/botpress-channel-web/src/umm.js)
 
----
-
-## Content Renderers
-
 <details>
     <summary><b>Text</b></summary>
 
