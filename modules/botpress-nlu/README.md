@@ -31,8 +31,8 @@ With Botpress NLU,
 
 # Usage
 
-1. You need to chose a Provider (currently `luis` or `rasa` or `native`)
-2. Set the `provider` config to either `luis` or `rasa`
+1. You need to chose a Provider (currently `dialogflow` or `luis` or `rasa` or `native`)
+2. Set the `provider` config
 3. Configure the provider
 
 # Global Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L19-L23)
@@ -51,9 +51,10 @@ Botpress NLU will instrument incoming events by providing a standardized object 
 
 | Path | Description | Supported by |
 | ---- | ----------- | ---- |
-| `nlu.intent.name` | The name of the classified intent | DIALOGFLOW, LUIS, RASA |
-| `nlu.intent.confidence` | Confidence of the classification, between `0` and `1`, higher the better | DIALOGFLOW, LUIS, RASA |
-| `nlu.intent.provider` | The provider that provided the classification | DIALOGFLOW, LUIS, RASA |
+| `nlu.intent` | Best classified intent based on confidence (same structure as below) | DIALOGFLOW, LUIS, RASA |
+| `nlu.intents[i].name` | The name of the classified intent | LUIS, RASA |
+| `nlu.intents[i].confidence` | Confidence of the classification, between `0` and `1`, higher the better | LUIS, RASA |
+| `nlu.intents[i].provider` | The provider that provided the classification | LUIS, RASA |
 | `nlu.entities[i].name` | The name of the extracted entitiy | DIALOGFLOW |
 | `nlu.entities[i].type` | The type of entity that was extracted | LUIS, RASA |
 | `nlu.entities[i].value` | The **normalized** value of the extracted entity | DIALOGFLOW, LUIS, RASA |
