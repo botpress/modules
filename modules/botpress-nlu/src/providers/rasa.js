@@ -219,6 +219,7 @@ export default class RasaProvider extends Provider {
 
     const intentName = _.get(res, 'data.intent.name') || 'None'
     const confidence = _.get(res, 'data.intent.confidence') || 0
+    const intents = _.get(res, 'data.intent_ranking') || []
     const entities = _.get(res, 'data.entities') || []
 
     return {
@@ -227,6 +228,11 @@ export default class RasaProvider extends Provider {
         confidence: parseFloat(confidence),
         provider: 'rasa'
       },
+      intents: intents.map(intent => ({
+        name: intent.name,
+        confidence: parseFloat(intent.confidence),
+        provider: 'rasa'
+      })),
       entities: entities.map(entity => ({
         name: null,
         type: entity.entity,

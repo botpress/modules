@@ -84,6 +84,10 @@ module.exports = {
           intent: {
             is: intentName =>
               (_.get(event, 'nlu.intent.name') || '').toLowerCase() === (intentName && intentName.toLowerCase())
+          },
+          intents: {
+            has: intentName =>
+              (_.get(event, 'nlu.intents') || []).find(i => i.name === intentName) !== undefined
           }
         }
       })
