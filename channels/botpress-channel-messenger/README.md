@@ -125,7 +125,7 @@ botpress install messenger
 
 It's also possible to install it through the Botpress UI in the modules section.
 
-<img alt='Connexion settings' src='/assets/install-messenger-module.png' width='500px' />
+<img alt='Connexion settings' src='assets/install-messenger-module.png' width='500px' />
 
 ## Get started
 
@@ -139,17 +139,17 @@ We **highly recommand** to set your configuration in the `botpress-messenger.con
 
 ##### 1. Create a [**Facebook page**](https://www.facebook.com/pages/create) and a [**Messenger application**](https://developers.facebook.com).
 
-<img alt='Create app' src='/assets/create-app-facebook.png' width='500px' />
+<img alt='Create app' src='assets/create-app-facebook.png' width='500px' />
 
 ##### 2. Get App ID and App Secret
 These information are available on dashboard of developers page. You only need to copy them in module interface.
 
-<img alt='App id' src='/assets/app-id-app-secret.png' width='400px' />
+<img alt='App id' src='assets/app-id-app-secret.png' width='400px' />
 
 ##### 3. Get Access token
 Acces token is available in Messenger section of developers. You need to copy it in the appropriate section of botpress-messenger UI.
 
-<img alt='Acces token' src='/assets/access-token.png' width='500px;' />
+<img alt='Acces token' src='assets/access-token.png' width='500px;' />
 
 ##### 4. Setup Hostname
 
@@ -543,7 +543,7 @@ This module also support referrals. In fact, the value of the `ref` parameter is
 
 To active get started button on Messenger, users can modify display setting directly in user interface ([facebook doc](https://developers.facebook.com/docs/messenger-platform/thread-settings/get-started-button)).
 
-<img alt='Get started button' src='/assets/display-get-started.png' width='600px' />
+<img alt='Get started button' src='assets/display-get-started.png' width='600px' />
 
 
 #### Greeting message
@@ -551,19 +551,19 @@ To active get started button on Messenger, users can modify display setting dire
 Directly in module view, users are able to modify greeting message ([facebook doc](https://developers.facebook.com/docs/messenger-platform/thread-settings/greeting-text)).
 
 
-<img alt='Greeting message' src='/assets/greeting-message.png' width='600px' />
+<img alt='Greeting message' src='assets/greeting-message.png' width='600px' />
 
 #### Persistent menu
 
 Users can directly modify persistent menu in module user interface. By using UI, it's possible to add, modify and remove items \([facebook doc](https://developers.facebook.com/docs/messenger-platform/thread-settings/persistent-menu)\).
 
-<img alt='Persistent menu' src='/assets/persistent-menu.png' width='600px' />
+<img alt='Persistent menu' src='assets/persistent-menu.png' width='600px' />
 
 #### Automatically mark as read
 
 Directly in UI, users can setup if they want to automatically mark all messages as read ([facebook doc](https://developers.facebook.com/docs/messenger-platform/webhook-reference/message-read)).
 
-<img alt='Mark as read' src='/assets/automatically-mark-as-read.png' width='600px' />
+<img alt='Mark as read' src='assets/automatically-mark-as-read.png' width='600px' />
 
 #### Composer input disabled
 
@@ -573,7 +573,7 @@ Directly in UI, users can setup if they want to deactivate or not the user input
 
 By using UI, users can configure \(add, modify and remove\) trusted domains ([facebook doc](https://developers.facebook.com/docs/messenger-platform/thread-settings/domain-whitelisting)).
 
-<img alt='Trusted domains' src='/assets/trusted-domains.png' width='600px'/>
+<img alt='Trusted domains' src='assets/trusted-domains.png' width='600px'/>
 
 #### Chat Extensions
 
@@ -581,7 +581,7 @@ Using the UI, you can set the home URL for your chat extension ([facebook doc](h
 
 **Note:** the URL you specify must use HTTPS.  Facebook will return an error if you enter an URL that is not using HTTPS.
 
-<img alt="Chat Extensions" src='/assets/chat-extensions.png' width='600px'/>
+<img alt="Chat Extensions" src='assets/chat-extensions.png' width='600px'/>
 
 Chat extensions supports the following configuration options:
   - *Update Home URL*: the url that hosts your chat extension.  You can remove the URL by leaving the box blank.
@@ -593,7 +593,7 @@ Using the UI, you can assign users to be ["Payment Testers."](https://developers
 
 In order for this to work, the user must be a registered admin, developer or test user through your Facebook developer console and they must have initiated conversation with your bot.  You cannot just add any user to be a payment tester.  It is also important to note that this is the *only* way to run a test payment with [Messenger Extensions](https://developers.facebook.com/docs/messenger-platform/webview).
 
-<img alt="Payment Testers" src='/assets/payment_testers.png' width='600px'/>
+<img alt="Payment Testers" src='assets/payment_testers.png' width='600px'/>
 
 When adding a new user, you can start typing their name into the box.  This will pull up a list of matching users who have been communicating with your bot.  The value in the parentheses is the page-scoped user ID for that user.
 
