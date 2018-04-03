@@ -3,6 +3,8 @@ import React from 'react'
 import { ListGroup, ListGroupItem, Alert, Tabs, Tab } from 'react-bootstrap'
 import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc'
 
+import ContentPickerWidget from 'botpress/content-picker'
+
 import style from './style.scss'
 
 const SortableItem = SortableElement(({ value, onRemove, onChangeKeywords }) => (
@@ -25,7 +27,6 @@ const SortableItem = SortableElement(({ value, onRemove, onChangeKeywords }) => 
 export default class TemplateModule extends React.Component {
   state = {
     choices: [],
-    inputValue: '',
     nbMaxRetries: 1,
     questionValue: 'Please pick one of the following: ',
     invalidOptionValue: 'Invalid choice, please pick one of the following:',
@@ -69,18 +70,6 @@ export default class TemplateModule extends React.Component {
     }
   }
 
-  onInputChange = event => {
-    this.setState({ inputValue: event.target.value })
-  }
-
-  onQuestionChange = event => {
-    this.setState({ questionValue: event.target.value })
-  }
-
-  onInvalidOptionInputChanged = event => {
-    this.setState({ invalidOptionValue: event.target.value })
-  }
-
   onMaxRetriesChanged = event => {
     this.setState({ nbMaxRetries: isNaN(event.target.value) ? 1 : event.target.value })
   }
@@ -98,16 +87,9 @@ export default class TemplateModule extends React.Component {
   onNameOfQuestionBlocChanged = this.onBlocNameChanged('nameOfQuestionBloc')
   onNameOfInvalidBlocChanged = this.onBlocNameChanged('nameOfInvalidBloc')
 
-  onKeyPress = event => {
-    if (event.key === 'Enter' && this.state.inputValue.length >= 0) {
-      const value = this.state.inputValue
-      const newChoice = { value: value, keywords: [value.toLowerCase()] }
-
-      this.setState({
-        choices: [...this.state.choices, newChoice],
-        inputValue: ''
-      })
-    }
+  addChoice = ({ data, previewText: value }) => {
+    const newChoice = { value, keywords: [Object.values(data).map(value => value.toLowerCase())] }
+    this.setState({ choices: [...this.state.choices, newChoice] })
   }
 
   onSortEnd = ({ oldIndex, newIndex }) => {
@@ -151,6 +133,8 @@ export default class TemplateModule extends React.Component {
     })
   }
 
+  textToItemId = text => _.get(text.match(/^say #!(.*)$/), '[1]')
+
   renderBasic() {
     const SortableList = SortableContainer(({ items }) => {
       return (
@@ -168,26 +152,32 @@ export default class TemplateModule extends React.Component {
       )
     })
 
+    const itemId = this.textToItemId(this.state.questionValue)
+
     return (
       <div className={style.content}>
         <p>This skill allows you to make the user pick a choice.</p>
-
         <p>
           <b>Question / text</b>
         </p>
-        <textarea onChange={this.onQuestionChange} value={this.state.questionValue} />
+        { this.state.questionValue && !itemId && <div>
+          <textarea
+            title="Storing plain text is depreacted! Please create text content-item for it and use it instead!"
+            style={{ backgroundColor: 'lightcoral' }}
+            disabled
+            value={this.state.questionValue}
+          />
+        </div>}
+        <ContentPickerWidget
+          itemId={itemId}
+          onChange={item => this.setState({ questionValue: `say #!${item.id}` })}
+          placeholder="Question to ask"
+        />
 
         <p>
           <b>Choices</b>
         </p>
-        <input
-          className={style.newChoice}
-          value={this.state.inputValue}
-          type="text"
-          placeholder="Type new choice here"
-          onChange={this.onInputChange}
-          onKeyPress={this.onKeyPress}
-        />
+        <ContentPickerWidget onChange={this.addChoice} placeholder="Select new choice here" />
         <SortableList
           pressDelay={200}
           helperClass={style.sortableHelper}
@@ -200,6 +190,7 @@ export default class TemplateModule extends React.Component {
   }
 
   renderAdvanced() {
+    const itemId = this.textToItemId(this.state.invalidOptionValue)
     return (
       <div className={style.content}>
         <div>
@@ -217,10 +208,20 @@ export default class TemplateModule extends React.Component {
 
         <div>
           <label htmlFor="invalidOptionText">On invalid option, say:</label>
-          <textarea
-            id="invalidOptionText"
-            value={this.state.invalidOptionValue}
-            onChange={this.onInvalidOptionInputChanged}
+
+          { this.state.invalidOptionValue && !itemId && <div>
+            <textarea
+              title="Storing plain text is depreacted! Please create text content-item for it and use it instead!"
+              style={{ backgroundColor: 'lightcoral' }}
+              disabled
+              id="invalidOptionText"
+              value={this.state.invalidOptionValue}
+            />
+          </div>}
+          <ContentPickerWidget
+            itemId={itemId}
+            onChange={({ id }) => this.setState({ invalidOptionValue: `say #!${id}` })}
+            placeholder="Question to ask"
           />
         </div>
 
