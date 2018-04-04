@@ -64,6 +64,8 @@ Botpress NLU will instrument incoming events by providing a standardized object 
 | `nlu.sentiment` | TBD | - |
 | `nlu.language` | TBD | - |
 
+Botpress NLU also provides two convenient methods to the NLU Object : `nlu.intent.is(intentName)` and `nlu.intents.has(intentName)`
+
 # Providers – Features Matrix
 
 | Provider | Synchronization | Intent Classification | Entity Extraction | Scopes (*coming soon*) |

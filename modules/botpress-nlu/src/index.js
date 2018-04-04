@@ -87,7 +87,7 @@ module.exports = {
           },
           intents: {
             has: intentName =>
-              (_.get(event, 'nlu.intents') || []).find(i => i.name === intentName) !== undefined
+              !!(_.get(event, 'nlu.intents') || []).find(i => i.name === intentName)
           }
         }
       })
