@@ -67,7 +67,7 @@ function updateSchedule({ id, date, time, timezone, content, type, filters }) {
 
   const row = {
     date_time: dateTime,
-    ts: helpers(knex).date.format(ts),
+    ts: ts ? helpers(knex).date.format(ts) : null,
     text: content,
     type: type,
     filters: JSON.stringify(filters)
