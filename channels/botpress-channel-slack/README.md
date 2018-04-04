@@ -105,37 +105,37 @@ You need to manually enter your hostname. If you are developping locally, we sug
 
 #### 2. Create a [**Slack app**](https://api.slack.com/apps?new_app=1)
   
-<img alt='Create app' src='/assets/create-app-slack.png' width='450px' />
+<img alt='Create app' src='assets/create-app-slack.png' width='450px' />
 
 #### 3. Get Client ID and Client Secret
 
 These information are available on **Basic Information** of you app. You only need to copy them in module interface.
 
-<img alt='Client id and client secret' src='/assets/client-id-client-secret.png' width='500px' />
+<img alt='Client id and client secret' src='assets/client-id-client-secret.png' width='500px' />
 
 #### 4. Setup OAuth & Permissions
 
 On the **OAuth & Permissions** page of your slack app, you need to enter your redirect url for the authentification. The redirect url need to be `${hostname}/modules/botpress-slack` as you can see in the example screenshot below.
 
-<img alt='OAuth settings' src='/assets/oauth.png' width='500px;' />
+<img alt='OAuth settings' src='assets/oauth.png' width='500px;' />
 
 #### 5. Create a Bot User
 
 On the **Bot Users** page of your slack app, you need to add a Bot User by clicking on **Add a Bot User**. We suggest you to turn on **Always Show My Bot as Online** for be able to use RTM API correctly.
 
-<img alt='Bot users' src='/assets/bot-user.png' width='500px;' />
+<img alt='Bot users' src='assets/bot-user.png' width='500px;' />
 
 #### 6. Setup Interactive Messages
 
 On the **Interactive messages** page of your slack app, you need to **Enable Interactive Messages** and add a **Request URL**. The URL entered needs to be format as `${hostname}/api/botpress-slack/action-endpoint`.
 
-<img alt='Interactive messages' src='/assets/interactive-messages.png' width='500px;' />
+<img alt='Interactive messages' src='assets/interactive-messages.png' width='500px;' />
 
 #### 7. Get Verification Token
 
 The verification token should appear below App Id and App  information are available on **Basic Information** of you app. You only need to copy them in module interface.
 
-<img alt='App id and app secret' src='/assets/verification-token.png' width='500px' />
+<img alt='App id and app secret' src='assets/verification-token.png' width='500px' />
 
 #### 8. Set scope
 
@@ -145,7 +145,7 @@ On your configuration page of your module, you need to set scope of your bot. We
 
 Next step is to authenticate and connect your bot. To do it, you only need to click on **Authenticate & Connect** on your module and follow the steps. Once it will be done, you should received an **API Token** and a **Bot Token**. They will appear on your settings page of your module.
 
-<img alt='Connexion completed' src='/assets/completed.png' width='500px;' />
+<img alt='Connexion completed' src='assets/completed.png' width='500px;' />
 
 If you want to have more information about documentation, options and API, we suggest you to look at the [official slack documentation](https://api.slack.com/).
 
