@@ -78,7 +78,10 @@ const action = (name, args) => (args ? `${name} ${JSON.stringify(args)}` : name)
 // ****
 
 module.exports = {
-  config: {},
+  config: {
+    // TODO: we don't support array type, so it's comma-separated string like 'Jp, Fr'
+    additionalLanguages: { type: 'string', required: false, default: '', env: 'SKILL_CHOICE_LANGUAGES' },
+  },
 
   init: async function(bp, configurator) {
     // This is called before ready.
@@ -89,7 +92,8 @@ module.exports = {
     // Your module's been loaded by Botpress.
     // Serve your APIs here, execute logic, etc.
 
-    const config = await configurator.loadAll()
+    let config = await configurator.loadAll()
+    config = { ...config, additionalLanguages: config.additionalLanguages.split(', ') }
     // Do fancy stuff here :)
 
     bp.dialogEngine.registerFunctions({
@@ -114,6 +118,11 @@ module.exports = {
         return { ...state, [key]: (state[key] || 0) + 1 }
       }
     })
+
+    const router = bp.getRouter('botpress-skill-choice', { auth: false })
+    router.get('/config', async (req, res) =>
+      res.send(config)
+    )
   },
 
   generate: function(data) {
@@ -125,11 +134,17 @@ module.exports = {
       }))
     }
 
+    const pairsToObj = pairs => pairs.reduce((prev, [key, val]) => ({ ...prev, [key]: val}), {})
+    const langs = Object.keys(data).filter(key => /question.+/.test(key)).map(q => q.replace('question', ''))
+
     const flow = Flow({
       nodes: [
         Node({
           name: 'entry',
-          onEnter: [say(data.questionBloc, Object.assign(ummData, { text: data.question }))],
+          onEnter: [say(data.questionBloc, Object.assign(ummData, {
+            text: data.question,
+            ...pairsToObj(langs.map(lang => [`text${lang}`, data[`question${lang}`]]))
+          }))],
           next: [{ condition: 'true', node: 'parse' }]
         }),
         Node({

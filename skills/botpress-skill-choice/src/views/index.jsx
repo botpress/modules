@@ -22,6 +22,8 @@ const SortableItem = SortableElement(({ value, onRemove, onChangeKeywords }) => 
   </ListGroupItem>
 ))
 
+const pairsToObj = pairs => pairs.reduce((prev, [key, val]) => ({ ...prev, [key]: val}), {})
+
 export default class TemplateModule extends React.Component {
   state = {
     choices: [],
@@ -30,23 +32,34 @@ export default class TemplateModule extends React.Component {
     questionValue: 'Please pick one of the following: ',
     invalidOptionValue: 'Invalid choice, please pick one of the following:',
     nameOfQuestionBloc: '#choice',
-    nameOfInvalidBloc: '#choice'
+    nameOfInvalidBloc: '#choice',
+    additionalLanguages: []
   }
 
   componentDidMount() {
     this.props.resizeBuilderWindow && this.props.resizeBuilderWindow('small')
     const getOrDefault = (propsKey, stateKey) => this.props.initialData[propsKey] || this.state[stateKey]
 
-    if (this.props.initialData) {
-      this.setState({
-        choices: getOrDefault('choices', 'choices'),
-        questionValue: getOrDefault('question', 'questionValue'),
-        nbMaxRetries: getOrDefault('maxRetries', 'nbMaxRetries'),
-        invalidOptionValue: getOrDefault('invalid', 'invalidOptionValue'),
-        nameOfQuestionBloc: getOrDefault('questionBloc', 'nameOfQuestionBloc'),
-        nameOfInvalidBloc: getOrDefault('invalidBloc', 'nameOfInvalidBloc')
-      })
-    }
+    fetch('/api/botpress-skill-choice/config')
+      .then(res => res.json())
+      .then(({ additionalLanguages }) => this.setState({ additionalLanguages }, () => {
+        this.state.additionalLanguages.map(lang => [`questionValue${lang}`, `question${lang}`])
+        if (this.props.initialData) {
+          this.setState({
+            choices: getOrDefault('choices', 'choices'),
+            questionValue: getOrDefault('question', 'questionValue'),
+            ...pairsToObj(
+              this.state.additionalLanguages.map(lang =>
+                [`questionValue${lang}`, this.props.initialData[`question${lang}`]]
+              )
+            ),
+            nbMaxRetries: getOrDefault('maxRetries', 'nbMaxRetries'),
+            invalidOptionValue: getOrDefault('invalid', 'invalidOptionValue'),
+            nameOfQuestionBloc: getOrDefault('questionBloc', 'nameOfQuestionBloc'),
+            nameOfInvalidBloc: getOrDefault('invalidBloc', 'nameOfInvalidBloc')
+          })
+        }
+      }))
   }
 
   componentDidUpdate() {
@@ -58,6 +71,9 @@ export default class TemplateModule extends React.Component {
       this.props.onDataChanged({
         choices: this.state.choices,
         question: this.state.questionValue,
+        ...pairsToObj(
+          this.state.additionalLanguages.map(lang => [`question${lang}`, this.state[`questionValue${lang}`]])
+        ),
         maxRetries: this.state.nbMaxRetries,
         invalid: this.state.invalidOptionValue,
         questionBloc: this.state.nameOfQuestionBloc,
@@ -73,9 +89,7 @@ export default class TemplateModule extends React.Component {
     this.setState({ inputValue: event.target.value })
   }
 
-  onQuestionChange = event => {
-    this.setState({ questionValue: event.target.value })
-  }
+  onQuestionChange = (lang = '') => event => this.setState({ [`questionValue${lang}`]: event.target.value })
 
   onInvalidOptionInputChanged = event => {
     this.setState({ invalidOptionValue: event.target.value })
@@ -175,7 +189,15 @@ export default class TemplateModule extends React.Component {
         <p>
           <b>Question / text</b>
         </p>
-        <textarea onChange={this.onQuestionChange} value={this.state.questionValue} />
+        <textarea onChange={this.onQuestionChange()} value={this.state.questionValue} />
+        {this.state.additionalLanguages.map(lang => (
+          <div key={lang}>
+            <p>
+              <b>Question / text in {lang}</b>
+            </p>
+            <textarea onChange={this.onQuestionChange(lang)} value={this.state[`questionValue${lang}`]} />
+          </div>
+        ))}
 
         <p>
           <b>Choices</b>
