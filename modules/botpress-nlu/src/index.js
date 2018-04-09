@@ -9,6 +9,7 @@ import Entities from './providers/entities'
 import DialogflowProvider from './providers/dialogflow'
 import LuisProvider from './providers/luis'
 import RasaProvider from './providers/rasa'
+import RecastProvider from './providers/recast'
 import NativeProvider from './providers/native'
 
 let storage
@@ -34,7 +35,12 @@ module.exports = {
     // RASA-specific config
     rasaEndpoint: { type: 'string', required: false, default: 'http://localhost:5000', env: 'NLU_RASA_URL' },
     rasaToken: { type: 'string', required: false, default: '', env: 'NLU_RASA_TOKEN' },
-    rasaProject: { type: 'string', required: false, default: 'botpress', env: 'NLU_RASA_PROJECT' }
+    rasaProject: { type: 'string', required: false, default: 'botpress', env: 'NLU_RASA_PROJECT' },
+
+    // RECAST-specific config
+    recastToken: { type: 'string', required: false, default: '', env: 'NLU_RECAST_TOKEN' },
+    recastUserSlug: { type: 'string', required: false, default: '', env: 'NLU_RECAST_USER_SLUG' },
+    recastBotSlug: { type: 'string', required: false, default: '', env: 'NLU_RECAST_BOT_SLUG' }
   },
 
   init: async function(bp, configurator) {
@@ -46,6 +52,7 @@ module.exports = {
       dialogflow: DialogflowProvider,
       luis: LuisProvider,
       rasa: RasaProvider,
+      recast: RecastProvider,
       native: NativeProvider
     }[config.provider.toLowerCase()]
 

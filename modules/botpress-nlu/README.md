@@ -10,8 +10,9 @@ Botpress NLU is a Botpress module that adds NLU capatibilities to your bot by co
 | ------------- | :--------: |
 | Native (built-in) | ✅ |
 | [LUIS](https://www.luis.ai) | ✅ |
-| [DialogFlow](https://dialogflow.com/) | Help needed |
+| [Dialogflow](https://dialogflow.com/) | Help needed |
 | [RASA](https://github.com/RasaHQ/rasa_nlu) | ✅ |
+| [Recast](https://recast.ai) | Help needed |
 
 We believe NLP/NLU is a commodity, so this package abstracts the provider by providing a standard, clean interface that allows you (and the non-technicals) to easily edit the NLU data within Botpress.
 
@@ -26,12 +27,12 @@ With Botpress NLU,
 
 ⚠️ **This module only works with the upcoming [Botpress X](https://github.com/botpress/botpress/tree/develop/x).**
 
-- Install the module `yarn add botpress-nlu`
+- Install the module `yarn add @botpress/nlu`
 - Configure a provider (see below)
 
 # Usage
 
-1. You need to chose a Provider (currently `dialogflow` or `luis` or `rasa` or `native`)
+1. You need to chose a Provider (currently `dialogflow`, `luis`, `rasa`, `recast` or `native`)
 2. Set the `provider` config
 3. Configure the provider
 
@@ -43,7 +44,7 @@ With Botpress NLU,
 | intentsDir | `NLU_INTENTS_DIR` | Yes | `./intents` |
 | entitiesDir | `NLU_ENTITIES_DIR` | Yes | `./entities` |
 
-> **'*'**: Provider is one of `dialogflow`, `rasa`, `luis` or `native`
+> **'*'**: Provider is one of `dialogflow`, `rasa`, `luis`, `recast` or `native`
 
 # Standard NLU Object (`event.nlu`)
 
@@ -51,18 +52,19 @@ Botpress NLU will instrument incoming events by providing a standardized object 
 
 | Path | Description | Supported by |
 | ---- | ----------- | ---- |
-| `nlu.intent` | Best classified intent based on confidence (same structure as below) | DIALOGFLOW, LUIS, RASA |
-| `nlu.intents[i].name` | The name of the classified intent | LUIS, RASA |
-| `nlu.intents[i].confidence` | Confidence of the classification, between `0` and `1`, higher the better | LUIS, RASA |
-| `nlu.intents[i].provider` | The provider that provided the classification | LUIS, RASA |
-| `nlu.entities[i].name` | The name of the extracted entitiy | DIALOGFLOW |
-| `nlu.entities[i].type` | The type of entity that was extracted | LUIS, RASA |
-| `nlu.entities[i].value` | The **normalized** value of the extracted entity | DIALOGFLOW, LUIS, RASA |
-| `nlu.entities[i].original` | The original (raw) value of the extracted entity | RASA |
-| `nlu.entities[i].confidence` | The provider that extracted the entity | LUIS, RASA |
-| `nlu.entities[i].position` | The position where it was found in the input string (start position) | LUIS, RASA |
-| `nlu.sentiment` | TBD | - |
-| `nlu.language` | TBD | - |
+| `nlu.intent` | Best classified intent based on confidence (same structure as below) | Dialogflow, LUIS, Rasa, Recast |
+| `nlu.intents[i].name` | The name of the classified intent | LUIS, Rasa, Recast |
+| `nlu.intents[i].confidence` | Confidence of the classification, between `0` and `1`, higher the better | LUIS, Rasa, Recast |
+| `nlu.intents[i].provider` | The provider that provided the classification | * |
+| `nlu.entities[i].name` | The name of the extracted entitiy | Dialogflow |
+| `nlu.entities[i].type` | The type of entity that was extracted | LUIS, Rasa, Recast |
+| `nlu.entities[i].value` | The **normalized** value of the extracted entity | Dialogflow, LUIS, Rasa |
+| `nlu.entities[i].original` | The original (raw) value of the extracted entity | Rasa, Recast |
+| `nlu.entities[i].confidence` | Confidence of the extraction, between `0` and `1` | LUIS, Recast |
+| `nlu.entities[i].provider` | The provider that extracted the entity | * |
+| `nlu.entities[i].position` | The position where it was found in the input string (start position) | LUIS, Rasa |
+| `nlu.sentiment` | TBD | Recast |
+| `nlu.language` | TBD | Recast |
 
 Botpress NLU also provides two convenient methods to the NLU Object : `nlu.intent.is(intentName)` and `nlu.intents.has(intentName)`.
 
@@ -70,25 +72,26 @@ Botpress NLU also provides two convenient methods to the NLU Object : `nlu.inten
 
 | Provider | Synchronization | Intent Classification | Entity Extraction | Scopes (*coming soon*) |
 | ----- | :-----: | :-----: | :-----: | :-----: |
-| DIALOGFLOW | ❌ | ✅ | ✅ | ❌ |
+| Dialogflow | ❌ | ✅ | ✅ | ❌ |
 | LUIS | ✅ | ✅ | ✅ | ❌ |
 | RASA | ✅ | ✅ | ✅ | ❌ |
+| Recast | ❌ | ✅ | ✅ | ❌ |
 | Native | ✅ | ✅ | ❌ | ❌ |
 
 ## DIALOGFLOW
 
 Botpress NLU use the V2 API of Dialogflow, checkout this [link](https://dialogflow.com/docs/reference/v2-agent-setup) for more information.
 
-### DIALOGFLOW Specific Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L25-26)
+### Dialogflow Specific Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L26-27)
 
 | Key | Environment Variable | Required |
 | ------------- | -------- | ----- |
 | googleProjectId | `GOOGLE_PROJECT_ID` | Yes |
-| (https://cloud.google.com/docs/authentication/getting-started) | `GOOGLE_APPLICATION_CREDENTIALS` | Yes |
+| https://cloud.google.com/docs/authentication/getting-started | `GOOGLE_APPLICATION_CREDENTIALS` | Yes |
 
 ## LUIS
 
-### LUIS Specific Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L28-L32)
+### LUIS Specific Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L29-L33)
 
 | Key | Environment Variable | Required |
 | ------------- | -------- | ----- |
@@ -117,13 +120,23 @@ Botpress NLU will create and train and maintain your projects and models automat
 
 > **Note:** By default, Botpress creates separate projects for development and production environment, e.g. `dev__botpress__all` and `prod__botpress__all`.
 
-### RASA Specific Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L34-L37)
+### Rasa Specific Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L35-L38)
 
 | Key | Environment Variable | Required |
 | ------------- | -------- | ----- |
 | rasaEndpoint | `NLU_RASA_URL` | No (default is `http://localhost:5000/`) |
 | rasaToken | `NLU_RASA_TOKEN` | No (none by default) |
 | rasaProject | `NLU_RASA_PROJECT` | No (default is `botpress`) |
+
+## RECAST
+
+### Recast Specific Configuration [(source)](https://github.com/botpress/botpress-nlu/blob/master/src/index.js#L40-L43)
+
+| Key | Environment Variable | Required |
+| ------------- | -------- | ----- |
+| recastToken | `NLU_RECAST_TOKEN` | Yes |
+| recastUserSlug | `NLU_RECAST_USER_SLUG` | Yes |
+| recastBotSlug | `NLU_RECAST_BOT_SLUG` | Yes |
 
 # Contributing
 
