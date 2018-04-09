@@ -361,6 +361,7 @@ export default class LuisProvider extends Provider {
 
     const intentName = _.get(res, 'data.topScoringIntent.intent') || 'None'
     const confidence = _.get(res, 'data.topScoringIntent.score') || 0
+    const intents = _.get(res, 'data.intents') || []
     const entities = _.get(res, 'data.entities') || []
 
     return {
@@ -369,6 +370,11 @@ export default class LuisProvider extends Provider {
         confidence: parseFloat(confidence),
         provider: 'luis'
       },
+      intents: intents.map(intent => ({
+        name: intent.intent,
+        confidence: parseFloat(intent.score),
+        provider: 'luis'
+      })),
       entities: entities.map(entity => ({
         name: null,
         type: entity.type,

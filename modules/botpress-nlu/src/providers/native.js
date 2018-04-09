@@ -127,6 +127,11 @@ export default class NativeProvider extends Provider {
         confidence: parseFloat(confidence),
         provider: 'native'
       },
+      intents: intents.map(intent => ({
+        name: intent.intent,
+        confidence: parseFloat(intent.score),
+        provider: 'native'
+      })),
       entities: [] // Unsupported for now
     }
   }
