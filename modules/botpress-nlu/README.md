@@ -12,7 +12,7 @@ Botpress NLU is a Botpress module that adds NLU capatibilities to your bot by co
 | [LUIS](https://www.luis.ai) | ✅ |
 | [Dialogflow](https://dialogflow.com/) | Help needed |
 | [RASA](https://github.com/RasaHQ/rasa_nlu) | ✅ |
-| [Recast](https://recast.ai) | Help needed |
+| [Recast](https://recast.ai) | ✅ |
 
 We believe NLP/NLU is a commodity, so this package abstracts the provider by providing a standard, clean interface that allows you (and the non-technicals) to easily edit the NLU data within Botpress.
 
@@ -75,7 +75,7 @@ Botpress NLU also provides two convenient methods to the NLU Object : `nlu.inten
 | Dialogflow | ❌ | ✅ | ✅ | ❌ |
 | LUIS | ✅ | ✅ | ✅ | ❌ |
 | RASA | ✅ | ✅ | ✅ | ❌ |
-| Recast | ❌ | ✅ | ✅ | ❌ |
+| Recast | ✅ | ✅ | ✅ | ❌ |
 | Native | ✅ | ✅ | ❌ | ❌ |
 
 ## DIALOGFLOW

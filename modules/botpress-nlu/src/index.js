@@ -77,7 +77,7 @@ module.exports = {
     }
 
     async function incomingMiddleware(event, next) {
-      if (event.type === 'bp_dialog_timeout') return next()
+      if (['session_reset', 'bp_dialog_timeout'].includes(event.type)) return next()
 
       try {
         const metadata = await retry(() => provider.extract(event), retryPolicy)
