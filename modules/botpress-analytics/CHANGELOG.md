@@ -9,11 +9,4 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-**Note:** Version bump only for package @botpress/channel-messenger
-
-## [Unreleased]
-
-## [1.0.17] - 2017-01-26
-### Added
-- Added support for action creators (`create____`)
-- Introducing this CHANGELOG.md file \o/
+**Note:** Version bump only for package @botpress/analytics
