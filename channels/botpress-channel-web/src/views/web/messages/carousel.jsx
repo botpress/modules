@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 
-import Slider  from 'react-slick'
+import Slider from 'react-slick'
 
 import style from './style.scss'
 
-require("slick-carousel/slick/slick.css")
-require("slick-carousel/slick/slick-theme.css")
+require('slick-carousel/slick/slick.css')
+require('slick-carousel/slick/slick-theme.css')
 
 export default class CarouselMessage extends Component {
   constructor(props) {
@@ -14,28 +14,37 @@ export default class CarouselMessage extends Component {
   }
 
   render() {
-
-
     const CarouselElement = el => {
-
-      return <div className={style['carousel-item']}>
-        {el.picture && <div className={style.picture} style={{ backgroundImage: `url("${el.picture}")`}}></div>}
-        <div className={style.more}>
-          <div className={style.info}>
-            <div className={style.title}>{el.title}</div>
-            { el.subtitle && <div className={style.subtitle}>{el.subtitle}</div> }
-          </div>
-          <div className={style.buttons}>
-            { el.buttons.map(btn => {
-              if (btn.url) {
-                return <a href={btn.url} target="_blank" className={style.action}>{btn.title}</a>
-              } else {
-                return <a href="#" className={style.action}>{'[TODO] ' + btn.title || btn}</a>
-              }
-            }) }
+      return (
+        <div className={style['carousel-item']}>
+          {el.picture && <div className={style.picture} style={{ backgroundImage: `url("${el.picture}")` }} />}
+          <div className={style.more}>
+            <div className={style.info}>
+              <div className={style.title}>{el.title}</div>
+              {el.subtitle && <div className={style.subtitle}>{el.subtitle}</div>}
+            </div>
+            <div className={style.buttons}>
+              {el.buttons.map(btn => {
+                if (btn.url) {
+                  return (
+                    <a href={btn.url} target="_blank" className={style.action}>
+                      <i className={style.external} />
+                      {btn.title || btn}
+                    </a>
+                  )
+                } else {
+                  return (
+                    <a href="#" target="_blank" className={style.action}>
+                      <i className={style.external} />
+                      [NO LINK] {btn.title || btn}
+                    </a>
+                  )
+                }
+              })}
+            </div>
           </div>
         </div>
-      </div>
+      )
     }
 
     const elements = this.props.carousel.elements || []
@@ -57,8 +66,6 @@ export default class CarouselMessage extends Component {
 
     const settings = Object.assign({}, defaultSettings, this.props.carousel.settings)
 
-    return <Slider {...settings}>
-      {elements.map(el => CarouselElement(el))}
-    </Slider>
+    return <Slider {...settings}>{elements.map(el => CarouselElement(el))}</Slider>
   }
 }
