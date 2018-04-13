@@ -8,31 +8,18 @@ This repo contains all the official Botpress modules.
 
 ---
 
-Starting from Botpress X, modules are published on npm under the `@botpress/` organization.
+Starting from Botpress X, modules are published on npm under the `@botpress` organization.
 
-## Status
+## Contributing
 
-| Module                      | Status    | Installation                                        |
-| --------------------------- | --------- | --------------------------------------------------- |
-| @botpress/nlu               | Ready     | npm install --save @botpress/nlu                    |
-| @botpress/analytics         | Ready     | npm install --save @botpress/analytics@beta         |
-| @botpress/broadcast         | Ready     | npm install --save @botpress/broadcast@beta         |
-| @botpress/channel-messenger | NOT READY | npm install --save @botpress/channel-messenger@beta |
-| @botpress/channel-microsoft | Ready     | npm install --save @botpress/channel-microsoft      |
-| @botpress/channel-slack     | NOT READY | npm install --save @botpress/channel-slack          |
-| @botpress/channel-telegram  | NOT READY | npm install --save @botpress/channel-slack          |
-| @botpress/channel-twilio    | Ready     | npm install --save @botpress/channel-twilio@beta    |
-| @botpress/channel-web       | Ready     | npm install --save @botpress/channel-web@beta       |
-| @botpress/channel-hitl      | NOT READY | npm install --save @botpress/channel-web@beta       |
-| @botpress/channel-scheduler | Ready     | npm install --save @botpress/channel-ready@beta     |
-| @botpress/skill-choice      | Ready     | npm install --save @botpress/channel-ready@beta     |
-| @botpress/terminal          | Ready     | npm install --save @botpress/channel-terminal@beta  |
+Please follow the [Conventional Commits](https://conventionalcommits.org/) specs when doing commits. **PRs not respecting this commit style will be rejected.**
 
 ## Development steps
 
-If you are willing to test package before publishing it you can do it in a following way (this is a workaround that could be fixed in the future within `yarn` itself):
+To modify, test or create modules, please install [lerna](https://github.com/lerna/lerna).
 
-1.  Clone `botpress` package navigate to it and run `yarn link` within that folder
-2.  Navigate to appropriate directory like `packages` and run `yarn`
-3.  Run `yarn link botpress` to make your development instance of `botpress` available within packages
-4.  You can now link packages to the bot by running `yarn link` within package directory and then `yarn link <package-name>` within your bot directory
+Then run `lerna bootstrap`. This will initialize all modules and link them (using `yarn link`). Then in your bot, use `yarn link @botpress/module-name` to use the local version of that module.
+
+## Publishing changes (botpress team only)
+
+Run `./push-changes.sh`
