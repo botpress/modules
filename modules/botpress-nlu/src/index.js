@@ -70,6 +70,8 @@ module.exports = {
     }
 
     async function incomingMiddleware(event, next) {
+      if (event.type === 'bp_dialog_timeout') return next()
+
       try {
         const metadata = await retry(() => provider.extract(event), retryPolicy)
         if (metadata) {
@@ -84,6 +86,10 @@ module.exports = {
           intent: {
             is: intentName =>
               (_.get(event, 'nlu.intent.name') || '').toLowerCase() === (intentName && intentName.toLowerCase())
+          },
+          intents: {
+            has: intentName =>
+              !!(_.get(event, 'nlu.intents') || []).find(i => i.name === intentName)
           }
         }
       })

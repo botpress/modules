@@ -45,7 +45,8 @@ var webConfig = {
     'react': 'React',
     'react-dom': 'ReactDOM',
     'react-bootstrap': 'ReactBootstrap',
-    'prop-types': 'PropTypes'
+    'prop-types': 'PropTypes',
+    'botpress/content-picker': 'BotpressContentPicker',
   },
   resolve: {
     extensions: ['.js', '.jsx']

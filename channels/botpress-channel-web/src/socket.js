@@ -34,7 +34,8 @@ module.exports = async (bp, config) => {
     }
 
 
-    let user = await getOrCreateUser(event.user.id)
+    const userId = (event.user && event.user.id) || event.raw.to
+    let user = await getOrCreateUser(userId)
 
     const typing = parseTyping(event)
 

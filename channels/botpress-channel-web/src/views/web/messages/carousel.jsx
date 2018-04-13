@@ -39,12 +39,10 @@ export default class CarouselMessage extends Component {
     }
 
     const elements = this.props.carousel.elements || []
-
-    const settings = {
+    const defaultSettings = {
       dots: false,
       infinite: false,
-      // slidesToShow: 3,
-      responsible: [
+      responsive: [
         { breakpoint: 550, settings: { slidesToShow: 1 } },
         { breakpoint: 1024, settings: { slidesToShow: 2 } },
         { breakpoint: 1548, settings: { slidesToShow: 3 } },
@@ -56,6 +54,8 @@ export default class CarouselMessage extends Component {
       centerMode: false,
       arrows: elements.length > 1
     }
+
+    const settings = Object.assign({}, defaultSettings, this.props.carousel.settings)
 
     return <Slider {...settings}>
       {elements.map(el => CarouselElement(el))}
