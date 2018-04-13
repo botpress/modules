@@ -1,3 +1,4 @@
+node_modules/
 channels/node_modules/
 channels/yarn.lock
 packages/node_modules/
