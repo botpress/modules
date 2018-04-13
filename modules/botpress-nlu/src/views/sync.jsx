@@ -23,7 +23,7 @@ export default class SyncConfirmModal extends React.Component {
   }
 
   sync = () => {
-    this.setState({ isSyncing: true })
+    this.setState({ isSyncing: true, syncFailedError: null })
 
     return this.props.axios.get('/api/botpress-nlu/sync').then(res => {
       this.setState({ isSyncing: false })
