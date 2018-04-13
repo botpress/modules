@@ -13,10 +13,10 @@
     "menuIcon": "timeline",
     "webBundle": "bin/web.bundle.js"
   },
-  "keywords": [
-    "analytics",
-    "botpress"
-  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": ["analytics", "botpress"],
   "version-manager": {
     "warn": "",
     "botpress-check": ">= 0.1",

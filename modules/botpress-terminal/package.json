@@ -18,6 +18,9 @@
     "watch": "node webpack.js --watch",
     "compile": "node webpack.js --compile"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "Botpress Team",
   "license": "AGPL-3.0",
   "peerDependencies": {

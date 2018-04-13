@@ -9,10 +9,10 @@
     "menuIcon": "settings_input_antenna",
     "webBundle": "bin/web.bundle.js"
   },
-  "keywords": [
-    "botpress",
-    "broadcast"
-  ],
+  "keywords": ["botpress", "broadcast"],
+  "publishConfig": {
+    "access": "public"
+  },
   "version-manager": {
     "warn": "",
     "botpress-check": ">= 0.1",

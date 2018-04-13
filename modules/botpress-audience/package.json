@@ -9,12 +9,10 @@
     "menuIcon": "people",
     "webBundle": "bin/web.bundle.js"
   },
-  "keywords": [
-    "audience",
-    "visualiaze",
-    "botpress",
-    "botpress-viewer"
-  ],
+  "keywords": ["audience", "visualiaze", "botpress", "botpress-viewer"],
+  "publishConfig": {
+    "access": "public"
+  },
   "version-manager": {
     "date": "06/15/2017",
     "warn": "Botpress 1.0.10 is now available.",

@@ -8,15 +8,15 @@
     "menuIcon": "alarm_on",
     "webBundle": "bin/web.bundle.js"
   },
-  "keywords": [
-    "messenger",
-    "scheduler"
-  ],
+  "keywords": ["messenger", "scheduler"],
   "version-manager": {
     "warn": "",
     "botpress-check": ">= 0.1",
     "botpress-update": "^1.x",
     "module-downgrade": "~1.0.x"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "test": "mocha --compilers js:babel-core/register",
@@ -24,13 +24,8 @@
     "compile": "node webpack.js --compile"
   },
   "babel": {
-    "presets": [
-      "latest",
-      "stage-0"
-    ],
-    "plugins": [
-      "transform-object-rest-spread"
-    ]
+    "presets": ["latest", "stage-0"],
+    "plugins": ["transform-object-rest-spread"]
   },
   "repository": {
     "type": "git",
