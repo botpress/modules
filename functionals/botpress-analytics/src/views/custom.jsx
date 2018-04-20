@@ -135,10 +135,6 @@ export default class CustomMetrics extends React.Component {
       metrics: [],
       range: 'thisweek'
     }
-
-    this.render_count = this.render_count.bind(this)
-    this.render_percent = this.render_percent.bind(this)
-    this.render_piechart = this.render_piechart.bind(this)
   }
 
   componentDidMount() {
@@ -188,7 +184,7 @@ export default class CustomMetrics extends React.Component {
     return _.sortBy(data, ['name'])
   }
 
-  render_count(metric) {
+  render_count = (metric) => {
     const data = this.mergeDataWithDates(
       metric.results.map(row => {
         return { name: row.date, value: row.count }
@@ -209,7 +205,7 @@ export default class CustomMetrics extends React.Component {
     return (
       <div>
         <div className={style.customCount} style={{ height: '50px' }}>
-          {sum}
+          {metric.countUniq || sum}
         </div>
         <div className={style.customCountSmall} style={{ height: '25px' }}>
           Avg {avgPerDay} ({absAvg})
@@ -223,7 +219,9 @@ export default class CustomMetrics extends React.Component {
     )
   }
 
-  render_percent(metric) {
+  render_countUniq = (metric) => this.render_count(metric)
+
+  render_percent = (metric) => {
     const data = this.mergeDataWithDates(
       metric.results.map(row => {
         return { name: row.date, value: row.percent }
@@ -258,7 +256,7 @@ export default class CustomMetrics extends React.Component {
     )
   }
 
-  render_piechart(metric) {
+  render_piechart = (metric) => {
     const data = metric.results.map(row => {
       return { name: row.name, value: row.count }
     })
