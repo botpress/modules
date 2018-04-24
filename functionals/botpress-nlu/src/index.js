@@ -43,7 +43,7 @@ module.exports = {
     recastBotSlug: { type: 'string', required: false, default: '', env: 'NLU_RECAST_BOT_SLUG' },
 
     // Debug mode will print NLU information to the console for debugging purposes
-    debugModeEnabled: { type: 'boolean', required: true, default: false, env: 'NLU_DEBUG_ENABLED' }
+    debugModeEnabled: { type: 'bool', required: true, default: false, env: 'NLU_DEBUG_ENABLED' }
   },
 
   init: async function(bp, configurator) {
@@ -84,7 +84,7 @@ module.exports = {
 
       try {
         if (config.debugModeEnabled) {
-          bp.logger.info('[NLU Extraction] ' + event.text, event)
+          bp.logger.info('[NLU Extraction] ' + event.text, event.raw)
         }
 
         const metadata = await retry(() => provider.extract(event), retryPolicy)
