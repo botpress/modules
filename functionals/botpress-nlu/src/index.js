@@ -40,7 +40,10 @@ module.exports = {
     // RECAST-specific config
     recastToken: { type: 'string', required: false, default: '', env: 'NLU_RECAST_TOKEN' },
     recastUserSlug: { type: 'string', required: false, default: '', env: 'NLU_RECAST_USER_SLUG' },
-    recastBotSlug: { type: 'string', required: false, default: '', env: 'NLU_RECAST_BOT_SLUG' }
+    recastBotSlug: { type: 'string', required: false, default: '', env: 'NLU_RECAST_BOT_SLUG' },
+
+    // Debug mode will print NLU information to the console for debugging purposes
+    debugModeEnabled: { type: 'boolean', required: true, default: false, env: 'NLU_DEBUG_ENABLED' }
   },
 
   init: async function(bp, configurator) {
@@ -80,6 +83,10 @@ module.exports = {
       if (['session_reset', 'bp_dialog_timeout'].includes(event.type)) return next()
 
       try {
+        if (config.debugModeEnabled) {
+          bp.logger.info('[NLU Extraction] ' + event.text, event)
+        }
+
         const metadata = await retry(() => provider.extract(event), retryPolicy)
         if (metadata) {
           Object.assign(event, { nlu: metadata })
@@ -95,8 +102,7 @@ module.exports = {
               (_.get(event, 'nlu.intent.name') || '').toLowerCase() === (intentName && intentName.toLowerCase())
           },
           intents: {
-            has: intentName =>
-              !!(_.get(event, 'nlu.intents') || []).find(i => i.name === intentName)
+            has: intentName => !!(_.get(event, 'nlu.intents') || []).find(i => i.name === intentName)
           }
         }
       })
