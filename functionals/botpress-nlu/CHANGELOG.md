@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="10.2.3"></a>
+## [10.2.3](https://github.com/botpress/modules/compare/v10.2.1...v10.2.3) (2018-04-24)
+
+
+### Bug Fixes
+
+* **nlu:** debugMode ([541909c](https://github.com/botpress/modules/commit/541909c))
+
+
+
+
 <a name="10.2.1"></a>
 ## [10.2.1](https://github.com/botpress/modules/compare/v10.2.0...v10.2.1) (2018-04-19)
 
