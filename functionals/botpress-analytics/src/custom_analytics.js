@@ -60,7 +60,7 @@ module.exports = ({ bp }) => {
 
   //{ name, type, description, variables }
   function addGraph(graph) {
-    if (!_.includes(['count', 'percent', 'piechart'], graph.type)) {
+    if (!_.includes(['count', 'countUniq', 'percent', 'piechart'], graph.type)) {
       throw new Error('Unknown graph of type ' + graph.type)
     }
 
@@ -86,6 +86,25 @@ module.exports = ({ bp }) => {
         })
 
       return Object.assign({}, graph, { results: rows })
+    },
+
+    async countUniq(graph, from, to) {
+      const knex = await bp.db.get()
+      const variable = _.first(graph.variables)
+
+      const uniqRecordsQuery = function() {
+        this
+          .select(knex.raw('distinct name'))
+          .from('analytics_custom')
+          .where('date', '>=', from)
+          .andWhere('date', '<=', to)
+          .andWhere('name', 'LIKE', variable + '~%')
+          .as('t1')
+      }
+
+      const { count: countUniq } = await knex.count('*').from(uniqRecordsQuery).first()
+      const results = await this.count(graph, from, to)
+      return { ...graph, ...results, countUniq }
     },
 
     percent: async function(graph, from, to) {
