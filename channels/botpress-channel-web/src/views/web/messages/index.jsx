@@ -4,6 +4,7 @@ import classnames from 'classnames'
 import format from 'date-fns/format'
 import differenceInMinutes from 'date-fns/difference_in_minutes'
 import Linkify from 'react-linkify'
+import snarkdown from 'snarkdown'
 
 import BotAvatar from '../bot_avatar'
 import QuickReplies from './quick_replies'
@@ -208,12 +209,23 @@ class Message extends Component {
     return this.props.data.message_raw && this.props.data.message_raw['web-style']
   }
 
+  getMarkdownElement() {
+    let html = snarkdown(this.props.data.message_text)
+    html = html.replace(/<a href/gi, `<a target="_blank" href`)
+
+    return <div dangerouslySetInnerHTML={{ __html: html }} />
+  }
+
   render_text() {
+    const element =
+      this.props.data.message_raw && this.props.data.message_raw.markdown ? (
+        this.getMarkdownElement()
+      ) : (
+        <p style={this.getAddStyle()}>{this.props.data.message_text}</p>
+      )
     return (
       <Linkify properties={{ target: '_blank' }}>
-        <div>
-          <p style={this.getAddStyle()}>{this.props.data.message_text}</p>
-        </div>
+        <div>{element}</div>
       </Linkify>
     )
   }

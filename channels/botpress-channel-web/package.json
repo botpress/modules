@@ -60,6 +60,7 @@
     "react-spinkit": "^3.0.0",
     "sass-loader": "^6.0.6",
     "slick-carousel": "^1.8.1",
+    "snarkdown": "^1.2.2",
     "style-loader": "^0.19.1",
     "webpack": "^3.10.0",
     "webpack-node-externals": "^1.6.0"

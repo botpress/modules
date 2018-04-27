@@ -1,8 +1,9 @@
 # Botpress Webchat
 
 This channel is a customizable web chat that can be:
-- **Embedded** on any website
-- Used as a **Standalone** full-screen chat
+
+* **Embedded** on any website
+* Used as a **Standalone** full-screen chat
 
 ## Installation
 
@@ -24,13 +25,19 @@ yarn add @botpress/channel-web
     {
       on: 'webchat',
       typing: true,
-      text: data.text
+      text: data.text,
+      markdown: true
     }
 ]
 ```
+
 #### `typing` (optional)
 
 Can be `true` to use natural typing speed (based on characters length) or can also be a natural time string (parsed by [`ms module`](https://www.npmjs.com/package/ms)).
+
+#### `markdown` (optional)
+
+Can be `true` to render the text as markdown format. This allows you to include links, bold and italic text.
 
 #### `web-style` (optional)
 
@@ -53,8 +60,8 @@ Array of string, with the `<PAYLOAD> Text` format.
 ```js
 quick_replies: data.choices.map(choice => `<${choice.payload}> ${choice.text}`)
 ```
-</details>
 
+</details>
 
 <details>
     <summary><b>Form</b> (documentation for Botpress X coming soon)</summary>
@@ -84,16 +91,17 @@ welcome:
 ```
 
 It's look's like a usually web form. After submitted, you can handle this event with botpress.hear method. For example:
+
 ```js
-bp.hear({ type: 'form', formId: "survey" }, (event, next) => {
-    // Your code
-});
+bp.hear({ type: 'form', formId: 'survey' }, (event, next) => {
+  // Your code
+})
 ```
 
-You can always catch formId in the hear function, because Id is not an option in the form element. You  choose a value to go with your id keys.
+You can always catch formId in the hear function, because Id is not an option in the form element. You choose a value to go with your id keys.
 
 ```yaml
-welcome: 
+welcome:
   - text: "Welcome"
     typing: 250ms
     form:
@@ -104,7 +112,7 @@ welcome:
 
 
 form-email:
-  - text: Provide me your email 
+  - text: Provide me your email
     form:
       title: Email
       id: email
@@ -112,7 +120,6 @@ form-email:
       ...
 #
 ```
-
 
 in your `bp.hear` function
 
@@ -136,6 +143,7 @@ Has a same attributes like `input`, but has no `subtype` attribute
 Has a same attributes like `textarea`, but has no `maxlength` and `minlength` attributes, and has `options` attribute, which contain an option elements.
 
 Example:
+
 ```yaml
 - select:
     label: Select one item
@@ -158,10 +166,8 @@ Example:
 
 </details>
 
-
 <details>
     <summary><b>Carousel</b></summary>
-    
 
 #### `elements` (required)
 
@@ -196,22 +202,22 @@ Settings to pass the [`react-slick`](https://github.com/akiran/react-slick) comp
 In your `index.js` file, add this:
 
 ```js
-  const config = {
-    botName: '<<REPLACE>>',
-    botAvatarUrl: '<<REPLACE BY URL>>',
-    botConvoTitle: '<<REPLACE>>',
-    botConvoDescription: "<<REPLACE>>",
-    backgroundColor: '#ffffff',
-    textColorOnBackground: '#666666',
-    foregroundColor: '#000000',
-    textColorOnForeground: '#ffffff'
-  }
+const config = {
+  botName: '<<REPLACE>>',
+  botAvatarUrl: '<<REPLACE BY URL>>',
+  botConvoTitle: '<<REPLACE>>',
+  botConvoDescription: '<<REPLACE>>',
+  backgroundColor: '#ffffff',
+  textColorOnBackground: '#666666',
+  foregroundColor: '#000000',
+  textColorOnForeground: '#ffffff'
+}
 
-  bp.createShortlink('chat', '/lite', {
-    m: 'channel-web',
-    v: 'fullscreen',
-    options: JSON.stringify({ config: config })
-  })
+bp.createShortlink('chat', '/lite', {
+  m: 'channel-web',
+  v: 'fullscreen',
+  options: JSON.stringify({ config: config })
+})
 ```
 
 **Now your bot is available at the following url: `<BOT_URL>/s/chat`, e.g. `http://localhost:3000/s/chat`.**
@@ -228,19 +234,20 @@ To embedded the web interface to a website, you simply need to add this script a
 ```
 
 ## Customize the look and feel
+
 You can customize look and feel of the web chat by passing additional keys to `init` method like this:
 
 ```javascript
 window.botpressWebChat.init({
   host: '<host>',
-  botName: 'Bot',                     // Name of your bot
-  botAvatarUrl: null,                 // Default avatar url of the image (e.g. 'https://avatars3.githubusercontent.com/u/1315508?v=4&s=400' )
+  botName: 'Bot', // Name of your bot
+  botAvatarUrl: null, // Default avatar url of the image (e.g. 'https://avatars3.githubusercontent.com/u/1315508?v=4&s=400' )
   botConvoTitle: 'Technical Support', // Title of the first conversation with the bot
   botConvoDescription: '',
-  backgroundColor: '#ffffff',         // Color of the background 
-  textColorOnBackground: '#666666',   // Color of the text on the background
-  foregroundColor: '#0176ff',         // Element background color (header, composer, button..)
-  textColorOnForeground: '#ffffff'    // Element text color (header, composer, button..)
+  backgroundColor: '#ffffff', // Color of the background
+  textColorOnBackground: '#666666', // Color of the text on the background
+  foregroundColor: '#0176ff', // Element background color (header, composer, button..)
+  textColorOnForeground: '#ffffff' // Element text color (header, composer, button..)
 })
 ```
 
