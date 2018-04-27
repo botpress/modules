@@ -6,6 +6,6 @@
     "skills/*",
     "utils/*"
   ],
-  "version": "10.2.3",
+  "version": "10.3.0",
   "npmClient": "yarn"
 }
