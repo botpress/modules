@@ -89,6 +89,13 @@ class Telegram {
     });
   }
 
+  async sendAttachment(chatId, url,options) {
+    return Promise.fromCallback(() => {
+      this.bot.sendPhoto(chatId, url,options);
+    });
+
+  }
+
   startPolling(bp) {
     incoming(bp, this);
     bp.logger.info('Telegram loaded handler');

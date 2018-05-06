@@ -61,6 +61,10 @@ module.exports = (bp, telegram) => {
   const _handleEvent = (event, eventType) => {
     event = {
       type: eventType,
+      chat: event.message.chat,
+      user: event.from,
+      text: event.data,
+      message_id: event.message.message_id,
       ...extractBasics(preprocessEvent(event))
     };
     bp.middlewares.sendIncoming(event);
@@ -72,6 +76,7 @@ module.exports = (bp, telegram) => {
       chat: event.chat,
       user: event.from,
       text: event.text,
+      message_id: event.message_id,
       ...extractBasics(event)
     });
   })
@@ -83,8 +88,10 @@ module.exports = (bp, telegram) => {
       query_id: event.id,
       chat_id: event.message.chat.id,
       user_id: event.message.from.id,
+      chat: event.message.chat,
+      user: event.from,
+      text: event.data,
       message_id: event.message.message_id,
-      text: 'null',
       ...extractBasics(event)
     });
   });
