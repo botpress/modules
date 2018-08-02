@@ -120,7 +120,7 @@ welcome:
 Installing modules on Botpress is simple. By using the CLI, you only need to type this command in your terminal to add the messenger module to your bot.
 
 ```
-botpress install messenger
+npm install --save @botpress/channel-messenger
 ```
 
 It's also possible to install it through the Botpress UI in the modules section.
