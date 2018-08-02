@@ -34,8 +34,20 @@ const handleEditMessageText = (event, next, telegram) => {
   return handlePromise(next, telegram.sendEditMessage(event.text, options));
 };
 
+
+const handleAttachment = (event, next, telegram) => {
+  if (event.platform !== 'telegram' || event.type !== 'photo') {
+    return next();
+  }
+  const chatId = event.raw.chatId;
+  const url = event.raw.url;
+  const options = event.raw.options;
+  return handlePromise(next, telegram.sendAttachment(chatId,url,options));
+}
+
 module.exports = {
   'text': handleText,
   'edited_message_text': handleEditMessageText,
+  'photo': handleAttachment,
   pending: {},
 };
